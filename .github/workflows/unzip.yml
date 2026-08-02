@@ -1,0 +1,23 @@
+name: Unzip Folder
+on:
+  workflow_dispatch:
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip archive
+        run: |
+          unzip *.zip
+          rm *.zip
+
+      - name: Commit extracted files
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add .
+          git commit -m "Extract zip folder content"
+          git push
