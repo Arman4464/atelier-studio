@@ -1,294 +1,346 @@
-import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { motion } from "motion/react";
-import { Heart, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
-import { useProductsStore } from "../store/productsStore";
-import { useCartStore } from "../store/cartStore";
-import { useSettingsStore } from "../store/settingsStore";
-import { useUIStore } from "../store/uiStore";
-import { formatPrice } from "../lib/format";
-import Rating from "../components/Rating";
+import React, { useState, useMemo } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useProductsStore } from '../store/productsStore';
+import { useCartStore } from '../store/cartStore';
+import { useUIStore } from '../store/uiStore';
+import { ProductCard } from '../components/ProductCard';
 
-const PALETTE = [
-  { name: "Void Black", cls: "bg-onpaper" },
-  { name: "Stone Grey", cls: "bg-[#8A8A85]" },
-  { name: "Forest", cls: "bg-[#3F4B3C]" },
-];
+export const ProductDetail: React.FC = () => {
+  const { id, slug } = useParams<{ id?: string; slug?: string }>();
+  const navigate = useNavigate();
 
-export default function ProductDetail() {
-  const { id } = useParams();
-  const products = useProductsStore((s) => s.products);
-  const product = products.find((p) => p.id === Number(id));
+  const productsStore = useProductsStore() as any;
+  const cartStore = useCartStore() as any;
+  const uiStore = useUIStore() as any;
 
-  const currency = useCartStore((s) => s.currency);
-  const freeShippingThreshold = useSettingsStore((s) => s.freeShippingThreshold);
-  const addToCart = useCartStore((s) => s.addToCart);
-  const toggleWishlist = useCartStore((s) => s.toggleWishlist);
-  const isWishlisted = useCartStore((s) => s.isWishlisted(product?.id ?? -1));
-  const setSizeGuideOpen = useUIStore((s) => s.setSizeGuideOpen);
-  const showToast = useUIStore((s) => s.showToast);
+  const products: any[] = productsStore.products || [];
+  const targetKey = slug || id;
 
-  const [galleryIndex, setGalleryIndex] = useState(0);
-  const [size, setSize] = useState("S");
-  const [color, setColor] = useState(0);
-  const [qty, setQty] = useState(1);
-  const [accordion, setAccordion] = useState<number | null>(null);
+  const product = useMemo(() => {
+    return (
+      products.find(
+        (p) =>
+          String(p.slug) === String(targetKey) ||
+          String(p.id) === String(targetKey)
+      ) || products[0]
+    );
+  }, [products, targetKey]);
 
-  useEffect(() => {
-    setGalleryIndex(0);
-    setSize("S");
-    setColor(0);
-    setQty(1);
-    setAccordion(null);
-    window.scrollTo({ top: 0 });
-  }, [id]);
+  const images: string[] = useMemo(() => {
+    if (product?.images?.length) return product.images;
+    if (product?.image) return [product.image];
+    return [
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=85',
+    ];
+  }, [product]);
+
+  const sizes: string[] = product?.sizes || ['XS', 'S', 'M', 'L', 'XL'];
+  const colors: any[] = product?.colors || [{ name: 'Raw Carbon', hex: '#181715' }, { name: 'Unbleached Calico', hex: '#DDD6C7' }];
+
+  const [activeImage, setActiveImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<string>(sizes[2] || sizes[0] || 'M');
+  const [selectedColor, setSelectedColor] = useState<string>(
+    typeof colors[0] === 'string' ? colors[0] : colors[0]?.name || 'Raw Carbon'
+  );
+  const [quantity, setQuantity] = useState<number>(1);
+  const [openAccordion, setOpenAccordion] = useState<string>('CONSTRUCTION');
+  const [stamped, setStamped] = useState(false);
 
   if (!product) {
     return (
-      <div className="py-32 text-center">
-        <p className="mb-6 font-display text-3xl text-ink-dim">That piece isn't available.</p>
-        <Link to="/shop" className="text-xs uppercase tracking-widest text-indigo-glow hover:text-ink">Back to Catalog</Link>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-10 font-ledger text-xs">
+        <p className="mb-4">[ SPECIMEN NOT FOUND IN ARCHIVE ]</p>
+        <Link to="/shop" className="px-5 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)]">
+          RETURN TO CATALOG →
+        </Link>
       </div>
     );
   }
 
-  const related = products.filter((p) => p.id !== product.id).slice(0, 4);
+  const title = product.name || product.title || 'Archival Garment';
+  const priceNum =
+    typeof product.price === 'number'
+      ? product.price > 1000
+        ? Math.round(product.price * 0.0104)
+        : product.price
+      : Number(product.price) || 420;
+
+  const handleAddToBag = () => {
+    if (cartStore.addItem) {
+      cartStore.addItem({
+        ...product,
+        id: product.id,
+        selectedSize,
+        size: selectedSize,
+        selectedColor,
+        color: selectedColor,
+        quantity,
+      });
+    } else if (cartStore.addToCart) {
+      cartStore.addToCart(product, quantity, selectedSize, selectedColor);
+    }
+
+    setStamped(true);
+    setTimeout(() => setStamped(false), 1400);
+    if (uiStore.openCart) uiStore.openCart();
+    else if (uiStore.setCartOpen) uiStore.setCartOpen(true);
+  };
+
+  const openSizeGuide = () => {
+    if (uiStore.openSizeGuide) uiStore.openSizeGuide();
+    else if (uiStore.setSizeGuideOpen) uiStore.setSizeGuideOpen(true);
+  };
+
+  const relatedProducts = products
+    .filter((p) => p.id !== product.id)
+    .slice(0, 4);
+
+  const specs = [
+    {
+      id: 'CONSTRUCTION',
+      title: '01 // PATTERN & TEXTILE SPECIFICATION',
+      content:
+        product.description ||
+        'Cut from high-density loomstate textile with unlined interior French seams. Horn buttons are hand-shanked with waxed linen thread to prevent tension pull.',
+    },
+    {
+      id: 'MEASUREMENTS',
+      title: '02 // FLAT PATTERN TOLERANCES (CM)',
+      content:
+        'Relaxed architectural drape. Chest: 58cm (S) / 61cm (M) / 64cm (L). Center-back length: 76cm–112cm depending on silhouette index. Allow ±0.8cm variance due to cold-vat garment dyeing.',
+    },
+    {
+      id: 'PROVENANCE',
+      title: '03 // MILL ORIGIN & CARE DOCTRINE',
+      content:
+        'Woven in Biella, Italy & Okayama, Japan. Cold water immersion only; dry flat on unbleached cotton towel away from direct solar radiation.',
+    },
+  ];
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="pb-24 md:pb-0">
-      <nav aria-label="Breadcrumb" className="mx-auto flex max-w-[1800px] items-center gap-2 border-b border-line px-5 py-5 text-[11px] uppercase tracking-widest text-ink-dim md:px-10">
-        <Link to="/" className="hover:text-ink">Home</Link>
-        <span>/</span>
-        <Link to="/shop" className="hover:text-ink">Catalog</Link>
-        <span>/</span>
-        <span className="text-ink">{product.name}</span>
-      </nav>
+    <main className="min-h-screen bg-[var(--bg-canvas)]">
+      {/* Top Breadcrumb Specification Bar */}
+      <div className="px-6 sm:px-10 py-3 hairline-b flex flex-wrap items-center justify-between font-ledger text-[11px] uppercase text-[var(--ink-secondary)]">
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate(-1)} className="hover:text-[var(--ink-primary)]">
+            ← BACK
+          </button>
+          <span>/</span>
+          <Link to="/shop" className="hover:text-[var(--ink-primary)]">
+            ARCHIVE
+          </Link>
+          <span>/</span>
+          <span className="text-[var(--ink-primary)] font-medium">{title}</span>
+        </div>
+        <div>SPECIMEN REF: AS-{String(product.id || '019').toUpperCase()}</div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12">
-        <div className="border-line bg-void-2 lg:sticky lg:top-[110px] lg:col-span-7 lg:h-[calc(100vh-110px)] lg:self-start lg:border-r">
-          <div className="flex h-full flex-col">
-            <div className="relative min-h-[420px] flex-1 overflow-hidden">
-              <img src={product.images[galleryIndex]} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
-              <button
-                onClick={() => {
-                  toggleWishlist(product.id);
-                  showToast(isWishlisted ? "Removed from wishlist" : "Saved to wishlist");
-                }}
-                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-scrim/80 backdrop-blur-md hover:bg-scrim"
-              >
-                <Heart size={18} className={isWishlisted ? "fill-flame text-flame" : "text-on-scrim"} />
-              </button>
-              <button
-                onClick={() => setGalleryIndex((galleryIndex - 1 + product.images.length) % product.images.length)}
-                aria-label="Previous image"
-                className="absolute left-4 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-scrim/70 backdrop-blur-md hover:bg-scrim"
-              >
-                <ChevronLeft size={16} className="text-on-scrim" />
-              </button>
-              <button
-                onClick={() => setGalleryIndex((galleryIndex + 1) % product.images.length)}
-                aria-label="Next image"
-                className="absolute right-4 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-scrim/70 backdrop-blur-md hover:bg-scrim"
-              >
-                <ChevronRight size={16} className="text-on-scrim" />
-              </button>
+      {/* Main Garment Dissection Grid */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 hairline-b">
+        {/* Left 7 Columns: Contact Sheet & Specimen Plates */}
+        <div className="lg:col-span-7 hairline-r flex flex-col">
+          {/* Primary Plate Viewer */}
+          <div className="relative aspect-[4/5] bg-[var(--bg-sub)] overflow-hidden hairline-b">
+            <img
+              src={images[activeImage]}
+              alt={`${title} — Plate ${activeImage + 1}`}
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute top-4 left-4 bg-[var(--bg-canvas)]/90 backdrop-blur-sm px-3 py-1 hairline-box font-ledger text-[11px]">
+              PLATE 0{activeImage + 1} OF 0{images.length} // SCALE 1:1
             </div>
-            <div className="flex justify-center gap-2 p-4">
-              {product.images.map((img, i) => (
-                <button key={i} onClick={() => setGalleryIndex(i)} className={`h-20 w-16 overflow-hidden border-2 transition-colors ${galleryIndex === i ? "border-indigo-glow" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                  <img src={img} className="h-full w-full object-cover" alt={`View ${i + 1}`} />
-                </button>
-              ))}
-            </div>
+          </div>
+
+          {/* Contact Sheet Thumbnail Strip */}
+          <div className="grid grid-cols-4 sm:grid-cols-6 bg-[var(--bg-canvas)]">
+            {images.map((imgUrl, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveImage(idx)}
+                className={`relative aspect-[3/4] overflow-hidden hairline-r p-1.5 transition-all ${
+                  activeImage === idx
+                    ? 'bg-[var(--ink-primary)]'
+                    : 'opacity-65 hover:opacity-100'
+                }`}
+              >
+                <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                <span className="absolute bottom-2 left-2 px-1 bg-[var(--bg-canvas)] font-ledger text-[9px]">
+                  0{idx + 1}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="bg-void px-6 py-10 md:px-14 md:py-16 lg:col-span-5">
-          <div className="mb-6 flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">{product.category}</span>
-            <span className="font-mono text-xs text-ink-dim">SKU: ATL-2026-00{product.id}</span>
-          </div>
-
-          <h1 className="font-display text-4xl font-black uppercase leading-tight text-ink md:text-5xl">{product.name}</h1>
-
-          <div className="mt-3 flex items-center gap-3">
-            <Rating value={product.rating} />
-            <a href="#reviews" className="text-xs text-ink-dim hover:text-ink">{product.reviewCount} reviews</a>
-          </div>
-
-          <p className="mt-4 font-mono text-2xl font-light text-ink">{formatPrice(product.price, currency)}</p>
-
-          {product.stock <= 4 && (
-            <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-flame">Only {product.stock} left in this run</p>
-          )}
-
-          <div className="my-8 h-px w-full bg-line" />
-
-          <p className="text-sm leading-relaxed text-ink-dim">{product.description}</p>
-
-          <div className="mt-10">
-            <label className="mb-4 block text-[10px] font-semibold uppercase tracking-widest text-ink">Select Palette</label>
-            <div className="flex gap-4">
-              {PALETTE.map((c, i) => (
-                <button
-                  key={c.name}
-                  onClick={() => setColor(i)}
-                  aria-label={c.name}
-                  className={`h-7 w-7 rounded-full ${c.cls} ${color === i ? "ring-2 ring-indigo-glow ring-offset-2 ring-offset-void" : ""}`}
-                />
-              ))}
+        {/* Right 5 Columns: Sticky Woven Care Tag & Requisition Controls */}
+        <div className="lg:col-span-5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between lg:sticky lg:top-[68px] h-fit">
+          <div>
+            {/* Batch Stamp & Category */}
+            <div className="flex items-center justify-between font-ledger text-xs uppercase text-[var(--ink-muted)] pb-4 perforated-b">
+              <span>CATEGORY // {product.category || 'OUTERWEAR'}</span>
+              <span className="text-[var(--accent-stamp)] font-medium">
+                [ IN ARCHIVE STOCK ]
+              </span>
             </div>
-          </div>
 
-          <div className="mt-8">
-            <div className="mb-4 flex items-center justify-between">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-ink">Select Size</label>
-              <button onClick={() => setSizeGuideOpen(true)} className="text-xs text-ink-dim hover:text-ink">Sizing Chart</button>
+            {/* Garment Title & Valuation */}
+            <div className="mt-6 flex items-baseline justify-between gap-4">
+              <h1 className="font-grotesk font-extrabold text-3xl sm:text-4xl uppercase tracking-[-0.03em] leading-[0.98]">
+                {title}
+              </h1>
+              <span className="font-ledger text-2xl font-semibold shrink-0">
+                ${priceNum.toFixed(2)}
+              </span>
             </div>
-            <div className="grid grid-cols-4 gap-3">
-              {["XS", "S", "M", "L"].map((s) => (
+
+            <p className="mt-4 text-sm sm:text-base text-[var(--ink-secondary)] leading-relaxed">
+              {product.description ||
+                'Architectural silhouette engineered from heavy-gauge natural fibers. Raw selvedge seams and unbleached internal pocketing with numbered batch stamp.'}
+            </p>
+
+            {/* Dye Lot (Color) Selector */}
+            <div className="mt-8 pt-6 hairline-t">
+              <div className="flex items-center justify-between font-ledger text-xs uppercase mb-3">
+                <span className="text-[var(--ink-muted)]">DYE LOT SPECIFICATION:</span>
+                <span className="font-medium">{selectedColor}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((c, idx) => {
+                  const colorName = typeof c === 'string' ? c : c.name || `Lot 0${idx + 1}`;
+                  const colorHex = typeof c === 'object' && c.hex ? c.hex : '#1C1B1A';
+                  const active = selectedColor === colorName;
+                  return (
+                    <button
+                      key={colorName}
+                      onClick={() => setSelectedColor(colorName)}
+                      className={`px-3.5 py-2 hairline-box font-ledger text-xs uppercase flex items-center gap-2 transition-colors ${
+                        active
+                          ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
+                          : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-sub)]'
+                      }`}
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full border border-current"
+                        style={{ backgroundColor: colorHex }}
+                      />
+                      <span>{colorName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Woven Size Tag Matrix */}
+            <div className="mt-6 pt-6 hairline-t">
+              <div className="flex items-center justify-between font-ledger text-xs uppercase mb-3">
+                <span className="text-[var(--ink-muted)]">PATTERN PROPORTION (SIZE):</span>
                 <button
-                  key={s}
-                  onClick={() => setSize(s)}
-                  className={`border py-3 font-mono text-xs uppercase transition-colors ${size === s ? "border-indigo-glow bg-indigo-glow text-void" : "border-line text-ink hover:border-ink"}`}
+                  onClick={openSizeGuide}
+                  className="underline hover:text-[var(--accent-stamp)]"
                 >
-                  {s}
+                  [ VIEW PATTERN CHART ]
                 </button>
-              ))}
+              </div>
+              <div className="grid grid-cols-5 gap-2">
+                {sizes.map((sz) => {
+                  const active = selectedSize === sz;
+                  return (
+                    <button
+                      key={sz}
+                      onClick={() => setSelectedSize(sz)}
+                      className={`py-3 font-ledger text-xs uppercase hairline-box transition-colors ${
+                        active
+                          ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] font-bold'
+                          : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-sub)]'
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="mt-8">
-            <label className="mb-4 block text-[10px] font-semibold uppercase tracking-widest text-ink">Quantity</label>
-            <div className="flex w-fit items-center border border-line font-mono text-sm">
-              <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2.5 hover:bg-void-3" aria-label="Decrease quantity"><Minus size={13} /></button>
-              <span className="px-5">{qty}</span>
-              <button onClick={() => setQty(Math.min(product.stock, qty + 1))} className="px-4 py-2.5 hover:bg-void-3" aria-label="Increase quantity"><Plus size={13} /></button>
-            </div>
-          </div>
-
-          <div className="mt-10 grid grid-cols-3 gap-3 text-center">
-            <div className="border border-line p-3">
-              <span className="mb-1 block text-[9px] uppercase tracking-widest text-ink-dim">Material</span>
-              <span className="block text-xs font-medium text-ink">{product.origin.material}</span>
-            </div>
-            <div className="border border-line p-3">
-              <span className="mb-1 block text-[9px] uppercase tracking-widest text-ink-dim">Maker</span>
-              <span className="block text-xs font-medium text-ink">{product.origin.maker}</span>
-            </div>
-            <div className="border border-line p-3">
-              <span className="mb-1 block text-[9px] uppercase tracking-widest text-ink-dim">Arrives</span>
-              <span className="block text-xs font-medium text-ink">{product.origin.arrival}</span>
-            </div>
-          </div>
-
-          <div className="mt-4 border-t border-line">
-            {[
-              { title: "Material & Care", body: product.care },
-              { title: "Shipping & Returns", body: `Complimentary carbon-neutral express delivery on all orders over ${formatPrice(freeShippingThreshold, currency)}. Returns accepted within 14 days, unworn and with tags attached.` },
-              { title: "Sustainability", body: product.sustainability },
-            ].map((section, i) => (
-              <div key={section.title} className="border-b border-line">
-                <button onClick={() => setAccordion(accordion === i ? null : i)} className="flex w-full items-center justify-between py-5 text-xs font-semibold uppercase tracking-widest text-ink">
-                  <span>{section.title}</span>
-                  <span className="font-mono text-base text-indigo-glow">{accordion === i ? "\u2212" : "+"}</span>
+            {/* Quantity & Requisition Button */}
+            <div className="mt-8 grid grid-cols-12 gap-3">
+              <div className="col-span-4 flex items-center justify-between hairline-box bg-[var(--bg-elevated)] font-ledger text-xs">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="px-3.5 py-4 hover:bg-[var(--bg-sub)]"
+                >
+                  -
                 </button>
-                {accordion === i && <div className="pb-6 text-xs leading-relaxed text-ink-dim">{section.body}</div>}
+                <span>{String(quantity).padStart(2, '0')}</span>
+                <button
+                  onClick={() => setQuantity((q) => q + 1)}
+                  className="px-3.5 py-4 hover:bg-[var(--bg-sub)]"
+                >
+                  +
+                </button>
               </div>
-            ))}
-          </div>
 
-          <div className="mt-10 hidden pt-2 md:block">
-            <button
-              onClick={() => {
-                addToCart(product, qty);
-                useUIStore.getState().setCartOpen(true);
-                showToast(`${product.name} added to your bag`);
-              }}
-              className="w-full bg-ink py-5 text-xs font-semibold uppercase tracking-[0.2em] text-void transition-colors hover:bg-indigo-glow"
-            >
-              Add To Bag — {formatPrice(product.price * qty, currency)}
-            </button>
-            <p className="mt-4 text-center text-[11px] text-ink-dim">Free returns within 14 days · Secure checkout</p>
-          </div>
-        </div>
-      </div>
+              <button
+                onClick={handleAddToBag}
+                className="col-span-8 py-4 px-6 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] transition-colors font-ledger text-xs uppercase tracking-widest font-medium flex items-center justify-between"
+              >
+                <span>
+                  {stamped
+                    ? `STAMPED [${selectedSize}] TO REQUISITION`
+                    : 'STAMP TO REQUISITION BAG'}
+                </span>
+                <span>→</span>
+              </button>
+            </div>
 
-      <div id="reviews" className="border-t border-line bg-void-2 py-20">
-        <div className="mx-auto max-w-[1000px] px-6 md:px-10">
-          <div className="mb-12 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-            <h2 className="font-display text-3xl font-black uppercase text-ink md:text-5xl">Reviews</h2>
-            <div className="flex items-center gap-4">
-              <span className="font-display text-4xl font-black text-ink">{product.rating.toFixed(1)}</span>
-              <div>
-                <Rating value={product.rating} />
-                <span className="text-xs text-ink-dim">Based on {product.reviewCount} reviews</span>
-              </div>
+            {/* Technical Specification Accordions */}
+            <div className="mt-10 hairline-t">
+              {specs.map((spec) => {
+                const isOpen = openAccordion === spec.id;
+                return (
+                  <div key={spec.id} className="hairline-b">
+                    <button
+                      onClick={() => setOpenAccordion(isOpen ? '' : spec.id)}
+                      className="w-full py-4 flex items-center justify-between font-ledger text-xs uppercase text-left hover:text-[var(--accent-stamp)]"
+                    >
+                      <span>{spec.title}</span>
+                      <span>{isOpen ? '[ — ]' : '[ + ]'}</span>
+                    </button>
+                    {isOpen && (
+                      <div className="pb-5 text-sm text-[var(--ink-secondary)] leading-relaxed">
+                        {spec.content}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
-          <div className="space-y-8">
-            {product.reviews.map((review, i) => (
-              <div key={i} className="border-b border-line pb-8 last:border-0">
-                <div className="mb-2 flex items-center justify-between">
-                  <Rating value={review.rating} />
-                  <span className="text-[11px] text-ink-dim">{review.date}</span>
-                </div>
-                <p className="mb-3 text-sm leading-relaxed text-ink">{review.text}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-ink">{review.author}</span>
-                  {review.verified && (
-                    <span className="border border-indigo-glow/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-indigo-glow">
-                      Verified Buyer
-                    </span>
-                  )}
-                </div>
+        </div>
+      </section>
+
+      {/* Related Archive Specimens */}
+      {relatedProducts.length > 0 && (
+        <section className="hairline-b">
+          <div className="px-6 sm:px-10 py-6 hairline-b flex items-center justify-between">
+            <h2 className="font-grotesk font-extrabold text-xl uppercase tracking-tight">
+              Companion Archive Specimens
+            </h2>
+            <Link to="/shop" className="font-ledger text-xs uppercase underline">
+              VIEW ALL →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {relatedProducts.map((item, idx) => (
+              <div key={item.id || idx} className="hairline-r hairline-b">
+                <ProductCard product={item} index={idx} />
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div className="border-t border-line py-20">
-        <div className="mx-auto max-w-[1800px] px-6 md:px-10">
-          <h2 className="mb-12 font-display text-3xl font-black uppercase text-ink md:text-5xl">Complete The Look</h2>
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
-            {related.map((p) => (
-              <ProductLite key={p.id} id={p.id} name={p.name} image={p.images[0]} price={p.price} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-4 border-t border-line bg-void-2 p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] md:hidden">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-semibold text-ink">{product.name}</p>
-          <p className="font-mono text-sm text-ink">{formatPrice(product.price * qty, currency)}</p>
-        </div>
-        <button
-          onClick={() => {
-            addToCart(product, qty);
-            showToast(`${product.name} added to your bag`);
-          }}
-          className="flex-shrink-0 bg-indigo-glow px-6 py-3.5 text-[11px] font-semibold uppercase tracking-widest text-void"
-        >
-          Add to Bag
-        </button>
-      </div>
-    </motion.div>
+        </section>
+      )}
+    </main>
   );
-}
+};
 
-function ProductLite({ id, name, image, price }: { id: number; name: string; image: string; price: number }) {
-  const currency = useCartStore((s) => s.currency);
-  const navigate = useNavigate();
-  return (
-    <div className="group cursor-pointer" onClick={() => navigate(`/product/${id}`)}>
-      <div className="mb-4 aspect-[3/4] overflow-hidden border border-line bg-void-3">
-        <img src={image} alt={name} className="h-full w-full object-cover saturate-[0.85] transition-transform duration-700 ease-out group-hover:scale-105 group-hover:saturate-100" />
-      </div>
-      <h3 className="font-display text-lg text-ink transition-colors group-hover:text-indigo-glow">{name}</h3>
-      <span className="font-mono text-xs text-ink-dim">{formatPrice(price, currency)}</span>
-    </div>
-  );
-}
+export default ProductDetail;

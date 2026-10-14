@@ -1,48 +1,67 @@
-import { useState } from "react";
-import { useUIStore } from "../../store/uiStore";
+import React, { useState } from 'react';
 
-export default function Newsletter() {
-  const showToast = useUIStore((s) => s.showToast);
-  const [email, setEmail] = useState("");
+export const Newsletter: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [registered, setRegistered] = useState(false);
 
-  const subscribe = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.includes("@")) {
-      showToast("Enter a valid email to subscribe");
-      return;
-    }
-    showToast("Subscribed — check your inbox for 10% off");
-    setEmail("");
+    if (!email) return;
+    setRegistered(true);
+    setEmail('');
   };
 
   return (
-    <section className="mx-auto max-w-[1800px] px-1.5 pb-1.5">
-      <div className="relative overflow-hidden border border-line bg-indigo px-6 py-20 text-center md:py-28">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-indigo-glow/30 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-void/20 blur-3xl" />
-        <div className="relative mx-auto max-w-2xl">
-          <span className="mb-4 block text-[10px] font-semibold uppercase tracking-widest text-void/70">Journal Dispatch</span>
-          <h2 className="mb-4 font-display text-4xl font-black uppercase leading-none text-void md:text-6xl">
-            Get 10% off your first order
-          </h2>
-          <p className="mx-auto mb-10 max-w-md text-sm text-void/70">
-            One dispatch a month: new small-batch releases, workshop notes, and nothing else.
-          </p>
-          <form onSubmit={subscribe} className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@email.com"
-              className="flex-1 border border-void/30 bg-transparent px-5 py-4 text-sm text-void placeholder:text-void/50 focus:outline-none focus:border-void"
-            />
-            <button type="submit" className="bg-void px-7 py-4 text-xs font-semibold uppercase tracking-widest text-ink transition-colors hover:bg-onpaper">
-              Subscribe
-            </button>
+    <section className="hairline-b grid grid-cols-1 lg:grid-cols-12">
+      <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 hairline-r">
+        <span className="font-ledger text-xs uppercase tracking-widest text-[var(--ink-muted)]">
+          // PRIVATE CLIENTELE DISPATCH
+        </span>
+        <h2 className="font-grotesk font-extrabold text-3xl sm:text-5xl uppercase tracking-tight mt-2">
+          Receive Notice of <br />
+          <span className="font-editorial italic font-normal lowercase text-[var(--accent-stamp)]">
+            numbered dye lots.
+          </span>
+        </h2>
+        <p className="mt-4 text-sm sm:text-base text-[var(--ink-secondary)] max-w-xl">
+          We release small-batch garments without paid advertising. Register your dossier address for private archive access 24 hours before public indexing.
+        </p>
+      </div>
+
+      <div className="lg:col-span-5 p-8 sm:p-12 lg:p-16 bg-[var(--bg-sub)] flex flex-col justify-center">
+        {registered ? (
+          <div className="p-6 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs space-y-2">
+            <div className="text-[var(--accent-stamp)] font-bold">[ DOSSIER REGISTERED ]</div>
+            <p className="text-[var(--ink-secondary)]">
+              Your coordinates have been logged for the next edition release.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={onSubmit} className="space-y-3 font-ledger text-xs">
+            <label className="block uppercase text-[var(--ink-secondary)]">
+              ELECTRONIC DOSSIER ADDRESS:
+            </label>
+            <div className="flex items-stretch">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="NAME@ARCHIVEDOMAIN.COM"
+                className="w-full px-4 py-4 bg-[var(--bg-canvas)] hairline-box focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="px-6 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] transition-colors uppercase tracking-widest shrink-0 font-medium"
+              >
+                STAMP →
+              </button>
+            </div>
           </form>
-        </div>
+        )}
       </div>
     </section>
   );
-}
+};
+
+export default Newsletter;

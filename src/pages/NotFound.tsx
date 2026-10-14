@@ -1,28 +1,29 @@
-import { Link } from "react-router-dom";
-import { motion } from "motion/react";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function NotFound() {
+export const NotFound: React.FC = () => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-24 text-center"
-    >
-      <span className="mb-4 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">Error 404</span>
-      <h1 className="font-display text-[clamp(4rem,14vw,10rem)] font-black leading-none text-line">404</h1>
-      <p className="mt-4 max-w-sm font-display text-2xl font-light text-ink">This piece isn't in the catalog.</p>
-      <p className="mt-3 max-w-sm text-sm text-ink-dim">
-        The page you're looking for may have been moved, retired at the end of a run, or never existed.
-      </p>
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Link to="/" className="bg-ink px-7 py-4 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow">
-          Back to Home
-        </Link>
-        <Link to="/shop" className="border border-line px-7 py-4 text-xs font-semibold uppercase tracking-widest text-ink transition-colors hover:border-indigo-glow hover:text-indigo-glow">
-          Browse Catalog
+    <main className="min-h-[75vh] flex items-center justify-center p-6 bg-[var(--bg-canvas)]">
+      <div className="max-w-lg w-full hairline-box p-8 sm:p-12 bg-[var(--bg-elevated)] font-ledger text-xs space-y-6">
+        <div className="flex justify-between items-center pb-4 perforated-b">
+          <span className="text-[var(--accent-stamp)] font-bold">[ ERROR CODE // 404 ]</span>
+          <span>ARCHIVE LEDGER</span>
+        </div>
+        <h1 className="font-grotesk font-extrabold text-3xl sm:text-4xl uppercase">
+          Specimen Missing From Rack
+        </h1>
+        <p className="text-[var(--ink-secondary)] leading-relaxed">
+          The pattern plate or archive coordinate you requested has either been retired from production or moved to private vault storage.
+        </p>
+        <Link
+          to="/shop"
+          className="inline-block w-full text-center py-4 bg-[var(--ink-primary)] text-[var(--bg-canvas)] uppercase tracking-widest hover:bg-[var(--accent-stamp)] transition-colors font-medium"
+        >
+          RETURN TO COMPLETE CATALOG →
         </Link>
       </div>
-    </motion.div>
+    </main>
   );
-}
+};
+
+export default NotFound;

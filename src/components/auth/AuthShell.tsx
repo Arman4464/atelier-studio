@@ -1,45 +1,78 @@
-import { Link } from "react-router-dom";
-import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface AuthShellProps {
-  children: ReactNode;
-  eyebrow: string;
   title: string;
   subtitle?: string;
-  image?: string;
-  quote?: string;
+  eyebrow?: string;
+  children: React.ReactNode;
+  footerText?: string;
+  footerLinkText?: string;
+  footerLinkTo?: string;
 }
 
-export default function AuthShell({
-  children,
-  eyebrow,
+export const AuthShell: React.FC<AuthShellProps> = ({
   title,
   subtitle,
-  image = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1600&auto=format&fit=crop",
-  quote = "Six small runs a year. No seasons to chase, nothing made to be thrown away.",
-}: AuthShellProps) {
+  eyebrow,
+  children,
+  footerText,
+  footerLinkText,
+  footerLinkTo = '/login',
+}) => {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="grid min-h-[calc(100vh-92px)] grid-cols-1 md:min-h-[calc(100vh-100px)] lg:grid-cols-2">
-      <div className="relative hidden overflow-hidden border-r border-line lg:block">
-        <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover saturate-[0.8]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-scrim via-scrim/30 to-scrim/10" />
-        <div className="absolute inset-x-10 bottom-10 text-on-scrim">
-          <Link to="/" className="font-display text-2xl font-black uppercase tracking-tight">
-            Atelier<span className="text-indigo-glow">.</span>
-          </Link>
-          <p className="mt-6 max-w-sm font-display text-2xl font-light leading-snug">&ldquo;{quote}&rdquo;</p>
+    <main className="min-h-[82vh] grid grid-cols-1 lg:grid-cols-12 bg-[var(--bg-canvas)]">
+      {/* Left Specimen Plate */}
+      <div className="hidden lg:flex lg:col-span-6 bg-[var(--bg-sub)] hairline-r p-12 flex-col justify-between">
+        <div className="font-ledger text-xs uppercase text-[var(--ink-muted)]">
+          ATELIER STUDIO // PRIVATE CLIENTELE REGISTRY
+        </div>
+        <div className="my-auto max-w-md space-y-4">
+          <h2 className="font-editorial italic text-5xl leading-none">
+            Personal garment provenance & archive history.
+          </h2>
+          <p className="font-ledger text-xs text-[var(--ink-secondary)] leading-relaxed">
+            Access your past waybills, saved pattern proportions, and private batch reservations.
+          </p>
+        </div>
+        <div className="font-ledger text-[11px] text-[var(--ink-muted)]">
+          SECURITY PROTOCOL // TLS ENCRYPTED DOSSIER
         </div>
       </div>
 
-      <div className="flex items-center justify-center px-6 py-16 md:px-14">
-        <div className="w-full max-w-sm">
-          <span className="mb-3 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">{eyebrow}</span>
-          <h1 className="font-display text-4xl font-black uppercase leading-tight text-ink">{title}</h1>
-          {subtitle && <p className="mt-3 text-sm text-ink-dim">{subtitle}</p>}
-          <div className="mt-10">{children}</div>
+      {/* Right Credentials Ledger */}
+      <div className="lg:col-span-6 flex items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-md bg-[var(--bg-elevated)] hairline-box p-8 sm:p-10">
+          <div className="pb-4 perforated-b mb-6">
+            <span className="font-ledger text-[10px] uppercase tracking-widest text-[var(--accent-stamp)]">
+              {eyebrow ? `// ${eyebrow.toUpperCase()}` : '// CREDENTIAL VERIFICATION'}
+            </span>
+            <h1 className="font-grotesk font-extrabold text-2xl sm:text-3xl uppercase mt-1">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="font-ledger text-xs text-[var(--ink-secondary)] mt-1">
+                {subtitle}
+              </p>
+            )}
+          </div>
+
+          {children}
+
+          {(footerText || footerLinkText) && (
+            <div className="mt-6 pt-4 hairline-t font-ledger text-xs text-[var(--ink-secondary)] flex items-center justify-between">
+              <span>{footerText}</span>
+              {footerLinkText && (
+                <Link to={footerLinkTo} className="underline text-[var(--ink-primary)] font-bold">
+                  {footerLinkText} →
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </div>
-    </motion.div>
+    </main>
   );
-}
+};
+
+export default AuthShell;

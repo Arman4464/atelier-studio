@@ -1,82 +1,122 @@
-import { Link } from "react-router-dom";
-import { motion } from "motion/react";
-import { processSteps, workshopGallery, craftStations } from "../data/content";
+import React, { useState } from 'react';
 
-export default function Journal() {
+const MONOGRAPHS = [
+  {
+    issue: 'MONOGRAPH N° 01',
+    date: 'OCT 2026',
+    readTime: '04 MIN DOSSIER',
+    title: 'On Loomstate Selvedge & The Beauty of Irregular Tension',
+    excerpt:
+      'Why vintage shuttle looms in Okayama produce microscopic slub variations that modern air-jet looms erased from industrial fashion.',
+    body: 'Modern textile engineering prizes speed and uniformity above all else. High-speed projectile looms fire weft yarns across warps at thousands of meters per minute, stripping the cloth of character. In our Autumn—Winter archive, we returned to 1950s Toyoda shuttle looms where wooden bobbins travel back and forth under low tension, preserving the organic density of raw cotton.',
+    image:
+      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=85',
+  },
+  {
+    issue: 'MONOGRAPH N° 02',
+    date: 'SEP 2026',
+    readTime: '06 MIN DOSSIER',
+    title: 'Cold-Vat Iron Oxide & Botanical Dye Immersion',
+    excerpt:
+      'Documenting our 4-hour pigment immersion baths in Biella using fermented walnut husks, iron mordants, and rainwater.',
+    body: 'Synthetic reactive dyes lock flat color onto the surface of a garment. Mineral and botanical immersion works differently: the pigment bonds unevenly with the natural oils of virgin wool and heavy duck canvas, creating living surfaces that lighten along high-friction seams.',
+    image:
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=85',
+  },
+  {
+    issue: 'MONOGRAPH N° 03',
+    date: 'AUG 2026',
+    readTime: '05 MIN DOSSIER',
+    title: 'Pattern Cutting as Structural Cantilever',
+    excerpt:
+      'Adapting 1940s French railway workwear gussets and bias-cut raglan sleeves for unrestricted kinetic movement.',
+    body: 'When a coat relies on shoulder pads for structure, it fights the wearer. By rotating the sleeve pitch forward 12 degrees and inserting a single-piece underarm gusset, heavy 540 GSM wool hangs from the collarbone like a suspension bridge.',
+    image:
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=85',
+  },
+];
+
+export const Journal: React.FC = () => {
+  const [activeArticle, setActiveArticle] = useState(MONOGRAPHS[0]);
+
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-      <section className="grid grid-cols-1 border-b border-line lg:grid-cols-12">
-        <div className="min-h-[60vh] lg:col-span-7">
-          <img
-            src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop"
-            alt="Inside the Atelier workshop, Lisbon"
-            className="h-full w-full object-cover saturate-[0.85]"
-          />
-        </div>
-        <div className="flex flex-col justify-center bg-void px-6 py-16 md:px-14 lg:col-span-5">
-          <span className="mb-4 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">Est. 2016, Lisboa</span>
-          <h1 className="font-display text-5xl font-black uppercase leading-[0.95] text-ink md:text-7xl">
-            The Long <span className="text-indigo-glow">Way</span> Round
+    <main className="min-h-screen bg-[var(--bg-canvas)]">
+      {/* Header */}
+      <section className="px-6 sm:px-10 py-12 hairline-b grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+        <div className="lg:col-span-8">
+          <span className="font-ledger text-xs uppercase tracking-widest text-[var(--accent-stamp)]">
+            // DEPT. OF TEXTILE RESEARCH
+          </span>
+          <h1 className="font-grotesk font-extrabold text-4xl sm:text-6xl uppercase tracking-[-0.04em] mt-2">
+            Atelier <span className="font-editorial italic font-normal lowercase">Monographs</span>
           </h1>
-          <p className="mt-8 text-sm leading-relaxed text-ink-dim">
-            ATELIER began as two people, a rented ground floor in Alfama, and a refusal to make anything that
-            wouldn't survive its owner by twenty years. A decade later the workshop is bigger, but the rule hasn't
-            moved: six collections a year, never more, each one held to the same question — will this still earn
-            its place in ten years?
-          </p>
+        </div>
+        <div className="lg:col-span-4 font-ledger text-xs text-[var(--ink-secondary)] lg:text-right">
+          PUBLISHED QUARTERLY IN MILAN & KYOTO
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1800px] px-6 py-24 md:px-14">
-        <div className="mb-16 text-center">
-          <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">How a Piece Is Made</span>
-          <h2 className="font-display text-4xl font-black uppercase text-ink md:text-6xl">From Raw Material to Doorstep</h2>
+      {/* Editorial Broadsheet Split */}
+      <section className="grid grid-cols-1 lg:grid-cols-12">
+        {/* Left 5 Columns: Issue Index */}
+        <div className="lg:col-span-5 hairline-r">
+          {MONOGRAPHS.map((item) => {
+            const selected = activeArticle.issue === item.issue;
+            return (
+              <button
+                key={item.issue}
+                onClick={() => setActiveArticle(item)}
+                className={`w-full text-left p-6 sm:p-8 hairline-b transition-colors ${
+                  selected
+                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
+                    : 'hover:bg-[var(--bg-sub)]'
+                }`}
+              >
+                <div className="flex justify-between font-ledger text-[11px] opacity-75 mb-2">
+                  <span>{item.issue}</span>
+                  <span>{item.date} // {item.readTime}</span>
+                </div>
+                <h2 className="font-grotesk font-bold text-xl sm:text-2xl tracking-tight">
+                  {item.title}
+                </h2>
+                <p className="mt-2 text-xs sm:text-sm opacity-80 leading-relaxed">
+                  {item.excerpt}
+                </p>
+              </button>
+            );
+          })}
         </div>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4 md:gap-6">
-          {processSteps.map((step) => (
-            <div key={step.n}>
-              <span className="mb-4 block font-display text-5xl font-black text-line">{step.n}</span>
-              <h3 className="mb-2 text-sm font-semibold uppercase tracking-widest text-ink">{step.title}</h3>
-              <p className="text-xs leading-relaxed text-ink-dim">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      <section className="grid grid-cols-2 gap-1.5 border-y border-line p-1.5 md:grid-cols-3">
-        {workshopGallery.map((img) => (
-          <div key={img} className="aspect-[4/5] overflow-hidden">
-            <img src={img} alt="Workshop detail" className="h-full w-full object-cover saturate-[0.85]" />
+        {/* Right 7 Columns: Full Monograph Plate */}
+        <article className="lg:col-span-7 p-6 sm:p-12 lg:p-16 space-y-8">
+          <div className="flex items-center justify-between font-ledger text-xs text-[var(--ink-muted)] pb-4 hairline-b">
+            <span>{activeArticle.issue}</span>
+            <span>FIELD REPORT // {activeArticle.readTime}</span>
           </div>
-        ))}
-      </section>
 
-      <section className="mx-auto max-w-[1800px] px-6 py-24 md:px-14">
-        <div className="mb-16">
-          <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">The Workshop</span>
-          <h2 className="font-display text-4xl font-black uppercase text-ink md:text-6xl">Hands Behind the Work</h2>
-        </div>
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {craftStations.map((station) => (
-            <div key={station.name}>
-              <div className="mb-4 aspect-[3/4] overflow-hidden border border-line bg-void-3">
-                <img src={station.image} alt={station.name} className="h-full w-full object-cover saturate-[0.85]" />
-              </div>
-              <h3 className="font-display text-xl text-ink">{station.name}</h3>
-              <p className="text-xs uppercase tracking-widest text-ink-dim">{station.detail}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+          <h2 className="font-editorial italic text-4xl sm:text-6xl leading-[1.02]">
+            {activeArticle.title}
+          </h2>
 
-      <section className="border-t border-line bg-void-2 py-24 text-center">
-        <h2 className="mx-auto mb-8 max-w-xl font-display text-3xl font-bold text-ink md:text-5xl">
-          Come see the current run before it's gone.
-        </h2>
-        <Link to="/shop" className="inline-block bg-ink px-8 py-5 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow">
-          Shop Volume 04
-        </Link>
+          <div className="aspect-[16/10] hairline-box overflow-hidden bg-[var(--bg-sub)]">
+            <img
+              src={activeArticle.image}
+              alt={activeArticle.title}
+              className="w-full h-full object-cover grayscale-[15%]"
+            />
+          </div>
+
+          <p className="text-base sm:text-lg leading-relaxed text-[var(--ink-primary)] font-medium">
+            {activeArticle.excerpt}
+          </p>
+
+          <p className="text-sm sm:text-base leading-relaxed text-[var(--ink-secondary)]">
+            {activeArticle.body}
+          </p>
+        </article>
       </section>
-    </motion.div>
+    </main>
   );
-}
+};
+
+export default Journal;
