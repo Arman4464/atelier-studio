@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
@@ -10,7 +10,7 @@ import { isValidEmail, passwordStrength } from "../../lib/validators";
 import type { Currency } from "../../lib/format";
 import { ACTIVE_CURRENCIES, CURRENCY_LABELS } from "../../lib/format";
 
-export default function AccountSettings() {
+export const AccountSettings: React.FC = () => {
   const user = useAuthStore((s) => s.currentUser());
   const updateProfile = useAuthStore((s) => s.updateProfile);
   const changePassword = useAuthStore((s) => s.changePassword);
@@ -72,90 +72,109 @@ export default function AccountSettings() {
   };
 
   const deleteAccount = () => {
-    if (!confirm("Delete your account? This can't be undone in this demo either.")) return;
+    if (!confirm("Delete your account? This will erase local storage state.")) return;
     logOut();
     showToast("Account removed");
     navigate("/");
   };
 
   return (
-    <div className="max-w-2xl">
-      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">Account</span>
-      <h1 className="font-display text-4xl font-black uppercase text-ink md:text-5xl">Settings</h1>
+    <div className="max-w-2xl space-y-12">
+      <div>
+        <span className="mb-2 block text-[10px] font-mono font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400">
+          Private Client
+        </span>
+        <h1 className="font-display text-4xl font-light italic text-[var(--ink-primary)] md:text-5xl">Profile &amp; Settings</h1>
+      </div>
 
-      <section className="mt-12">
-        <h2 className="mb-5 font-display text-xl font-bold text-ink">Profile</h2>
-        <form onSubmit={saveProfile} className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <section className="glass-card rounded-[28px] p-6 sm:p-8">
+        <h2 className="mb-5 font-display text-2xl font-light text-[var(--ink-primary)]">Personal Details</h2>
+        <form onSubmit={saveProfile} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label="Full Name" value={name} onChange={setName} required error={profileErrors.name} />
           <FormField label="Phone" value={phone} onChange={setPhone} placeholder="Optional" />
           <FormField label="Email" type="email" span2 value={email} onChange={setEmail} required error={profileErrors.email} />
-          <label className="flex items-center gap-3 text-xs text-ink-dim sm:col-span-2">
-            <input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} className="h-4 w-4 border-line accent-indigo" />
-            Send me new-release &amp; workshop-note emails
+          <label className="flex items-center gap-3 text-xs text-[var(--ink-secondary)] sm:col-span-2 pt-1 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={newsletter}
+              onChange={(e) => setNewsletter(e.target.checked)}
+              className="h-4 w-4 rounded-md border-black/10 dark:border-white/10 accent-purple-600"
+            />
+            Receive seasonal monographs and studio release dispatches
           </label>
-          <button type="submit" className="w-fit bg-ink px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow sm:col-span-2">
-            Save Changes
-          </button>
+          <div className="sm:col-span-2 pt-3">
+            <button type="submit" className="btn-prism px-7 py-3 rounded-2xl text-xs font-semibold uppercase tracking-wider">
+              Save Changes
+            </button>
+          </div>
         </form>
       </section>
 
-      <section className="mt-14">
-        <h2 className="mb-5 font-display text-xl font-bold text-ink">Change Password</h2>
-        <form onSubmit={savePassword} className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <section className="glass-card rounded-[28px] p-6 sm:p-8">
+        <h2 className="mb-5 font-display text-2xl font-light text-[var(--ink-primary)]">Security Passkey</h2>
+        <form onSubmit={savePassword} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <PasswordField label="Current Password" span2 value={currentPassword} onChange={setCurrentPassword} autoComplete="current-password" error={passwordErrors.currentPassword} />
           <PasswordField label="New Password" value={newPassword} onChange={setNewPassword} showStrength autoComplete="new-password" error={passwordErrors.newPassword} />
           <PasswordField label="Confirm New Password" value={confirmPassword} onChange={setConfirmPassword} autoComplete="new-password" error={passwordErrors.confirmPassword} />
-          {passwordSuccess && <p className="text-xs text-indigo-glow sm:col-span-2">Password updated successfully.</p>}
-          <button type="submit" className="w-fit bg-ink px-7 py-3.5 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow sm:col-span-2">
-            Update Password
-          </button>
+          {passwordSuccess && (
+            <p className="text-xs font-medium text-emerald-500 sm:col-span-2">Password successfully updated.</p>
+          )}
+          <div className="sm:col-span-2 pt-3">
+            <button type="submit" className="btn-prism px-7 py-3 rounded-2xl text-xs font-semibold uppercase tracking-wider">
+              Update Password
+            </button>
+          </div>
         </form>
       </section>
 
-      <section className="mt-14">
-        <h2 className="mb-5 font-display text-xl font-bold text-ink">Preferences</h2>
-        <div className="divide-y divide-line border border-line">
-          <div className="flex items-center justify-between p-5">
-            <div>
-              <p className="text-sm text-ink">Currency</p>
-              <p className="text-xs text-ink-dim">Applies across the whole store</p>
-            </div>
-            {ACTIVE_CURRENCIES.length > 1 ? (
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as Currency)}
-                className="border border-line bg-transparent px-3 py-2 text-xs text-ink focus:outline-none focus:border-indigo-glow"
-              >
-                {ACTIVE_CURRENCIES.map((c) => (
-                  <option key={c} value={c} className="bg-void">{CURRENCY_LABELS[c]}</option>
-                ))}
-              </select>
-            ) : (
-              <span className="text-xs text-ink-dim">{CURRENCY_LABELS[currency]}</span>
-            )}
+      <section className="glass-card rounded-[28px] overflow-hidden divide-y divide-black/5 dark:divide-white/10">
+        <div className="flex items-center justify-between p-6">
+          <div>
+            <p className="text-sm font-semibold text-[var(--ink-primary)]">Valuation Currency</p>
+            <p className="text-xs text-[var(--ink-muted)]">Applied globally across all plates</p>
           </div>
-          <div className="flex items-center justify-between p-5">
-            <div>
-              <p className="text-sm text-ink">Appearance</p>
-              <p className="text-xs text-ink-dim">Switch between dark and light</p>
-            </div>
-            <button
-              onClick={toggleTheme}
-              className="border border-line px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-ink hover:border-indigo-glow"
+          {ACTIVE_CURRENCIES.length > 1 ? (
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value as Currency)}
+              className="glass-pill px-4 py-2 text-xs font-semibold uppercase text-[var(--ink-primary)]"
             >
-              {isDark ? "Switch to Light" : "Switch to Dark"}
-            </button>
+              {ACTIVE_CURRENCIES.map((c) => (
+                <option key={c} value={c} className="bg-void dark:bg-zinc-900">{CURRENCY_LABELS[c]}</option>
+              ))}
+            </select>
+          ) : (
+            <span className="text-xs font-mono text-[var(--ink-secondary)]">{CURRENCY_LABELS[currency]}</span>
+          )}
+        </div>
+        <div className="flex items-center justify-between p-6">
+          <div>
+            <p className="text-sm font-semibold text-[var(--ink-primary)]">Visual Atmosphere</p>
+            <p className="text-xs text-[var(--ink-muted)]">Alabaster daylight or smoked obsidian night</p>
           </div>
+          <button
+            onClick={toggleTheme}
+            className="glass-pill px-5 py-2 rounded-full text-xs font-semibold uppercase tracking-wider text-[var(--ink-primary)] hover:border-purple-500/30"
+          >
+            {isDark ? "Switch to Light" : "Switch to Dark"}
+          </button>
         </div>
       </section>
 
-      <section className="mt-14 border border-flame/30 p-6">
-        <h2 className="mb-2 font-display text-lg font-bold text-flame">Danger Zone</h2>
-        <p className="mb-5 text-xs text-ink-dim">Deleting your account removes it from this browser's demo storage.</p>
-        <button onClick={deleteAccount} className="border border-flame px-6 py-3 text-xs font-semibold uppercase tracking-widest text-flame transition-colors hover:bg-flame hover:text-on-flame">
-          Delete Account
+      <section className="rounded-[28px] border border-rose-500/20 bg-rose-500/5 p-6">
+        <h2 className="mb-2 font-display text-lg font-semibold text-rose-500">Danger Zone</h2>
+        <p className="mb-5 text-xs text-[var(--ink-secondary)]">
+          Terminating your client dossier will clear your local cached credentials and active simulated orders.
+        </p>
+        <button
+          onClick={deleteAccount}
+          className="rounded-2xl border border-rose-500/30 px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-rose-500 transition-colors hover:bg-rose-500 hover:text-white"
+        >
+          Erase Dossier
         </button>
       </section>
     </div>
   );
-}
+};
+
+export default AccountSettings;

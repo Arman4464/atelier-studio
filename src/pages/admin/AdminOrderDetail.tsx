@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useAuthStore, type OrderStatus } from "../../store/authStore";
@@ -8,7 +9,7 @@ import OrderStatusBadge from "../../components/account/OrderStatusBadge";
 
 const STATUSES: OrderStatus[] = ["Processing", "Shipped", "Delivered"];
 
-export default function AdminOrderDetail() {
+export const AdminOrderDetail: React.FC = () => {
   const { customerId, id } = useParams();
   const currency = useCartStore((s) => s.currency);
   const customer = useAuthStore((s) => (customerId ? s.getCustomer(customerId) : undefined));
@@ -19,26 +20,31 @@ export default function AdminOrderDetail() {
 
   if (!customer || !order) {
     return (
-      <div className="py-12 text-center">
-        <p className="mb-4 font-display text-2xl text-ink-dim">Order not found.</p>
-        <Link to="/admin/orders" className="text-xs uppercase tracking-widest text-indigo-glow hover:text-ink">
-          Back to Orders
+      <div className="py-12 text-center glass-card rounded-[28px] p-8">
+        <p className="mb-4 font-display text-2xl text-[var(--ink-secondary)]">Waybill record not found.</p>
+        <Link to="/admin/orders" className="glass-pill px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[var(--ink-primary)]">
+          Back to Order Log
         </Link>
       </div>
     );
   }
 
   return (
-    <div>
-      <Link to="/admin/orders" className="mb-6 flex items-center gap-2 text-xs uppercase tracking-widest text-ink-dim hover:text-ink">
-        <ArrowLeft size={14} /> Back to Orders
+    <div className="space-y-8">
+      <Link
+        to="/admin/orders"
+        className="glass-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]"
+      >
+        <ArrowLeft size={14} /> Back to Order Log
       </Link>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 pb-6 border-b border-black/5 dark:border-white/10">
         <div>
-          <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">Order Detail</span>
-          <h1 className="font-mono text-2xl font-bold text-ink md:text-3xl">{order.id}</h1>
-          <p className="mt-2 text-xs text-ink-dim">
+          <span className="mb-1 block text-[10px] font-mono font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400">
+            Fulfillment Dossier
+          </span>
+          <h1 className="font-mono text-3xl font-light tracking-tight text-[var(--ink-primary)] md:text-4xl">{order.id}</h1>
+          <p className="mt-1 text-xs font-mono text-[var(--ink-muted)]">
             Placed {new Date(order.date).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
@@ -50,53 +56,61 @@ export default function AdminOrderDetail() {
               updateOrderStatus(customer.id, order.id, e.target.value as OrderStatus);
               showToast(`Order marked as ${e.target.value}`);
             }}
-            className="border border-line bg-void-2 px-3 py-2 text-xs text-ink focus:outline-none focus:border-indigo-glow"
+            className="glass-pill px-4 py-2 text-xs font-mono font-semibold text-[var(--ink-primary)]"
           >
             {STATUSES.map((s) => (
-              <option key={s} value={s} className="bg-void">Mark as {s}</option>
+              <option key={s} value={s} className="bg-void dark:bg-zinc-900">Mark as {s}</option>
             ))}
           </select>
         </div>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <h2 className="mb-5 font-display text-xl font-bold text-ink">Items</h2>
-          <div className="divide-y divide-line border border-line">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+        <div className="lg:col-span-7 space-y-4">
+          <h2 className="font-display text-xl font-light text-[var(--ink-primary)]">Manifest Items</h2>
+          <div className="glass-card rounded-[28px] overflow-hidden divide-y divide-black/5 dark:divide-white/10">
             {order.items.map((item, i) => (
               <div key={i} className="flex items-center gap-4 p-4">
-                <img src={item.image} alt={item.name} className="h-20 w-16 flex-shrink-0 object-cover" />
+                <img src={item.image} alt={item.name} className="h-20 w-16 flex-shrink-0 rounded-2xl object-cover shadow-xs" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-ink">{item.name}</p>
-                  <p className="text-xs text-ink-dim">Qty {item.qty}</p>
+                  <p className="truncate text-sm font-medium text-[var(--ink-primary)]">{item.name}</p>
+                  <p className="text-xs font-mono text-[var(--ink-muted)]">Qty {item.qty}</p>
                 </div>
-                <span className="font-mono text-sm text-ink">{formatPrice(item.price * item.qty, currency)}</span>
+                <span className="font-mono text-sm font-medium text-[var(--ink-primary)]">{formatPrice(item.price * item.qty, currency)}</span>
               </div>
             ))}
           </div>
-          <div className="mt-4 border border-line p-5">
-            <div className="flex justify-between border-t border-line pt-2 text-sm font-semibold text-ink">
-              <span>Total</span>
-              <span className="font-mono">{formatPrice(order.total, currency)}</span>
+          <div className="glass-card rounded-[24px] p-5">
+            <div className="flex justify-between font-semibold text-[var(--ink-primary)]">
+              <span>Total Settlement</span>
+              <span className="font-mono text-base">{formatPrice(order.total, currency)}</span>
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-5">
-          <h2 className="mb-5 font-display text-xl font-bold text-ink">Customer</h2>
-          <Link to={`/admin/customers/${customer.id}`} className="block border border-line p-5 text-sm transition-colors hover:border-indigo-glow">
-            <p className="text-ink">{customer.name}</p>
-            <p className="mt-1 text-ink-dim">{customer.email}</p>
-            {customer.phone && <p className="text-ink-dim">{customer.phone}</p>}
-          </Link>
+        <div className="lg:col-span-5 space-y-6">
+          <div>
+            <h2 className="mb-4 font-display text-xl font-light text-[var(--ink-primary)]">Client Profile</h2>
+            <Link to={`/admin/customers/${customer.id}`} className="glass-card block rounded-[24px] p-5 transition-all hover:shadow-lg group">
+              <p className="font-semibold text-[var(--ink-primary)] group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                {customer.name}
+              </p>
+              <p className="mt-1 text-xs font-mono text-[var(--ink-muted)]">{customer.email}</p>
+              {customer.phone && <p className="text-xs font-mono text-[var(--ink-muted)]">{customer.phone}</p>}
+            </Link>
+          </div>
 
-          <h2 className="mb-5 mt-8 font-display text-xl font-bold text-ink">Shipping To</h2>
-          <div className="border border-line p-5 text-sm">
-            <p className="text-ink">{order.shippingName}</p>
-            <p className="mt-1 text-ink-dim">{order.shippingAddress}</p>
+          <div>
+            <h2 className="mb-4 font-display text-xl font-light text-[var(--ink-primary)]">Dispatch Address</h2>
+            <div className="glass-card rounded-[24px] p-5 text-sm">
+              <p className="font-semibold text-[var(--ink-primary)]">{order.shippingName}</p>
+              <p className="mt-1 text-xs text-[var(--ink-secondary)] leading-relaxed">{order.shippingAddress}</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default AdminOrderDetail;

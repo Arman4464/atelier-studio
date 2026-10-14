@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Plus, Star, Trash2, CreditCard } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
@@ -12,7 +12,7 @@ function detectBrand(cardNumber: string): "Visa" | "Mastercard" | "Amex" {
   return "Visa";
 }
 
-export default function AccountPayment() {
+export const AccountPayment: React.FC = () => {
   const user = useAuthStore((s) => s.currentUser());
   const addPaymentMethod = useAuthStore((s) => s.addPaymentMethod);
   const removePaymentMethod = useAuthStore((s) => s.removePaymentMethod);
@@ -54,30 +54,42 @@ export default function AccountPayment() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">Account</span>
-          <h1 className="font-display text-4xl font-black uppercase text-ink md:text-5xl">Payment Methods</h1>
+          <span className="mb-2 block text-[10px] font-mono font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400">
+            Private Client
+          </span>
+          <h1 className="font-display text-4xl font-light italic text-[var(--ink-primary)] md:text-5xl">Payment Methods</h1>
         </div>
         {!showForm && (
-          <button onClick={() => setShowForm(true)} className="flex items-center gap-2 border border-line px-5 py-3 text-xs font-semibold uppercase tracking-widest text-ink transition-colors hover:border-indigo-glow hover:text-indigo-glow">
+          <button
+            onClick={() => setShowForm(true)}
+            className="btn-prism flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-semibold uppercase tracking-wider"
+          >
             <Plus size={14} /> Add Card
           </button>
         )}
       </div>
 
-      <p className="mt-4 max-w-lg text-xs leading-relaxed text-ink-dim">
-        This is a demo store — card numbers are never transmitted or stored. Only the card brand, last 4 digits and expiry are kept, exactly like a real checkout would show you.
+      <p className="mt-3 max-w-lg text-xs leading-relaxed text-[var(--ink-secondary)]">
+        Encrypted simulation layer — card data is processed locally. Only brand signature, last 4 digits, and expiry interval are registered.
       </p>
 
       {showForm && (
-        <form onSubmit={onSubmit} className="mt-8 grid grid-cols-1 gap-5 border border-line p-6 sm:grid-cols-2">
+        <form onSubmit={onSubmit} className="mt-8 glass-card rounded-[28px] p-6 sm:p-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField label="Name on Card" span2 value={name} onChange={setName} required error={errors.name} />
           <FormField label="Card Number" span2 mono placeholder="0000 0000 0000 0000" maxLength={19} value={cardNumber} onChange={setCardNumber} required error={errors.cardNumber} />
           <FormField label="Expiry" mono placeholder="MM / YY" value={expiry} onChange={setExpiry} required error={errors.expiry} />
-          <div className="flex gap-4 sm:col-span-2">
-            <button type="button" onClick={() => setShowForm(false)} className="flex-1 border border-line py-4 text-xs font-semibold uppercase tracking-widest text-ink hover:border-ink">
+          <div className="flex gap-3 sm:col-span-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="glass-pill flex-1 py-3 rounded-2xl text-xs font-semibold uppercase tracking-wider text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]"
+            >
               Cancel
             </button>
-            <button type="submit" className="flex-[2] bg-ink py-4 text-xs font-semibold uppercase tracking-widest text-void hover:bg-indigo-glow">
+            <button
+              type="submit"
+              className="btn-prism flex-[2] py-3 rounded-2xl text-xs font-semibold uppercase tracking-wider"
+            >
               Add Card
             </button>
           </div>
@@ -85,28 +97,35 @@ export default function AccountPayment() {
       )}
 
       {!showForm && user.paymentMethods.length === 0 && (
-        <div className="mt-10 border border-line p-10 text-center">
-          <p className="text-sm text-ink-dim">No saved payment methods yet.</p>
+        <div className="mt-8 glass-card rounded-[28px] p-12 text-center">
+          <p className="text-sm text-[var(--ink-secondary)]">No saved payment methods registered.</p>
         </div>
       )}
 
       {!showForm && user.paymentMethods.length > 0 && (
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
           {user.paymentMethods.map((pm) => (
-            <div key={pm.id} className="border border-line p-6">
+            <div key={pm.id} className="glass-card rounded-[24px] p-6 transition-all duration-300 hover:shadow-lg">
               <div className="mb-4 flex items-center justify-between">
-                <CreditCard size={20} className="text-indigo-glow" />
+                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-300">
+                  <CreditCard size={18} />
+                </div>
                 {pm.isDefault && (
-                  <span className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-zest">
-                    <Star size={11} className="fill-zest" /> Default
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-300">
+                    <Star size={11} className="fill-amber-500" /> Default
                   </span>
                 )}
               </div>
-              <p className="font-mono text-sm text-ink">{pm.brand} &bull;&bull;&bull;&bull; {pm.last4}</p>
-              <p className="mt-1 text-xs text-ink-dim">Expires {pm.expiry}</p>
-              <div className="mt-5 flex items-center gap-5 text-[11px] uppercase tracking-widest">
+              <p className="font-mono text-base font-semibold text-[var(--ink-primary)]">
+                {pm.brand} •••• {pm.last4}
+              </p>
+              <p className="mt-1 text-xs font-mono text-[var(--ink-muted)]">Expires {pm.expiry}</p>
+              <div className="mt-5 flex items-center gap-4 text-xs font-medium pt-3 border-t border-black/5 dark:border-white/10">
                 {!pm.isDefault && (
-                  <button onClick={() => setDefaultPaymentMethod(pm.id)} className="text-ink-dim hover:text-ink">
+                  <button
+                    onClick={() => setDefaultPaymentMethod(pm.id)}
+                    className="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition-colors"
+                  >
                     Set Default
                   </button>
                 )}
@@ -115,7 +134,7 @@ export default function AccountPayment() {
                     removePaymentMethod(pm.id);
                     showToast("Card removed");
                   }}
-                  className="ml-auto flex items-center gap-1.5 text-flame hover:underline"
+                  className="ml-auto flex items-center gap-1.5 text-rose-500 hover:underline"
                 >
                   <Trash2 size={12} /> Remove
                 </button>
@@ -126,4 +145,6 @@ export default function AccountPayment() {
       )}
     </div>
   );
-}
+};
+
+export default AccountPayment;

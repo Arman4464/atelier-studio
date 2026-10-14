@@ -1,78 +1,137 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useProductsStore } from '../../store/productsStore';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Package, TrendingUp, Layers, ShoppingBag, ArrowUpRight } from "lucide-react";
+import { useProductsStore } from "../../store/productsStore";
+import { useAuthStore, computeAllOrders } from "../../store/authStore";
 
 export const AdminDashboard: React.FC = () => {
   const productsStore = useProductsStore() as any;
   const products: any[] = productsStore.products || [];
+  const accounts = useAuthStore((s) => s.accounts);
+  const allOrders = computeAllOrders(accounts);
+
+  const totalRevenue = allOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const formattedRevenue = totalRevenue > 1000
+    ? `$${(Math.round(totalRevenue * 0.0104)).toLocaleString()}`
+    : `$${totalRevenue.toLocaleString()}`;
 
   const metrics = [
-    { code: 'M-01', label: 'GROSS ARCHIVE VALUATION', value: '$48,920.00', delta: '+14.2% LOT AW26' },
-    { code: 'M-02', label: 'ACTIVE WAYBILL DISPATCHES', value: '142', delta: '18 AWAITING SEAL' },
-    { code: 'M-03', label: 'INDEXED SPECIMENS', value: String(products.length || 12), delta: '3 LOW STOCK LOTS' },
-    { code: 'M-04', label: 'AVERAGE REQUISITION', value: '$540.00', delta: '+6.8% VS SS26' },
+    {
+      code: "M-01",
+      label: "Gross Archive Valuation",
+      value: formattedRevenue,
+      delta: "+14.2% vs last cycle",
+      icon: TrendingUp,
+      color: "text-purple-600 dark:text-purple-400",
+    },
+    {
+      code: "M-02",
+      label: "Active Dispatches",
+      value: String(allOrders.length),
+      delta: "4 pending courier seal",
+      icon: ShoppingBag,
+      color: "text-amber-600 dark:text-amber-400",
+    },
+    {
+      code: "M-03",
+      label: "Indexed Garments",
+      value: String(products.length || 12),
+      delta: "2 low-stock allocations",
+      icon: Layers,
+      color: "text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      code: "M-04",
+      label: "Registered Clients",
+      value: String(accounts.length),
+      delta: "+6 accounts this month",
+      icon: Package,
+      color: "text-indigo-600 dark:text-indigo-400",
+    },
   ];
 
   const formatAuditPrice = (price: any) => {
-    if (typeof price === 'number') {
+    if (typeof price === "number") {
       return (price > 1000 ? Math.round(price * 0.0104) : price).toFixed(2);
     }
-    const parsed = parseFloat(String(price).replace(/[^0-9.]/g, ''));
+    const parsed = parseFloat(String(price).replace(/[^0-9.]/g, ""));
     return (isNaN(parsed) ? 380 : parsed > 1000 ? Math.round(parsed * 0.0104) : parsed).toFixed(2);
   };
 
   return (
     <div className="space-y-10">
-      <div className="pb-6 hairline-b flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-4 pb-6 border-b border-black/5 dark:border-white/10">
         <div>
-          <span className="font-ledger text-xs uppercase text-[var(--accent-stamp)]">
-            // MILAN & KYOTO OPERATIONS
+          <span className="mb-1 block text-[10px] font-mono font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400">
+            Operations &amp; Archive Management
           </span>
-          <h1 className="font-grotesk font-extrabold text-3xl uppercase mt-1">
-            Atelier Ledger Overview
+          <h1 className="font-display text-4xl font-light italic text-[var(--ink-primary)] md:text-5xl">
+            Command Center
           </h1>
         </div>
         <Link
           to="/admin/products/new"
-          className="px-5 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)] font-ledger text-xs uppercase tracking-widest hover:bg-[var(--accent-stamp)] font-medium"
+          className="btn-prism px-6 py-3 rounded-2xl text-xs font-semibold uppercase tracking-wider"
         >
-          + INDEX NEW GARMENT SPECIMEN
+          + Index New Garment
         </Link>
       </div>
 
-      {/* KPI Ledger Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 hairline-t hairline-l">
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         {metrics.map((m) => (
-          <div key={m.code} className="p-6 bg-[var(--bg-elevated)] hairline-r hairline-b font-ledger">
-            <div className="flex justify-between text-[10px] text-[var(--ink-muted)] mb-3">
-              <span>[{m.code}]</span>
-              <span className="text-[var(--accent-stamp)]">{m.delta}</span>
+          <div
+            key={m.code}
+            className="glass-card rounded-[24px] p-6 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-300">
+                <m.icon size={18} />
+              </div>
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-black/5 dark:bg-white/5 text-[var(--ink-muted)]">
+                {m.code}
+              </span>
             </div>
-            <div className="text-2xl sm:text-3xl font-bold tracking-tight">{m.value}</div>
-            <div className="text-[11px] text-[var(--ink-secondary)] mt-1">{m.label}</div>
+            <div className="font-display text-3xl font-light text-[var(--ink-primary)] tracking-tight">
+              {m.value}
+            </div>
+            <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-[var(--ink-muted)]">
+              {m.label}
+            </div>
+            <div className="mt-3 text-[11px] font-mono text-purple-600 dark:text-purple-400">
+              {m.delta}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Specimen Inventory Audit Table */}
-      <div className="bg-[var(--bg-elevated)] hairline-box">
-        <div className="px-6 py-4 hairline-b flex items-center justify-between font-ledger text-xs uppercase">
-          <span className="font-bold">CURRENT ARCHIVE STOCK AUDIT</span>
-          <Link to="/admin/products" className="underline">
-            MANAGE ALL SPECIMENS →
+      <div className="glass-card rounded-[28px] overflow-hidden">
+        <div className="px-6 py-4 border-b border-black/5 dark:border-white/10 flex items-center justify-between">
+          <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--ink-primary)]">
+            Active Garment Archive
+          </span>
+          <Link
+            to="/admin/products"
+            className="glass-pill px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] flex items-center gap-1.5"
+          >
+            Manage All Garments <ArrowUpRight size={13} />
           </Link>
         </div>
-        <div className="divide-y divide-[var(--border-hairline)] font-ledger text-xs">
+        <div className="divide-y divide-black/5 dark:divide-white/10 text-xs">
           {products.slice(0, 6).map((p, idx) => (
-            <div key={p.id || idx} className="grid grid-cols-12 items-center px-6 py-3.5">
-              <span className="col-span-2 text-[var(--ink-muted)]">AS-{idx + 101}</span>
-              <span className="col-span-5 font-grotesk font-bold uppercase">
+            <div
+              key={p.id || idx}
+              className="grid grid-cols-12 items-center px-6 py-4 hover:bg-white/40 dark:hover:bg-white/5 transition-colors"
+            >
+              <span className="col-span-2 font-mono text-[var(--ink-muted)]">ATL-{(idx + 101).toString()}</span>
+              <span className="col-span-5 font-semibold text-[var(--ink-primary)]">
                 {p.name || p.title}
               </span>
-              <span className="col-span-3 uppercase text-[var(--ink-secondary)]">
-                {p.category || 'OUTERWEAR'}
+              <span className="col-span-3 font-mono uppercase text-[var(--ink-secondary)]">
+                {p.category || "Outerwear"}
               </span>
-              <span className="col-span-2 text-right font-semibold">
+              <span className="col-span-2 text-right font-mono font-semibold text-[var(--ink-primary)]">
                 ${formatAuditPrice(p.price)}
               </span>
             </div>
