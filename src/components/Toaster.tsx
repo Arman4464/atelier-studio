@@ -9,24 +9,22 @@ export const Toaster: React.FC = () => {
   if (!toasts.length) return null;
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="fixed bottom-24 right-5 sm:bottom-6 sm:right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
       {toasts.map((t: any) => (
         <div
           key={t.id}
-          className="pointer-events-auto bg-[var(--ink-primary)] text-[var(--bg-canvas)] p-4 hairline-box shadow-xl font-ledger text-xs flex items-start justify-between gap-4"
+          className="pointer-events-auto glass-pill rounded-full px-5 py-3 shadow-xl flex items-center justify-between gap-3 text-xs animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
-          <div>
-            <div className="text-[10px] text-[var(--accent-stamp)] font-bold uppercase">
-              // ATELIER DISPATCH NOTICE
-            </div>
-            <div className="mt-1 uppercase">{t.message || t.title}</div>
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500 animate-pulse" />
+            <span className="font-medium text-[var(--ink-primary)]">{t.message || t.title}</span>
           </div>
           {dismissToast && (
             <button
               onClick={() => dismissToast(t.id)}
-              className="opacity-70 hover:opacity-100 text-[10px]"
+              className="text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition-colors text-xs"
             >
-              [✕]
+              ✕
             </button>
           )}
         </div>

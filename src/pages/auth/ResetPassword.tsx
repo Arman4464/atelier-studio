@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Loader2, Check } from "lucide-react";
 import AuthShell from "../../components/auth/AuthShell";
@@ -7,7 +7,7 @@ import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
 import { passwordStrength } from "../../lib/validators";
 
-export default function ResetPassword() {
+export const ResetPassword: React.FC = () => {
   const [params] = useSearchParams();
   const token = params.get("token") || "";
   const resetPassword = useAuthStore((s) => s.resetPassword);
@@ -22,11 +22,11 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <AuthShell eyebrow="Reset Password" title="Link Missing">
-        <p className="text-sm leading-relaxed text-ink-dim">
-          This page needs a reset token from the link we sent you. Request a new one below.
+      <AuthShell eyebrow="Reset Password" title="Token Missing">
+        <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
+          This session requires a valid security token. Please request a new recovery link.
         </p>
-        <Link to="/forgot-password" className="mt-6 inline-block text-xs font-semibold uppercase tracking-widest text-indigo-glow hover:text-ink">
+        <Link to="/forgot-password" className="mt-6 inline-block text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400 hover:underline">
           Request a new link &rarr;
         </Link>
       </AuthShell>
@@ -35,14 +35,14 @@ export default function ResetPassword() {
 
   if (done) {
     return (
-      <AuthShell eyebrow="All Set" title="Password Updated">
+      <AuthShell eyebrow="Security Verified" title="Password Updated">
         <div className="flex flex-col items-start gap-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-glow text-void">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300">
             <Check size={20} />
           </div>
-          <p className="text-sm leading-relaxed text-ink-dim">Your password has been reset. Log in with your new password.</p>
-          <Link to="/login" className="bg-ink px-7 py-4 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow">
-            Go to Log In
+          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">Your security credentials have been updated. Sign in with your new credentials.</p>
+          <Link to="/login" className="btn-prism px-7 py-3.5 rounded-2xl text-xs font-semibold uppercase tracking-wider">
+            Proceed to Log In
           </Link>
         </div>
       </AuthShell>
@@ -73,15 +73,21 @@ export default function ResetPassword() {
   };
 
   return (
-    <AuthShell eyebrow="Almost Done" title="Set New Password" subtitle="Choose something you haven't used before.">
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+    <AuthShell eyebrow="Security Update" title="Set New Password" subtitle="Choose a strong, unique passkey for your account.">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         <PasswordField label="New Password" value={password} onChange={setPassword} required showStrength autoComplete="new-password" error={errors.password} />
         <PasswordField label="Confirm New Password" value={confirm} onChange={setConfirm} required autoComplete="new-password" error={errors.confirm} />
-        {formError && <p className="border border-flame/30 bg-flame/10 px-4 py-3 text-xs text-flame">{formError}</p>}
+        
+        {formError && (
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-xs text-rose-500 font-medium">
+            {formError}
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 flex items-center justify-center gap-2 bg-ink py-4 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow disabled:opacity-60"
+          className="btn-prism mt-2 flex w-full items-center justify-center gap-2 py-4 rounded-2xl text-xs font-semibold uppercase tracking-wider disabled:opacity-60"
         >
           {loading && <Loader2 size={14} className="animate-spin" />}
           {loading ? "Updating..." : "Update Password"}
@@ -89,4 +95,6 @@ export default function ResetPassword() {
       </form>
     </AuthShell>
   );
-}
+};
+
+export default ResetPassword;

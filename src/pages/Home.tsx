@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import Hero from "../components/home/Hero";
 import KeyPieces from "../components/home/KeyPieces";
 import Manifesto from "../components/home/Manifesto";
+import TrustStrip from "../components/home/TrustStrip";
 import Testimonials from "../components/home/Testimonials";
 import Community from "../components/home/Community";
 import FAQSection from "../components/home/FAQSection";
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <KeyPieces />
       <Manifesto />
+      <TrustStrip />
       <Testimonials />
       <Community />
       <FAQSection />

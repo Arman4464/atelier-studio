@@ -1,17 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --bg-canvas: #FAF9F6;
-  --bg-sub: #F1EFEA;
-  --bg-elevated: #FFFFFF;
-  --ink-primary: #0B0B0E;
-  --ink-secondary: #52525B;
-  --ink-muted: #9CA3AF;
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-dark: rgba(15, 15, 18, 0.75);
-  --glass-border: rgba(11, 11, 14, 0.08);
-  --shadow-ambient: 0 24px 60px -15px rgba(11, 11, 14, 0.07);
-  --shadow-float: 0 20px 45px -10px rgba(11, 11, 14, 0.14);
+  --bg-canvas: #FAF8F5;
+  --bg-sub: rgba(255, 255, 255, 0.55);
+  --bg-elevated: rgba(255, 255, 255, 0.78);
+  --ink-primary: #0F1117;
+  --ink-secondary: #4B5060;
+  --ink-muted: #8B90A0;
+
+  /* Luminous Silk Mesh Gradient Tokens */
+  --aura-1: #F9D8D6; /* Rose Quartz */
+  --aura-2: #E2D9F3; /* Soft Iris Lavender */
+  --aura-3: #F8E5C4; /* Champagne Gold */
+  --aura-4: #D4E7F7; /* Sky Opal */
+
+  /* Primary Button & Accent Gradient */
+  --prism-gradient: linear-gradient(135deg, #11131A 0%, #2B223C 50%, #161924 100%);
+  --accent-gradient: linear-gradient(135deg, #E11D48 0%, #9333EA 52%, #4F46E5 100%);
+  --soft-pill-gradient: linear-gradient(135deg, rgba(251, 207, 232, 0.55), rgba(221, 214, 254, 0.55), rgba(254, 243, 199, 0.55));
+
+  /* Refractive Glass Tokens */
+  --glass-surface: rgba(255, 255, 255, 0.62);
+  --glass-heavy: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-border-subtle: rgba(15, 17, 23, 0.07);
+  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.35);
+  --shadow-glass: 0 20px 50px -12px rgba(15, 17, 23, 0.07), 0 4px 16px -2px rgba(15, 17, 23, 0.03);
+  --shadow-island: 0 30px 70px -15px rgba(15, 17, 23, 0.14), 0 10px 25px -5px rgba(15, 17, 23, 0.05);
 
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
@@ -19,8 +34,8 @@
   --font-grotesk: var(--font-sans);
   --font-ledger: var(--font-sans);
 
-  /* Legacy theme aliases mapped to spatial palette */
-  --accent-stamp: var(--ink-primary);
+  /* Legacy aliases mapped to luminous glass palette */
+  --accent-stamp: #E11D48;
   --color-void: var(--bg-canvas);
   --color-void-2: var(--bg-sub);
   --color-void-3: var(--bg-elevated);
@@ -28,40 +43,53 @@
   --color-paper-dim: var(--bg-sub);
   --color-ink: var(--ink-primary);
   --color-ink-dim: var(--ink-secondary);
-  --color-line: var(--glass-border);
-  --color-line-soft: var(--glass-border);
+  --color-line: var(--glass-border-subtle);
+  --color-line-soft: var(--glass-border-subtle);
   --color-onpaper: var(--ink-primary);
   --color-onpaper-dim: var(--ink-muted);
-  --color-indigo: var(--ink-primary);
-  --color-indigo-dim: var(--ink-secondary);
-  --color-indigo-glow: var(--ink-primary);
-  --color-brass: var(--ink-primary);
-  --color-brass-dim: var(--ink-secondary);
-  --color-zest: var(--ink-primary);
-  --color-flame: #EF4444;
-  --color-glass: var(--glass-bg);
-  --color-scrim: #0B0B0E;
-  --color-on-scrim: #FAF9F6;
+  --color-indigo: #9333EA;
+  --color-indigo-dim: #7E22CE;
+  --color-indigo-glow: #C084FC;
+  --color-brass: #D97706;
+  --color-brass-dim: #B45309;
+  --color-zest: #F59E0B;
+  --color-flame: #E11D48;
+  --color-glass: var(--glass-surface);
+  --color-scrim: #0F1117;
+  --color-on-scrim: #FAF8F5;
   --color-on-indigo: #FFFFFF;
-  --color-on-zest: #0B0B0E;
+  --color-on-zest: #0F1117;
   --color-on-flame: #FFFFFF;
+  --border-hairline: var(--glass-border-subtle);
+  --border-strong: var(--ink-primary);
 }
 
 .dark,
 html.dark {
-  --bg-canvas: #09090B;
-  --bg-sub: #121216;
-  --bg-elevated: #18181D;
-  --ink-primary: #F4F4F6;
-  --ink-secondary: #A1A1AA;
-  --ink-muted: #52525B;
-  --glass-bg: rgba(24, 24, 29, 0.72);
-  --glass-dark: rgba(244, 244, 246, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.09);
-  --shadow-ambient: 0 24px 60px -15px rgba(0, 0, 0, 0.5);
-  --shadow-float: 0 20px 45px -10px rgba(0, 0, 0, 0.65);
+  --bg-canvas: #07080C;
+  --bg-sub: rgba(22, 24, 34, 0.6);
+  --bg-elevated: rgba(28, 31, 44, 0.78);
+  --ink-primary: #F5F6FA;
+  --ink-secondary: #A3A8B8;
+  --ink-muted: #63687A;
 
-  --accent-stamp: var(--ink-primary);
+  --aura-1: rgba(139, 92, 246, 0.22); /* Nocturnal Violet */
+  --aura-2: rgba(236, 72, 153, 0.18); /* Crimson Rose */
+  --aura-3: rgba(14, 165, 233, 0.16); /* Abyssal Cyan */
+  --aura-4: rgba(245, 158, 11, 0.12); /* Molten Amber */
+
+  --prism-gradient: linear-gradient(135deg, #F5F6FA 0%, #E2E8F0 50%, #F8FAFC 100%);
+  --soft-pill-gradient: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.25));
+
+  --glass-surface: rgba(18, 20, 29, 0.62);
+  --glass-heavy: rgba(22, 25, 36, 0.84);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-subtle: rgba(255, 255, 255, 0.08);
+  --glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-glass: 0 20px 50px -12px rgba(0, 0, 0, 0.55);
+  --shadow-island: 0 30px 70px -15px rgba(0, 0, 0, 0.75);
+
+  --accent-stamp: #FB7185;
   --color-void: var(--bg-canvas);
   --color-void-2: var(--bg-sub);
   --color-void-3: var(--bg-elevated);
@@ -69,23 +97,25 @@ html.dark {
   --color-paper-dim: var(--bg-sub);
   --color-ink: var(--ink-primary);
   --color-ink-dim: var(--ink-secondary);
-  --color-line: var(--glass-border);
-  --color-line-soft: var(--glass-border);
+  --color-line: var(--glass-border-subtle);
+  --color-line-soft: var(--glass-border-subtle);
   --color-onpaper: var(--ink-primary);
   --color-onpaper-dim: var(--ink-muted);
-  --color-indigo: var(--ink-primary);
-  --color-indigo-dim: var(--ink-secondary);
-  --color-indigo-glow: var(--ink-primary);
-  --color-brass: var(--ink-primary);
-  --color-brass-dim: var(--ink-secondary);
-  --color-zest: var(--ink-primary);
-  --color-flame: #F87171;
-  --color-glass: var(--glass-bg);
-  --color-scrim: #09090B;
-  --color-on-scrim: #F4F4F6;
-  --color-on-indigo: #09090B;
-  --color-on-zest: #09090B;
-  --color-on-flame: #FFFFFF;
+  --color-indigo: #A855F7;
+  --color-indigo-dim: #9333EA;
+  --color-indigo-glow: #D8B4FE;
+  --color-brass: #F59E0B;
+  --color-brass-dim: #D97706;
+  --color-zest: #FBBF24;
+  --color-flame: #FB7185;
+  --color-glass: var(--glass-surface);
+  --color-scrim: #07080C;
+  --color-on-scrim: #F5F6FA;
+  --color-on-indigo: #07080C;
+  --color-on-zest: #07080C;
+  --color-on-flame: #07080C;
+  --border-hairline: var(--glass-border-subtle);
+  --border-strong: var(--ink-primary);
 }
 
 * {
@@ -103,6 +133,20 @@ body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+/* ==========================================================================
+   ATMOSPHERIC SILK MESH GRADIENT BACKDROP (Powers Glass Refraction)
+   ========================================================================== */
+.ambient-canvas {
+  position: relative;
+  background-color: var(--bg-canvas);
+  background-image:
+    radial-gradient(at 12% 15%, var(--aura-1) 0px, transparent 48%),
+    radial-gradient(at 85% 12%, var(--aura-2) 0px, transparent 50%),
+    radial-gradient(at 78% 78%, var(--aura-3) 0px, transparent 52%),
+    radial-gradient(at 18% 82%, var(--aura-4) 0px, transparent 48%);
+  background-attachment: fixed;
+}
+
 .font-editorial {
   font-family: var(--font-serif);
 }
@@ -115,24 +159,92 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Spatial Frosted Glass Surfaces */
+/* ==========================================================================
+   THREE-TIER REFRACTIVE GLASSMORPHISM CLASSES
+   ========================================================================== */
 .glass-pill {
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: var(--glass-surface);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-ambient);
+  box-shadow: var(--glass-specular), var(--shadow-glass);
 }
 
+.glass-card {
+  background: var(--glass-surface);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-specular), var(--shadow-glass);
+  border-radius: 26px;
+}
+
+.glass-modal,
 .glass-island {
-  background: var(--glass-bg);
-  backdrop-filter: blur(32px) saturate(190%);
-  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  background: var(--glass-heavy);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--glass-specular), var(--shadow-island);
 }
 
-/* Smooth Image Zoom */
+/* Universal Frosted Input */
+.glass-input {
+  width: 100%;
+  background: var(--bg-sub);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 2px rgba(15, 17, 23, 0.03);
+  border-radius: 16px;
+  padding: 0.85rem 1.1rem;
+  color: var(--ink-primary);
+  font-size: 0.875rem;
+  transition: all 0.25s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(147, 51, 234, 0.45);
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.12), var(--glass-specular);
+}
+
+/* Luminous Prism CTA Button */
+.btn-prism {
+  background: var(--prism-gradient);
+  color: var(--bg-canvas);
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  box-shadow: 0 12px 28px -8px rgba(15, 17, 23, 0.35);
+}
+
+.dark .btn-prism {
+  color: #07080C;
+}
+
+.btn-prism:hover {
+  transform: translateY(-1.5px) scale(1.01);
+  box-shadow: 0 18px 36px -8px rgba(147, 51, 234, 0.32);
+}
+
+/* Iridescent Gradient Badge & Text */
+.aura-badge {
+  background: var(--soft-pill-gradient);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-primary);
+}
+
+.aura-gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .sculptural-img {
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -140,14 +252,13 @@ body {
   transform: scale(1.045);
 }
 
-/* Structural Whisper Borders */
-.hairline-t { border-top: 1px solid var(--glass-border); }
-.hairline-b { border-bottom: 1px solid var(--glass-border); }
-.hairline-l { border-left: 1px solid var(--glass-border); }
-.hairline-r { border-right: 1px solid var(--glass-border); }
-.hairline-box { border: 1px solid var(--glass-border); }
+/* Hairline helpers */
+.hairline-t { border-top: 1px solid var(--glass-border-subtle); }
+.hairline-b { border-bottom: 1px solid var(--glass-border-subtle); }
+.hairline-l { border-left: 1px solid var(--glass-border-subtle); }
+.hairline-r { border-right: 1px solid var(--glass-border-subtle); }
+.hairline-box { border: 1px solid var(--glass-border-subtle); }
 
-/* Hide scrollbars on horizontal strips */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

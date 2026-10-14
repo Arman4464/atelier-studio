@@ -39,6 +39,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const secondaryImage = product?.images?.[1] || primaryImage;
   const sizes: string[] = product?.sizes || ['XS', 'S', 'M', 'L', 'XL'];
 
+  const isWishlisted = cartStore.isWishlisted?.(product.id) || false;
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    cartStore.toggleWishlist?.(product.id);
+  };
+
   const handleQuickAdd = (e: React.MouseEvent, size: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -75,7 +82,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Sculptural Image Container */}
       <Link
         to={`/product/${slug}`}
-        className={`relative block overflow-hidden rounded-[22px] bg-[var(--bg-sub)] ${ratio}`}
+        className={`relative block overflow-hidden rounded-[26px] bg-[var(--bg-sub)] ${ratio}`}
       >
         <img
           src={hovered ? secondaryImage : primaryImage}
@@ -84,16 +91,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           className="w-full h-full object-cover object-center sculptural-img"
         />
 
-        {/* Subtle Top-Left Pill if New */}
+        {/* Top-Left Pill Badge */}
         {(product?.isNew || product?.badge) && (
           <span className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full glass-pill text-[10px] font-medium tracking-wider uppercase">
             {product?.badge || 'New Season'}
           </span>
         )}
 
+        {/* Top-Right Wishlist Pill */}
+        <button
+          onClick={toggleWishlist}
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+          className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full glass-pill flex items-center justify-center text-xs transition-transform hover:scale-110 z-10"
+        >
+          <span className={isWishlisted ? 'text-rose-500 scale-110' : 'text-[var(--ink-secondary)]'}>
+            {isWishlisted ? '♥' : '♡'}
+          </span>
+        </button>
+
         {/* Floating Frosted Glass Quick-Size Capsule on Hover */}
-        <div className="absolute inset-x-3 bottom-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <div className="glass-island rounded-2xl p-2.5">
+        <div className="absolute inset-x-3 bottom-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-10">
+          <div className="glass-modal rounded-2xl p-2.5">
             <div className="text-[10px] text-center font-medium text-[var(--ink-secondary)] mb-1.5">
               {addedSize ? `Added ${addedSize} to Bag ✓` : 'Quick Add Size'}
             </div>

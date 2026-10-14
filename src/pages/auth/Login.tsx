@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import AuthShell from "../../components/auth/AuthShell";
@@ -8,7 +8,7 @@ import { useAuthStore } from "../../store/authStore";
 import { useUIStore } from "../../store/uiStore";
 import { isValidEmail } from "../../lib/validators";
 
-export default function Login() {
+export const Login: React.FC = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const logIn = useAuthStore((s) => s.logIn);
@@ -58,53 +58,69 @@ export default function Login() {
   };
 
   return (
-    <AuthShell eyebrow="Welcome Back" title="Log In" subtitle="Sign in to view your orders, wishlist and saved details.">
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+    <AuthShell eyebrow="Welcome Back" title="Client Sign In" subtitle="Access your orders, saved curation, and tailored preferences.">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
         <FormField label="Email" type="email" value={email} onChange={setEmail} required autoComplete="email" error={errors.email} />
         <PasswordField label="Password" value={password} onChange={setPassword} required autoComplete="current-password" error={errors.password} />
 
-        <div className="flex items-center justify-between text-xs">
-          <label className="flex items-center gap-2 text-ink-dim">
-            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 border-line accent-indigo" />
-            Stay signed in
+        <div className="flex items-center justify-between text-xs pt-1">
+          <label className="flex items-center gap-2 text-[var(--ink-secondary)] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded-md border-black/10 dark:border-white/10 accent-purple-600"
+            />
+            Keep me signed in
           </label>
-          <Link to="/forgot-password" className="text-ink-dim underline underline-offset-2 hover:text-ink">
+          <Link to="/forgot-password" className="text-[var(--ink-secondary)] hover:text-purple-600 dark:hover:text-purple-300 transition-colors">
             Forgot password?
           </Link>
         </div>
 
-        {formError && <p className="border border-flame/30 bg-flame/10 px-4 py-3 text-xs text-flame">{formError}</p>}
+        {formError && (
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-xs text-rose-500 font-medium">
+            {formError}
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 flex items-center justify-center gap-2 bg-ink py-4 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow disabled:opacity-60"
+          className="btn-prism mt-2 flex w-full items-center justify-center gap-2 py-4 rounded-2xl text-xs font-semibold uppercase tracking-wider disabled:opacity-60"
         >
           {loading && <Loader2 size={14} className="animate-spin" />}
-          {loading ? "Signing In..." : "Log In"}
+          {loading ? "Signing In..." : "Sign In to Studio"}
         </button>
       </form>
 
-      <div className="my-7 flex items-center gap-4 text-[10px] uppercase tracking-widest text-ink-dim">
-        <div className="h-px flex-1 bg-line" />
+      <div className="my-6 flex items-center gap-4 text-[10px] font-mono uppercase tracking-widest text-[var(--ink-muted)]">
+        <div className="h-px flex-1 bg-black/5 dark:bg-white/10" />
         or
-        <div className="h-px flex-1 bg-line" />
+        <div className="h-px flex-1 bg-black/5 dark:bg-white/10" />
       </div>
 
       <button
         onClick={tryDemo}
-        className="w-full border border-line py-4 text-xs font-semibold uppercase tracking-widest text-ink transition-colors hover:border-indigo-glow hover:text-indigo-glow"
+        className="glass-pill w-full py-3.5 rounded-2xl text-xs font-semibold uppercase tracking-wider text-[var(--ink-primary)] transition-all hover:border-purple-500/30"
       >
-        Continue with Demo Account
+        Explore with Demo Client
       </button>
-      <p className="mt-3 text-center text-[11px] text-ink-dim">Instantly explore the dashboard with sample orders &amp; addresses.</p>
+      <p className="mt-3 text-center text-[11px] text-[var(--ink-muted)]">
+        Instantly enter with pre-filled orders &amp; addresses.
+      </p>
 
-      <p className="mt-8 text-center text-xs text-ink-dim">
+      <p className="mt-8 text-center text-xs text-[var(--ink-secondary)]">
         New to Atelier?{" "}
-        <Link to={`/signup${params.get("redirect") ? `?redirect=${encodeURIComponent(params.get("redirect")!)}` : ""}`} className="text-ink underline underline-offset-2 hover:text-indigo-glow">
+        <Link
+          to={`/signup${params.get("redirect") ? `?redirect=${encodeURIComponent(params.get("redirect")!)}` : ""}`}
+          className="font-semibold text-purple-600 dark:text-purple-400 hover:underline"
+        >
           Create an account
         </Link>
       </p>
     </AuthShell>
   );
-}
+};
+
+export default Login;

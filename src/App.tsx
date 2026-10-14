@@ -76,6 +76,33 @@ function GlobalShortcuts({ isAdminRoute }: { isAdminRoute: boolean }) {
   return null;
 }
 
+function AmbientAuraWrapper({ children }: { children: React.ReactNode }) {
+  const [pos, setPos] = useState({ x: 50, y: 30 });
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => {
+      const x = Math.round((e.clientX / window.innerWidth) * 100);
+      const y = Math.round((e.clientY / window.innerHeight) * 100);
+      setPos({ x, y });
+    };
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, []);
+
+  return (
+    <div className="ambient-canvas min-h-screen relative overflow-x-hidden selection:bg-rose-200 selection:text-slate-900">
+      {/* Live Cursor-Following Silk Gradient Orb */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 opacity-60 dark:opacity-35"
+        style={{
+          background: `radial-gradient(650px circle at ${pos.x}% ${pos.y}%, var(--aura-2), transparent 70%)`,
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
 export default function App() {
   const [lastOrder, setLastOrder] = useState<{ shipping: ShippingInfo | null; orderNumber: string }>({
     shipping: null,
@@ -85,7 +112,7 @@ export default function App() {
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--ink-primary)]">
+    <AmbientAuraWrapper>
       <ScrollToTop />
       <GlobalShortcuts isAdminRoute={isAdminRoute} />
       <PreloaderController />
@@ -163,6 +190,6 @@ export default function App() {
       <SizeGuideModal />
       <QuickView />
       <Toaster />
-    </div>
+    </AmbientAuraWrapper>
   );
 }

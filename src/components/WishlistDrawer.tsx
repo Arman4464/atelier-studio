@@ -15,7 +15,6 @@ export const WishlistDrawer: React.FC = () => {
     else if (uiStore.setWishlistOpen) uiStore.setWishlistOpen(false);
   };
 
-  // Support wishlist stored in productsStore, cartStore, or uiStore
   const rawWishlist: any[] =
     productsStore.wishlist ||
     cartStore.wishlist ||
@@ -65,49 +64,52 @@ export const WishlistDrawer: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="fixed inset-0 z-50 flex justify-end p-3 sm:p-5">
       <div
         onClick={closeWishlist}
-        className="fixed inset-0 bg-black/50 backdrop-blur-[2px]"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
       />
 
-      <aside className="relative z-10 w-full max-w-md bg-[var(--bg-canvas)] text-[var(--ink-primary)] h-full flex flex-col justify-between hairline-l shadow-2xl font-ledger text-xs">
-        <div className="p-6 hairline-b flex items-center justify-between">
+      <aside className="relative z-10 w-full max-w-md glass-modal rounded-[32px] h-full flex flex-col justify-between overflow-hidden p-6 sm:p-8">
+        <div className="flex items-center justify-between pb-4 border-b border-[var(--glass-border-subtle)]">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-[var(--ink-muted)] block">
-              PRIVATE CLIENTELE PULL-SHEET
+            <h2 className="font-editorial italic text-3xl leading-none">Saved Wardrobe</h2>
+            <span className="text-xs text-[var(--ink-muted)] mt-1 block">
+              {savedProducts.length} {savedProducts.length === 1 ? 'piece' : 'pieces'} bookmarked
             </span>
-            <h2 className="font-grotesk font-extrabold text-xl uppercase mt-0.5">
-              Saved Specimens ({String(savedProducts.length).padStart(2, '0')})
-            </h2>
           </div>
           <button
             onClick={closeWishlist}
-            className="px-3 py-1.5 hairline-box hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)]"
+            className="w-9 h-9 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs hover:scale-105 transition-transform"
           >
-            [ ESC ]
+            ✕
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        <div className="flex-1 overflow-y-auto py-5 space-y-4 no-scrollbar">
           {savedProducts.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center text-[var(--ink-muted)] space-y-4">
-              <span>[ NO SPECIMENS CURRENTLY TAGGED ON YOUR RACK ]</span>
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-12">
+              <p className="font-editorial italic text-2xl text-[var(--ink-secondary)]">
+                Your saved wardrobe is empty
+              </p>
               <Link
                 to="/shop"
                 onClick={closeWishlist}
-                className="px-5 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)] uppercase tracking-widest"
+                className="btn-prism px-6 py-3 text-xs uppercase tracking-widest inline-block"
               >
-                EXPLORE ARCHIVE →
+                Explore Collection
               </Link>
             </div>
           ) : (
             savedProducts.map((item, idx) => (
-              <div key={item.id || idx} className="grid grid-cols-12 gap-4 pb-5 perforated-b">
+              <div
+                key={item.id || idx}
+                className="flex gap-4 p-3.5 rounded-2xl glass-card border border-[var(--glass-border-subtle)]"
+              >
                 <Link
                   to={`/product/${item.slug || item.id}`}
                   onClick={closeWishlist}
-                  className="col-span-3 aspect-[3/4] bg-[var(--bg-sub)] hairline-box overflow-hidden"
+                  className="w-20 h-24 rounded-xl overflow-hidden bg-[var(--bg-sub)] shrink-0"
                 >
                   <img
                     src={item.images?.[0] || item.image}
@@ -115,31 +117,37 @@ export const WishlistDrawer: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                 </Link>
-                <div className="col-span-9 flex flex-col justify-between">
+                <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between gap-2">
-                      <span className="font-grotesk font-bold text-sm uppercase">
+                      <Link
+                        to={`/product/${item.slug || item.id}`}
+                        onClick={closeWishlist}
+                        className="text-sm font-medium hover:opacity-75 transition-opacity leading-snug"
+                      >
                         {item.name || item.title}
+                      </Link>
+                      <span className="text-sm font-semibold shrink-0">
+                        {formatPrice(item.price)}
                       </span>
-                      <span className="font-bold">{formatPrice(item.price)}</span>
                     </div>
-                    <span className="text-[10px] text-[var(--ink-muted)] uppercase block mt-0.5">
-                      {item.category || 'ARCHIVE LOT'}
+                    <span className="text-xs text-[var(--ink-muted)] block mt-0.5">
+                      {item.category || 'Wardrobe Silhouette'}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between pt-3">
                     <button
                       onClick={() => handleMoveToBag(item)}
-                      className="px-3 py-1.5 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] uppercase text-[10px] tracking-wider font-medium"
+                      className="px-3.5 py-1.5 rounded-full btn-prism text-[11px] font-medium tracking-normal"
                     >
-                      + STAMP TO BAG
+                      + Move to Bag
                     </button>
                     <button
                       onClick={() => handleRemove(item.id)}
-                      className="text-[10px] text-[var(--ink-muted)] hover:text-[var(--accent-stamp)] underline uppercase"
+                      className="text-xs text-[var(--ink-muted)] hover:text-rose-500 transition-colors"
                     >
-                      RELEASE
+                      Remove
                     </button>
                   </div>
                 </div>

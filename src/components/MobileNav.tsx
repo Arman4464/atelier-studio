@@ -21,55 +21,63 @@ export const MobileNav: React.FC = () => {
   if (!isOpen) return null;
 
   const links = [
-    { idx: '01', label: 'COMPLETE ARCHIVE / SHOP', to: '/shop' },
-    { idx: '02', label: 'OUTERWEAR SILHOUETTES', to: '/shop?cat=Outerwear' },
-    { idx: '03', label: 'TEXTILE MONOGRAPHS', to: '/journal' },
-    { idx: '04', label: 'CLIENTELE DOSSIER', to: '/account' },
-    { idx: '05', label: 'ATELIER TERMINAL [ADMIN]', to: '/admin' },
+    { label: 'Home', to: '/' },
+    { label: 'Collection', to: '/shop' },
+    { label: 'Tailored Outerwear', to: '/shop?cat=Outerwear' },
+    { label: 'Editorial Monographs', to: '/journal' },
+    { label: 'Clientele Account', to: '/account' },
+    { label: 'Studio Portal', to: '/admin' },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 lg:hidden flex">
-      <div onClick={closeNav} className="fixed inset-0 bg-black/60 backdrop-blur-[2px]" />
+    <div className="fixed inset-0 z-50 lg:hidden flex p-4 sm:p-6">
+      <div onClick={closeNav} className="fixed inset-0 bg-black/45 backdrop-blur-md" />
 
-      <div className="relative z-10 w-full max-w-sm bg-[var(--bg-canvas)] text-[var(--ink-primary)] h-full flex flex-col justify-between hairline-r font-ledger">
-        <div className="p-5 hairline-b flex items-center justify-between">
-          <span className="font-grotesk font-extrabold text-lg">
-            ATELIER<span className="font-editorial italic font-normal text-xl ml-1">Studio</span>
-          </span>
-          <button onClick={closeNav} className="px-2.5 py-1 hairline-box text-xs">
-            [ CLOSE ]
+      <div className="relative z-10 w-full max-w-sm glass-modal rounded-[32px] h-full flex flex-col justify-between p-6 sm:p-8 overflow-hidden">
+        <div className="flex items-center justify-between pb-5 border-b border-[var(--glass-border-subtle)]">
+          <Link to="/" onClick={closeNav} className="font-editorial italic text-2xl">
+            Atelier Studio
+          </Link>
+          <button
+            onClick={closeNav}
+            className="w-9 h-9 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs hover:scale-105 transition-transform"
+          >
+            ✕
           </button>
         </div>
 
-        <nav className="flex-1 divide-y divide-[var(--border-hairline)]">
-          {links.map((item) => (
+        <nav className="flex-1 py-8 space-y-4 overflow-y-auto no-scrollbar">
+          {links.map((item, idx) => (
             <Link
-              key={item.idx}
+              key={item.label}
               to={item.to}
               onClick={closeNav}
-              className="flex items-center justify-between p-6 hover:bg-[var(--bg-sub)] transition-colors"
+              className="block font-editorial italic text-3xl sm:text-4xl text-[var(--ink-primary)] hover:opacity-70 transition-opacity"
             >
-              <div>
-                <span className="text-[10px] text-[var(--ink-muted)] block">/{item.idx}</span>
-                <span className="font-grotesk font-bold text-base uppercase">{item.label}</span>
-              </div>
-              <span className="text-sm text-[var(--accent-stamp)]">↗</span>
+              <span className="text-xs uppercase tracking-widest font-sans not-italic text-[var(--ink-muted)] block mb-1">
+                0{idx + 1}
+              </span>
+              {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="p-6 bg-[var(--bg-sub)] hairline-t text-xs space-y-3">
+        <div className="pt-5 border-t border-[var(--glass-border-subtle)] flex items-center justify-between">
           <button
             onClick={toggleTheme}
-            className="w-full py-3 hairline-box bg-[var(--bg-canvas)] uppercase font-medium"
+            className="px-4 py-2 rounded-full glass-pill text-xs font-medium flex items-center gap-2"
           >
-            [ INVERT ATELIER LIGHTING ]
+            <span>Atmosphere</span>
+            <span>◐</span>
           </button>
-          <div className="text-[10px] text-[var(--ink-muted)] flex justify-between">
-            <span>MILAN // KYOTO</span>
-            <span>EDITION AW//26</span>
-          </div>
+
+          <Link
+            to="/shop"
+            onClick={closeNav}
+            className="btn-prism px-5 py-2 text-xs"
+          >
+            Explore →
+          </Link>
         </div>
       </div>
     </div>

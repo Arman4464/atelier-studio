@@ -3,7 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { cn } from "../lib/cn";
 import { passwordStrength, STRENGTH_LABEL, STRENGTH_COLOR } from "../lib/validators";
 
-interface PasswordFieldProps {
+export interface PasswordFieldProps {
   label: string;
   value: string;
   onChange: (v: string) => void;
@@ -15,7 +15,7 @@ interface PasswordFieldProps {
   span2?: boolean;
 }
 
-export default function PasswordField({
+export function PasswordField({
   label,
   value,
   onChange,
@@ -31,12 +31,12 @@ export default function PasswordField({
   const strength = showStrength ? passwordStrength(value) : null;
 
   return (
-    <label htmlFor={fieldId} className={cn("flex flex-col gap-2", span2 && "sm:col-span-2")}>
-      <span className="text-[10px] uppercase tracking-widest text-ink-dim">
+    <div className={cn("space-y-1.5 w-full", span2 && "sm:col-span-2")}>
+      <label htmlFor={fieldId} className="block text-xs font-medium tracking-wide text-[var(--ink-secondary)] pl-1">
         {label}
-        {required && <span className="text-flame"> *</span>}
-      </span>
-      <div className="relative">
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      <div className="relative flex items-center">
         <input
           id={fieldId}
           type={visible ? "text" : "password"}
@@ -47,36 +47,46 @@ export default function PasswordField({
           aria-describedby={error ? `${fieldId}-error` : undefined}
           onChange={(e) => onChange(e.target.value)}
           className={cn(
-            "w-full border bg-transparent px-4 py-3 pr-11 text-sm text-ink transition-colors focus:outline-none",
-            error ? "border-flame focus:border-flame" : "border-line focus:border-indigo-glow"
+            "glass-input pr-11",
+            error && "border-rose-400 focus:ring-rose-400/30"
           )}
         />
         <button
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-0 top-0 flex h-full w-11 items-center justify-center text-ink-dim hover:text-ink"
+          className="absolute right-3.5 flex items-center text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition-colors"
         >
           {visible ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
       </div>
 
       {showStrength && value.length > 0 && strength !== null && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pt-1 pl-1">
           <div className="flex flex-1 gap-1">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className={cn("h-1 flex-1 rounded-full transition-colors", i <= strength - 1 ? STRENGTH_COLOR[strength] : "bg-line")} />
+              <div
+                key={i}
+                className={cn(
+                  "h-1 flex-1 rounded-full transition-colors",
+                  i <= strength - 1 ? STRENGTH_COLOR[strength] : "bg-[var(--glass-border-subtle)]"
+                )}
+              />
             ))}
           </div>
-          <span className="w-14 flex-shrink-0 text-[10px] text-ink-dim">{STRENGTH_LABEL[strength]}</span>
+          <span className="w-14 flex-shrink-0 text-[10px] text-[var(--ink-muted)] font-medium">
+            {STRENGTH_LABEL[strength]}
+          </span>
         </div>
       )}
 
       {error && (
-        <span id={`${fieldId}-error`} className="text-[11px] text-flame">
+        <p id={`${fieldId}-error`} className="text-xs text-rose-500 pl-1 font-medium">
           {error}
-        </span>
+        </p>
       )}
-    </label>
+    </div>
   );
 }
+
+export default PasswordField;

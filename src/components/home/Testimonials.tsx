@@ -1,34 +1,47 @@
+import React from "react";
 import { testimonials } from "../../data/content";
 import Rating from "../Rating";
 
-export default function Testimonials() {
+export const Testimonials: React.FC = () => {
   return (
-    <section className="mx-auto max-w-[1800px] px-1.5 py-1.5">
-      <div className="mb-8 flex flex-col gap-4 px-4 pt-10 sm:flex-row sm:items-end sm:justify-between md:px-6">
+    <section className="py-20 px-5 sm:px-10 max-w-[1440px] mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
         <div>
-          <span className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-indigo-glow">From Our Customers</span>
-          <h2 className="font-display text-4xl font-black uppercase text-ink md:text-6xl">Worn &amp; Trusted</h2>
+          <span className="text-xs uppercase tracking-[0.25em] text-[var(--ink-muted)] block mb-3">
+            Client Impressions
+          </span>
+          <h2 className="font-editorial italic text-4xl sm:text-6xl font-normal leading-tight">
+            Worn &amp; Enduring
+          </h2>
         </div>
         <div className="flex items-center gap-3">
           <Rating value={5} />
-          <span className="text-xs text-ink-dim">4.8 average across 1,204 reviews</span>
+          <span className="text-xs text-[var(--ink-muted)]">
+            4.9 rating across small-batch patrons
+          </span>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-1.5 md:grid-cols-3">
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {testimonials.map((t) => (
-          <div key={t.author} className="flex flex-col justify-between border border-line bg-void-2 p-8">
+          <div
+            key={t.author}
+            className="glass-card p-8 flex flex-col justify-between space-y-6 hover:translate-y-[-2px] transition-transform duration-300"
+          >
             <div>
               <Rating value={t.rating} className="mb-4" />
-              <p className="font-display text-xl leading-snug text-ink">&ldquo;{t.text}&rdquo;</p>
+              <p className="font-editorial italic text-2xl leading-snug text-[var(--ink-primary)]">
+                &ldquo;{t.text}&rdquo;
+              </p>
             </div>
-            <div className="mt-8 flex items-center justify-between border-t border-line pt-5">
+            <div className="pt-5 border-t border-[var(--glass-border-subtle)] flex items-center justify-between">
               <div>
-                <span className="block text-sm font-semibold text-ink">{t.author}</span>
-                <span className="text-[11px] text-ink-dim">{t.location}</span>
+                <span className="block text-sm font-semibold">{t.author}</span>
+                <span className="text-xs text-[var(--ink-muted)]">{t.location}</span>
               </div>
               {t.verified && (
-                <span className="border border-indigo-glow/30 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-indigo-glow">
-                  Verified
+                <span className="px-3 py-1 rounded-full aura-badge text-[10px] font-medium tracking-wide">
+                  Verified Client
                 </span>
               )}
             </div>
@@ -37,4 +50,6 @@ export default function Testimonials() {
       </div>
     </section>
   );
-}
+};
+
+export default Testimonials;
