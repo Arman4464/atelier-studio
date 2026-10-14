@@ -1,23 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
 import { useProductsStore } from '../store/productsStore';
 import { ProductCard } from '../components/ProductCard';
 
 export const Shop: React.FC = () => {
-  const [params] = useSearchParams();
   const productsStore = useProductsStore() as any;
   const rawProducts: any[] = productsStore.products || [];
 
-  const initialCat = (params.get('category') || params.get('cat') || 'ALL').toUpperCase();
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
-  const [viewMode, setViewMode] = useState<'EDITORIAL' | 'INDEX'>('EDITORIAL');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [hoveredProduct, setHoveredProduct] = useState<any | null>(null);
+  const [density, setDensity] = useState<'EDITORIAL' | 'GALLERY' | 'COMPACT'>('EDITORIAL');
 
   const categories = useMemo(() => {
-    const set = new Set<string>(['ALL']);
+    const set = new Set<string>(['All']);
     rawProducts.forEach((p) => {
-      if (p?.category) set.add(String(p.category).toUpperCase());
+      if (p?.category) set.add(String(p.category));
     });
     return Array.from(set);
   }, [rawProducts]);
@@ -25,8 +21,8 @@ export const Shop: React.FC = () => {
   const filteredProducts = useMemo(() => {
     return rawProducts.filter((p) => {
       const catMatch =
-        selectedCategory === 'ALL' ||
-        String(p?.category || '').toUpperCase() === selectedCategory;
+        selectedCategory === 'All' ||
+        String(p?.category || '').toLowerCase() === selectedCategory.toLowerCase();
       const title = String(p?.name || p?.title || '').toLowerCase();
       const queryMatch = !searchQuery || title.includes(searchQuery.toLowerCase());
       return catMatch && queryMatch;
@@ -34,37 +30,31 @@ export const Shop: React.FC = () => {
   }, [rawProducts, selectedCategory, searchQuery]);
 
   return (
-    <main className="min-h-screen bg-[var(--bg-canvas)]">
-      {/* Top Archive Header */}
-      <section className="px-6 sm:px-10 py-12 hairline-b grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-        <div className="lg:col-span-8">
-          <div className="font-ledger text-xs text-[var(--accent-stamp)] uppercase tracking-widest mb-2">
-            // COMPLETE GARMENT INDEX
-          </div>
-          <h1 className="font-grotesk font-extrabold text-4xl sm:text-6xl tracking-[-0.04em] uppercase leading-none">
-            Archive <span className="font-editorial italic font-normal lowercase">Catalog</span>
-          </h1>
-        </div>
-        <div className="lg:col-span-4 font-ledger text-xs text-[var(--ink-secondary)] flex flex-col sm:items-end justify-end">
-          <span>SHOWING {String(filteredProducts.length).padStart(2, '0')} SPECIMENS</span>
-          <span>BATCH RELEASE: AW // 2026</span>
-        </div>
-      </section>
+    <main className="min-h-screen pt-28 pb-32 px-5 sm:px-10 max-w-[1440px] mx-auto">
+      {/* Minimalist Centered Editorial Title */}
+      <header className="text-center max-w-2xl mx-auto mb-12">
+        <span className="text-xs uppercase tracking-[0.25em] text-[var(--ink-muted)] block mb-3">
+          Autumn — Winter Collection
+        </span>
+        <h1 className="font-editorial italic text-5xl sm:text-7xl font-normal tracking-tight">
+          The Complete Wardrobe
+        </h1>
+      </header>
 
-      {/* Filter & View Switcher Toolbar */}
-      <div className="sticky top-[68px] z-30 bg-[var(--bg-canvas)]/95 backdrop-blur-md hairline-b grid grid-cols-1 lg:grid-cols-12">
-        {/* Category Tabs */}
-        <div className="lg:col-span-7 flex items-center overflow-x-auto no-scrollbar hairline-r">
+      {/* Floating Frosted Filter & Layout Bar */}
+      <div className="sticky top-20 z-30 mb-14 flex flex-wrap items-center justify-between gap-4 glass-island p-2 rounded-full max-w-5xl mx-auto">
+        {/* Category Pills */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar px-1">
           {categories.map((cat) => {
             const active = selectedCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-5 py-3.5 font-ledger text-xs uppercase whitespace-nowrap hairline-r transition-colors ${
+                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                   active
-                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] font-medium'
-                    : 'hover:bg-[var(--bg-sub)] text-[var(--ink-secondary)]'
+                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] shadow-sm'
+                    : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
                 }`}
               >
                 {cat}
@@ -73,134 +63,80 @@ export const Shop: React.FC = () => {
           })}
         </div>
 
-        {/* Search Input + Editorial / Index View Toggle */}
-        <div className="lg:col-span-5 flex items-stretch justify-between">
+        {/* Search + Density Switcher */}
+        <div className="flex items-center gap-2 ml-auto pr-2">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="FILTER BY GARMENT OR REF..."
-            className="w-full px-4 py-3 bg-transparent font-ledger text-xs uppercase placeholder:text-[var(--ink-muted)] focus:outline-none hairline-r"
+            placeholder="Filter pieces..."
+            className="px-4 py-1.5 rounded-full bg-[var(--bg-sub)] text-xs placeholder:text-[var(--ink-muted)] focus:outline-none w-36 sm:w-48 text-[var(--ink-primary)]"
           />
 
-          <div className="flex items-stretch shrink-0">
+          <div className="hidden md:flex items-center gap-1 bg-[var(--bg-sub)] p-1 rounded-full text-[11px]">
             <button
-              onClick={() => setViewMode('EDITORIAL')}
-              className={`px-4 font-ledger text-[11px] uppercase hairline-r ${
-                viewMode === 'EDITORIAL'
-                  ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
-                  : 'hover:bg-[var(--bg-sub)]'
+              onClick={() => setDensity('EDITORIAL')}
+              className={`px-3 py-1 rounded-full transition-colors ${
+                density === 'EDITORIAL' ? 'bg-[var(--bg-elevated)] font-semibold shadow-sm' : 'opacity-60'
               }`}
             >
-              [ GRID ]
+              Editorial
             </button>
             <button
-              onClick={() => setViewMode('INDEX')}
-              className={`px-4 font-ledger text-[11px] uppercase ${
-                viewMode === 'INDEX'
-                  ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
-                  : 'hover:bg-[var(--bg-sub)]'
+              onClick={() => setDensity('GALLERY')}
+              className={`px-3 py-1 rounded-full transition-colors ${
+                density === 'GALLERY' ? 'bg-[var(--bg-elevated)] font-semibold shadow-sm' : 'opacity-60'
               }`}
             >
-              [ LEDGER ]
+              3 Col
+            </button>
+            <button
+              onClick={() => setDensity('COMPACT')}
+              className={`px-3 py-1 rounded-full transition-colors ${
+                density === 'COMPACT' ? 'bg-[var(--bg-elevated)] font-semibold shadow-sm' : 'opacity-60'
+              }`}
+            >
+              4 Col
             </button>
           </div>
         </div>
       </div>
 
-      {/* MODE 1: Asymmetric Editorial Grid */}
-      {viewMode === 'EDITORIAL' ? (
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Product Showcase Grid */}
+      {density === 'EDITORIAL' ? (
+        /* Staggered Asymmetric Bento Rhythm */
+        <section className="grid grid-cols-1 md:grid-cols-12 gap-y-14 gap-x-8 items-start">
           {filteredProducts.map((product, idx) => {
-            // Every 5th item spans 2 columns for an editorial magazine rhythm
-            const isFeature = idx % 5 === 0;
+            const pattern = idx % 5;
+            let spanClass = 'md:col-span-4';
+            let aspect = 'aspect-[3/4]';
+
+            if (pattern === 0) {
+              spanClass = 'md:col-span-7';
+              aspect = 'aspect-[4/4] sm:aspect-[16/12]';
+            } else if (pattern === 1) {
+              spanClass = 'md:col-span-5 md:mt-20';
+              aspect = 'aspect-[3/4]';
+            } else if (pattern === 3) {
+              spanClass = 'md:col-span-4 md:mt-12';
+            }
+
             return (
-              <div
-                key={product.id || idx}
-                className={`hairline-b hairline-r ${
-                  isFeature ? 'sm:col-span-2' : 'col-span-1'
-                }`}
-              >
-                <ProductCard product={product} index={idx} featured={isFeature} />
+              <div key={product.id || idx} className={spanClass}>
+                <ProductCard product={product} index={idx} aspectClass={aspect} />
               </div>
             );
           })}
         </section>
       ) : (
-        /* MODE 2: High-Density Archival Ledger Table with Floating Lookbook Preview */
-        <section className="grid grid-cols-1 lg:grid-cols-12 min-h-[70vh]">
-          <div className="lg:col-span-8 hairline-r">
-            <div className="grid grid-cols-12 px-6 py-3 hairline-b font-ledger text-[10px] uppercase text-[var(--ink-muted)]">
-              <div className="col-span-2">REF N°</div>
-              <div className="col-span-5">GARMENT SPECIFICATION</div>
-              <div className="col-span-3">CATEGORY</div>
-              <div className="col-span-2 text-right">VALUATION</div>
-            </div>
-
-            {filteredProducts.map((product, idx) => {
-              const slug = product?.slug || product?.id;
-              const title = product?.name || product?.title;
-              const price =
-                typeof product?.price === 'number'
-                  ? product.price > 1000
-                    ? `$${Math.round(product.price * 0.0104)}`
-                    : `$${product.price}`
-                  : product?.price || '$380';
-
-              return (
-                <Link
-                  key={slug || idx}
-                  to={`/product/${slug}`}
-                  onMouseEnter={() => setHoveredProduct(product)}
-                  className="grid grid-cols-12 items-center px-6 py-4 hairline-b font-ledger text-xs hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors group"
-                >
-                  <div className="col-span-2 opacity-60">
-                    AS-{String(idx + 101)}
-                  </div>
-                  <div className="col-span-5 font-grotesk font-bold text-sm">
-                    {title}
-                  </div>
-                  <div className="col-span-3 uppercase opacity-75">
-                    {product?.category || 'ARCHIVE'}
-                  </div>
-                  <div className="col-span-2 text-right font-medium">
-                    {price} <span className="ml-1 opacity-0 group-hover:opacity-100">↗</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Sticky Specimen Preview Pane */}
-          <div className="hidden lg:flex lg:col-span-4 p-8 sticky top-[120px] h-fit flex-col justify-between">
-            {hoveredProduct ? (
-              <div className="space-y-4">
-                <div className="font-ledger text-[11px] uppercase text-[var(--ink-muted)] flex justify-between">
-                  <span>SPECIMEN PREVIEW</span>
-                  <span>[ LIVE ]</span>
-                </div>
-                <div className="aspect-[3/4] hairline-box overflow-hidden bg-[var(--bg-sub)]">
-                  <img
-                    src={hoveredProduct?.images?.[0] || hoveredProduct?.image}
-                    alt={hoveredProduct?.name || hoveredProduct?.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="font-ledger text-xs">
-                  <div className="font-bold uppercase">
-                    {hoveredProduct?.name || hoveredProduct?.title}
-                  </div>
-                  <p className="text-[var(--ink-secondary)] mt-1 line-clamp-2">
-                    {hoveredProduct?.description || 'Archival small-batch construction.'}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="aspect-[3/4] hairline-box flex items-center justify-center p-8 text-center font-ledger text-xs text-[var(--ink-muted)]">
-                [ HOVER ANY ARCHIVE LEDGER ROW TO INSPECT SILHOUETTE ]
-              </div>
-            )}
-          </div>
+        <section
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-x-7 gap-y-12 ${
+            density === 'GALLERY' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
+          }`}
+        >
+          {filteredProducts.map((product, idx) => (
+            <ProductCard key={product.id || idx} product={product} index={idx} />
+          ))}
         </section>
       )}
     </main>

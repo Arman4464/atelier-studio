@@ -1,75 +1,60 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const Manifesto: React.FC = () => {
   return (
-    <section className="hairline-b py-16 lg:py-24 px-4 sm:px-8 bg-[var(--bg-sub)]">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-        {/* Left Editorial Statement */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="font-ledger text-xs uppercase tracking-[0.2em] text-[var(--accent-stamp)]">
-            // MANIFESTO & MATERIAL DOCTRINE
-          </div>
-          <h2 className="font-grotesk font-extrabold text-3xl sm:text-5xl leading-[1.02] tracking-[-0.03em] uppercase">
-            Against disposable garments. <br />
-            <span className="font-editorial italic font-normal lowercase text-4xl sm:text-6xl">
-              Built like industrial architecture.
+    <section className="py-12 sm:py-20 px-5 sm:px-10 max-w-[1440px] mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Large Left Visual Bento Card */}
+        <div className="lg:col-span-7 relative rounded-[28px] overflow-hidden min-h-[460px] flex items-end p-8 sm:p-12 bg-[#141417] text-white">
+          <img
+            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85"
+            alt="Atelier Craft"
+            className="absolute inset-0 w-full h-full object-cover opacity-75"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="relative z-10 max-w-lg">
+            <span className="text-[11px] uppercase tracking-[0.25em] text-white/70 block mb-2">
+              Material Philosophy
             </span>
-          </h2>
-          <p className="text-[var(--ink-secondary)] text-base sm:text-lg leading-relaxed max-w-2xl">
-            Every silhouette begins as an unbleached muslin toile on our Milan pattern table. We leave selvedge edges intact, use natural corozo nut and horn hardware, and document the exact mill and weave weight on a physical label stitched into the lining.
-          </p>
+            <h3 className="font-editorial italic text-4xl sm:text-5xl font-normal leading-[1.05]">
+              Designed to move like liquid architecture.
+            </h3>
+          </div>
         </div>
 
-        {/* Right Physical Tyvek Care Label */}
-        <div className="lg:col-span-5">
-          <div className="bg-[var(--bg-elevated)] p-6 sm:p-8 hairline-box shadow-sm relative font-ledger text-xs">
-            {/* Top Stitch Marks */}
-            <div className="perforated-b pb-4 mb-4 flex items-center justify-between">
-              <span className="font-bold tracking-widest">ATELIER STUDIO // MILANO</span>
-              <span className="px-2 py-0.5 bg-[var(--ink-primary)] text-[var(--bg-canvas)]">
-                LOT N° 2026-A
+        {/* Right Stacked Bento Column */}
+        <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+          <div className="flex-1 rounded-[28px] bg-[var(--bg-sub)] p-8 sm:p-10 flex flex-col justify-between">
+            <span className="text-xs uppercase tracking-[0.2em] text-[var(--ink-muted)]">
+              01 — Textile Provenance
+            </span>
+            <p className="text-lg sm:text-xl font-normal leading-relaxed text-[var(--ink-primary)] my-6">
+              We partner exclusively with family-owned mills in Biella and Kyoto—selecting organic virgin wools, raw silk habotai, and brushed cashmere that soften with every year of wear.
+            </p>
+            <Link
+              to="/journal"
+              className="text-xs font-semibold uppercase tracking-widest underline underline-offset-8 self-start"
+            >
+              Read the Journal →
+            </Link>
+          </div>
+
+          <div className="rounded-[28px] bg-[var(--ink-primary)] text-[var(--bg-canvas)] p-8 sm:p-10 flex items-center justify-between gap-6">
+            <div>
+              <span className="text-[11px] uppercase tracking-[0.2em] opacity-60 block">
+                Complimentary Service
               </span>
+              <h4 className="font-editorial italic text-2xl sm:text-3xl mt-1">
+                Bespoke Hemming & Global Express Delivery
+              </h4>
             </div>
-
-            <div className="space-y-3 text-[11px] leading-relaxed">
-              <div className="grid grid-cols-3 py-1.5 hairline-b">
-                <span className="text-[var(--ink-muted)]">COMPOSITION:</span>
-                <span className="col-span-2 font-medium">
-                  100% LONG-STAPLE ORGANIC COTTON / VIRGIN WOOL
-                </span>
-              </div>
-              <div className="grid grid-cols-3 py-1.5 hairline-b">
-                <span className="text-[var(--ink-muted)]">WEAVE ORIGIN:</span>
-                <span className="col-span-2 font-medium">
-                  OKAYAMA LOOMSTATE & BIELLA ARCHIVE MILLS
-                </span>
-              </div>
-              <div className="grid grid-cols-3 py-1.5 hairline-b">
-                <span className="text-[var(--ink-muted)]">CONSTRUCTION:</span>
-                <span className="col-span-2 font-medium">
-                  SINGLE-NEEDLE LOCKSTITCH // FRENCH SEAMS
-                </span>
-              </div>
-              <div className="grid grid-cols-3 py-1.5 hairline-b">
-                <span className="text-[var(--ink-muted)]">CARE SPEC:</span>
-                <span className="col-span-2 font-medium">
-                  COLD HAND WASH. DRY FLAT IN SHADE. DO NOT TUMBLE.
-                </span>
-              </div>
-            </div>
-
-            {/* Care Symbols & Inspector Stamp */}
-            <div className="mt-6 pt-4 perforated-b flex items-center justify-between text-[var(--ink-secondary)]">
-              <div className="flex items-center gap-4 text-base tracking-widest">
-                <span title="30C Wash">[ 30° ]</span>
-                <span title="Do Not Bleach">[ ✕△ ]</span>
-                <span title="Dry Flat">[ ⊟ ]</span>
-                <span title="Low Iron">[  iron ]</span>
-              </div>
-              <div className="border border-[var(--accent-stamp)] text-[var(--accent-stamp)] px-2 py-0.5 text-[10px] uppercase rotate-[-3deg] font-bold">
-                INSPECTED BY N° 14
-              </div>
-            </div>
+            <Link
+              to="/shop"
+              className="w-12 h-12 rounded-full bg-[var(--bg-canvas)] text-[var(--ink-primary)] flex items-center justify-center shrink-0 text-sm hover:scale-105 transition-transform"
+            >
+              ↗
+            </Link>
           </div>
         </div>
       </div>

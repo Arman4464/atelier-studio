@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/uiStore';
 import { useProductsStore } from '../store/productsStore';
 
@@ -58,95 +58,76 @@ export const SearchModal: React.FC<SearchModalProps> = (props) => {
   }, [isOpen, products]);
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return products.slice(0, 6);
+    if (!query.trim()) return products.slice(0, 6);
+    const q = query.toLowerCase();
     return products.filter((p) => {
-      const name = String(p.name || p.title || '').toLowerCase();
+      const title = String(p.name || p.title || '').toLowerCase();
       const cat = String(p.category || '').toLowerCase();
-      const desc = String(p.description || '').toLowerCase();
-      return name.includes(q) || cat.includes(q) || desc.includes(q);
+      return title.includes(q) || cat.includes(q);
     });
-  }, [products, query]);
+  }, [query, products]);
+
+  const quickQueries = ['Coats', 'Trousers', 'Knitwear', 'Silk', 'Outerwear'];
+
+  const formatPrice = (val: any) => {
+    if (typeof val === 'number') {
+      const num = val > 1000 ? Math.round(val * 0.0104) : val;
+      return `$${num}`;
+    }
+    return val || '$380';
+  };
 
   if (!isOpen) return null;
 
-  const quickQueries = ['OUTERWEAR', 'WOOL', 'CANVAS', 'KNITWEAR', 'OBJECTS'];
-
-  const formatPrice = (price: any) => {
-    if (typeof price === 'number') {
-      return price > 1000 ? `$${Math.round(price * 0.0104)}` : `$${price}`;
-    }
-    return price || '$380';
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-20 px-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div
         onClick={closeSearch}
-        className="fixed inset-0 bg-black/60 backdrop-blur-[2px]"
+        className="fixed inset-0 bg-black/45 backdrop-blur-md transition-opacity"
       />
 
-      {/* Microfiche Index Terminal */}
-      <div className="relative z-10 w-full max-w-4xl bg-[var(--bg-canvas)] text-[var(--ink-primary)] hairline-box shadow-2xl overflow-hidden font-ledger text-xs">
-        {/* Top Terminal Status Bar */}
-        <div className="px-6 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)] flex items-center justify-between font-ledger text-[11px] uppercase">
-          <div className="flex items-center gap-3">
-            <span className="inline-block w-2 h-2 bg-[var(--accent-stamp)]" />
-            <span>ARCHIVE MICROFICHE TERMINAL // QUERY MODE</span>
-          </div>
-          <button
-            onClick={closeSearch}
-            className="hover:text-[var(--accent-stamp)] transition-colors"
-          >
-            [ ESC TO EXIT ]
-          </button>
-        </div>
-
-        {/* Search Input Row */}
-        <div className="p-6 hairline-b bg-[var(--bg-elevated)] flex items-center gap-4">
-          <span className="font-ledger text-sm text-[var(--accent-stamp)] font-bold">
-            QUERY://
-          </span>
+      <div className="relative z-10 w-full max-w-3xl glass-island rounded-[32px] overflow-hidden shadow-2xl">
+        {/* Search Input Bar */}
+        <div className="p-5 sm:p-7 border-b border-[var(--glass-border)] flex items-center gap-4">
+          <svg className="w-5 h-5 text-[var(--ink-muted)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
+          </svg>
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="TYPE SILHOUETTE, TEXTILE WEIGHT, OR REF N°..."
-            className="w-full bg-transparent font-ledger text-sm sm:text-base uppercase placeholder:text-[var(--ink-muted)] focus:outline-none"
+            placeholder="Search wardrobe, silhouettes, textiles..."
+            className="w-full bg-transparent text-lg sm:text-xl font-light placeholder:text-[var(--ink-muted)] focus:outline-none text-[var(--ink-primary)]"
           />
-          {query && (
-            <button
-              onClick={() => setQuery('')}
-              className="font-ledger text-xs text-[var(--ink-muted)] hover:text-[var(--ink-primary)]"
-            >
-              [CLEAR]
-            </button>
-          )}
+          <button
+            onClick={closeSearch}
+            className="w-8 h-8 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs hover:scale-105 transition-transform shrink-0"
+          >
+            ✕
+          </button>
         </div>
 
-        {/* Preset Tag Filters */}
-        <div className="px-6 py-2.5 hairline-b bg-[var(--bg-sub)] flex items-center gap-2 overflow-x-auto font-ledger text-[10px]">
-          <span className="text-[var(--ink-muted)] uppercase shrink-0">INDEX TAGS:</span>
+        {/* Quick Suggestion Pills */}
+        <div className="px-6 py-3 border-b border-[var(--glass-border)] bg-[var(--bg-sub)]/50 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+          <span className="text-[var(--ink-muted)] shrink-0">Explore:</span>
           {quickQueries.map((tag) => (
             <button
               key={tag}
               onClick={() => setQuery(tag)}
-              className="px-2.5 py-1 bg-[var(--bg-canvas)] hairline-box hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors uppercase shrink-0"
+              className="px-3.5 py-1 rounded-full glass-pill text-xs hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors shrink-0"
             >
               {tag}
             </button>
           ))}
         </div>
 
-        {/* Split Results Ledger & Specimen Preview */}
-        <div className="grid grid-cols-1 md:grid-cols-12 max-h-[60vh] overflow-y-auto">
-          {/* Left 7 Columns: Ledger Rows */}
-          <div className="md:col-span-7 hairline-r divide-y divide-[var(--border-hairline)]">
+        {/* Results List & Preview */}
+        <div className="grid grid-cols-1 md:grid-cols-12 max-h-[55vh] overflow-y-auto no-scrollbar">
+          <div className="md:col-span-7 divide-y divide-[var(--glass-border)]">
             {results.length === 0 ? (
-              <div className="p-10 font-ledger text-xs text-[var(--ink-muted)] text-center">
-                [ NO ARCHIVE SPECIMENS MATCHING "{query.toUpperCase()}" ]
+              <div className="p-12 text-center text-sm text-[var(--ink-muted)]">
+                No pieces found matching &ldquo;{query}&rdquo;
               </div>
             ) : (
               results.map((item, idx) => {
@@ -162,59 +143,43 @@ export const SearchModal: React.FC<SearchModalProps> = (props) => {
                       closeSearch();
                       navigate(`/product/${slug}`);
                     }}
-                    className="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors group font-ledger text-xs"
+                    className="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-[var(--bg-sub)] transition-colors group"
                   >
-                    <div className="flex items-center gap-4">
-                      <span className="opacity-50">
-                        N° {String(idx + 1).padStart(2, '0')}
-                      </span>
-                      <div>
-                        <div className="font-grotesk font-bold text-sm uppercase">
-                          {title}
-                        </div>
-                        <div className="text-[10px] opacity-70 uppercase">
-                          {item.category || 'ARCHIVE'}
-                        </div>
-                      </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-[var(--ink-primary)] group-hover:opacity-75 transition-opacity">
+                        {title}
+                      </h4>
+                      <p className="text-xs text-[var(--ink-muted)] mt-0.5">
+                        {item.category || 'Collection Piece'}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="font-medium">{price}</span>
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                        →
-                      </span>
-                    </div>
+                    <span className="text-xs font-semibold text-[var(--ink-primary)]">
+                      {price}
+                    </span>
                   </button>
                 );
               })
             )}
           </div>
 
-          {/* Right 5 Columns: Live Optical Plate */}
-          <div className="hidden md:flex md:col-span-5 p-6 bg-[var(--bg-sub)] flex-col justify-between">
+          {/* Right Preview Column */}
+          <div className="hidden md:block md:col-span-5 p-6 bg-[var(--bg-sub)]/30 border-l border-[var(--glass-border)]">
             {activeProduct ? (
               <div className="space-y-4">
-                <div className="flex justify-between font-ledger text-[10px] text-[var(--ink-muted)] uppercase">
-                  <span>OPTICAL PLATE PREVIEW</span>
-                  <span>REF. AS-{activeProduct.id || '01'}</span>
-                </div>
-                <div className="aspect-[4/5] bg-[var(--bg-canvas)] hairline-box overflow-hidden">
+                <div className="rounded-2xl overflow-hidden aspect-[3/4] bg-[var(--bg-sub)] shadow-md">
                   <img
-                    src={activeProduct?.images?.[0] || activeProduct?.image}
-                    alt={activeProduct?.name || activeProduct?.title}
+                    src={activeProduct.images?.[0] || activeProduct.image}
+                    alt={activeProduct.name || activeProduct.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex items-baseline justify-between font-ledger text-xs pt-2 hairline-t">
-                  <span className="font-bold uppercase">
+                <div>
+                  <h4 className="font-editorial italic text-2xl leading-none">
                     {activeProduct.name || activeProduct.title}
-                  </span>
-                  <Link
-                    to={`/product/${activeProduct.slug || activeProduct.id}`}
-                    onClick={closeSearch}
-                    className="underline text-[var(--accent-stamp)] font-semibold"
-                  >
-                    OPEN DOSSIER ↗
-                  </Link>
+                  </h4>
+                  <p className="text-xs text-[var(--ink-muted)] mt-1">
+                    {activeProduct.category} · {formatPrice(activeProduct.price)}
+                  </p>
                 </div>
               </div>
             ) : null}

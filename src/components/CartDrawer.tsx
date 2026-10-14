@@ -13,144 +13,112 @@ export const CartDrawer: React.FC = () => {
     else if (uiStore.setCartOpen) uiStore.setCartOpen(false);
   };
 
-  const rawItems: any[] =
-    cartStore.items && cartStore.items.length > 0
-      ? cartStore.items
-      : cartStore.cart || [];
+  const items: any[] = cartStore.items || cartStore.cart || [];
   const removeItem = cartStore.removeItem || cartStore.removeFromCart;
   const updateQuantity = cartStore.updateQuantity;
 
-  const getNormalizedPrice = (price: any): number => {
-    if (typeof price === 'number') {
-      return price > 1000 ? Math.round(price * 0.0104) : price;
-    }
-    const parsed = parseFloat(String(price).replace(/[^0-9.]/g, ''));
-    return isNaN(parsed) ? 0 : parsed > 1000 ? Math.round(parsed * 0.0104) : parsed;
-  };
-
-  const subtotal = rawItems.reduce(
-    (sum, item) => sum + getNormalizedPrice(item.price) * (item.quantity || item.qty || 1),
-    0
-  );
+  const subtotal = items.reduce((sum, item) => {
+    const rawPrice = Number(item.price) || 0;
+    const price = rawPrice > 1000 ? Math.round(rawPrice * 0.0104) : rawPrice;
+    return sum + price * (item.quantity || item.qty || 1);
+  }, 0);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex justify-end p-3 sm:p-5">
       <div
         onClick={closeCart}
-        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
       />
 
-      {/* Packing Slip Drawer */}
-      <aside className="relative z-10 w-full max-w-md bg-[var(--bg-canvas)] text-[var(--ink-primary)] h-full flex flex-col justify-between hairline-l shadow-2xl">
-        {/* Top Requisition Header */}
-        <div className="p-6 hairline-b flex items-center justify-between">
+      {/* Detached Floating Glass Pod */}
+      <aside className="relative z-10 w-full max-w-md glass-island rounded-[28px] sm:rounded-[32px] h-full flex flex-col justify-between overflow-hidden p-6 sm:p-8">
+        <div className="flex items-center justify-between pb-5 border-b border-[var(--glass-border)]">
           <div>
-            <span className="font-ledger text-[10px] uppercase tracking-widest text-[var(--ink-muted)] block">
-              REQUISITION SLIP // MILAN WORKSHOP
+            <h2 className="font-editorial italic text-3xl leading-none">Your Bag</h2>
+            <span className="text-xs text-[var(--ink-muted)] mt-1 block">
+              {items.length} {items.length === 1 ? 'piece' : 'pieces'} selected
             </span>
-            <h2 className="font-grotesk font-extrabold text-xl uppercase tracking-tight">
-              Client Bag ({String(rawItems.length).padStart(2, '0')})
-            </h2>
           </div>
           <button
             onClick={closeCart}
-            className="font-ledger text-xs uppercase px-3 py-1.5 hairline-box hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors"
+            className="w-9 h-9 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs hover:scale-105 transition-transform"
           >
-            [ ESC ]
+            ✕
           </button>
         </div>
 
-        {/* Line Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {rawItems.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center font-ledger text-xs text-[var(--ink-muted)] space-y-4">
-              <span>[ YOUR ARCHIVE REQUISITION SLIP IS EMPTY ]</span>
+        <div className="flex-1 overflow-y-auto py-6 space-y-5 no-scrollbar">
+          {items.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+              <p className="font-editorial italic text-2xl text-[var(--ink-secondary)]">
+                Your wardrobe bag is empty
+              </p>
               <Link
                 to="/shop"
                 onClick={closeCart}
-                className="px-5 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)] uppercase tracking-widest"
+                className="px-6 py-3 rounded-full bg-[var(--ink-primary)] text-[var(--bg-canvas)] text-xs font-medium uppercase tracking-widest hover:opacity-90 transition-opacity"
               >
-                BROWSE SPECIMENS →
+                Explore Collection
               </Link>
             </div>
           ) : (
-            rawItems.map((item, idx) => {
-              const itemKey = `${item.id}-${item.selectedSize || item.size || idx}`;
-              const size = item.selectedSize || item.size || 'OS';
-              const color = item.selectedColor || item.color || 'RAW';
-              const unitPrice = getNormalizedPrice(item.price);
+            items.map((item, idx) => {
+              const size = item.selectedSize || item.size || 'M';
+              const color = item.selectedColor || item.color || 'Default';
+              const rawPrice = Number(item.price) || 0;
+              const price = rawPrice > 1000 ? Math.round(rawPrice * 0.0104) : rawPrice;
               const qty = item.quantity || item.qty || 1;
 
               return (
                 <div
-                  key={itemKey}
-                  className="grid grid-cols-12 gap-4 pb-5 perforated-b items-start"
+                  key={`${item.id}-${size}-${idx}`}
+                  className="flex gap-4 p-3 rounded-2xl bg-[var(--bg-elevated)]/70"
                 >
-                  <div className="col-span-3 aspect-[3/4] bg-[var(--bg-sub)] hairline-box overflow-hidden">
-                    <img
-                      src={item?.images?.[0] || item?.image}
-                      alt={item?.name || item?.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="col-span-9 flex flex-col justify-between h-full">
+                  <img
+                    src={item?.images?.[0] || item?.image}
+                    alt={item?.name || item?.title}
+                    className="w-20 h-24 rounded-xl object-cover shrink-0"
+                  />
+                  <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-grotesk font-bold text-sm uppercase">
-                          {item?.name || item?.title}
-                        </h3>
-                        <span className="font-ledger text-xs font-semibold">
-                          ${(unitPrice * qty).toFixed(2)}
+                      <div className="flex justify-between gap-2">
+                        <h3 className="text-sm font-medium">{item?.name || item?.title}</h3>
+                        <span className="text-sm font-semibold">
+                          ${(price * qty).toFixed(2)}
                         </span>
                       </div>
-                      <div className="font-ledger text-[11px] text-[var(--ink-secondary)] mt-1">
-                        SIZE: [{size}] // LOT: {String(color).toUpperCase()}
-                      </div>
+                      <p className="text-xs text-[var(--ink-muted)] mt-0.5">
+                        {color} · Size {size}
+                      </p>
                     </div>
 
-                    <div className="flex items-center justify-between mt-4">
-                      <div className="inline-flex items-center hairline-box font-ledger text-xs">
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="inline-flex items-center rounded-full bg-[var(--bg-sub)] px-2 py-0.5 text-xs">
                         <button
-                          onClick={() => {
-                            if (updateQuantity) {
-                              updateQuantity(item.id, Math.max(1, qty - 1), size, color);
-                            } else if (cartStore.updateQty) {
-                              cartStore.updateQty(item.id, -1);
-                            }
-                          }}
-                          className="px-2.5 py-1 hover:bg-[var(--bg-sub)]"
+                          onClick={() =>
+                            updateQuantity?.(item.id, Math.max(1, qty - 1), size, color)
+                          }
+                          className="px-2 py-0.5 hover:text-[var(--ink-primary)]"
                         >
-                          -
+                          −
                         </button>
-                        <span className="px-3 py-1 hairline-l hairline-r">
-                          {qty}
-                        </span>
+                        <span className="px-2 font-medium">{qty}</span>
                         <button
-                          onClick={() => {
-                            if (updateQuantity) {
-                              updateQuantity(item.id, qty + 1, size, color);
-                            } else if (cartStore.updateQty) {
-                              cartStore.updateQty(item.id, 1);
-                            }
-                          }}
-                          className="px-2.5 py-1 hover:bg-[var(--bg-sub)]"
+                          onClick={() =>
+                            updateQuantity?.(item.id, qty + 1, size, color)
+                          }
+                          className="px-2 py-0.5 hover:text-[var(--ink-primary)]"
                         >
                           +
                         </button>
                       </div>
-
                       <button
-                        onClick={() => {
-                          if (removeItem) removeItem(item.id, size, color);
-                          else if (cartStore.removeFromCart) cartStore.removeFromCart(item.id);
-                        }}
-                        className="font-ledger text-[11px] uppercase text-[var(--ink-muted)] hover:text-[var(--accent-stamp)] underline"
+                        onClick={() => removeItem?.(item.id, size, color)}
+                        className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink-primary)] transition-colors"
                       >
-                        REMOVE
+                        Remove
                       </button>
                     </div>
                   </div>
@@ -160,27 +128,20 @@ export const CartDrawer: React.FC = () => {
           )}
         </div>
 
-        {/* Bottom Invoice Ledger */}
-        {rawItems.length > 0 && (
-          <div className="p-6 bg-[var(--bg-sub)] hairline-t space-y-4">
-            <div className="space-y-1.5 font-ledger text-xs">
-              <div className="flex justify-between text-[var(--ink-secondary)]">
-                <span>COURIER DISPATCH</span>
-                <span>COMPLIMENTARY</span>
-              </div>
-              <div className="flex justify-between text-sm font-bold pt-2 perforated-b pb-2">
-                <span>TOTAL VALUATION</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
+        {items.length > 0 && (
+          <div className="pt-5 border-t border-[var(--glass-border)] space-y-4">
+            <div className="flex items-baseline justify-between">
+              <span className="text-xs uppercase tracking-widest text-[var(--ink-muted)]">
+                Subtotal
+              </span>
+              <span className="font-editorial italic text-3xl">${subtotal.toFixed(2)}</span>
             </div>
-
             <Link
               to="/checkout"
               onClick={closeCart}
-              className="w-full py-4 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] transition-colors font-ledger text-xs uppercase tracking-widest flex items-center justify-center gap-3 font-medium"
+              className="block w-full py-4 rounded-full bg-[var(--ink-primary)] text-[var(--bg-canvas)] text-center text-xs font-semibold uppercase tracking-[0.18em] hover:opacity-90 transition-opacity shadow-lg"
             >
-              <span>PROCEED TO DISPATCH LEDGER</span>
-              <span>→</span>
+              Proceed to Checkout →
             </Link>
           </div>
         )}

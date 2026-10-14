@@ -29,7 +29,7 @@ export const Checkout: React.FC<CheckoutProps> = ({ onComplete }) => {
     city: '',
     postalCode: '',
     country: 'ITALY',
-    courier: 'DHL_EXPRESS_ARCHIVE',
+    courier: 'DHL_EXPRESS',
     cardName: '',
     cardNumber: '',
     expiry: '',
@@ -48,14 +48,14 @@ export const Checkout: React.FC<CheckoutProps> = ({ onComplete }) => {
     (sum, item) => sum + getNormalizedPrice(item.price) * (item.quantity || item.qty || 1),
     0
   );
-  const shipping = form.courier === 'DHL_EXPRESS_ARCHIVE' ? 0 : 25;
+  const shipping = form.courier === 'DHL_EXPRESS' ? 0 : 25;
   const total = subtotal + shipping;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const orderRef = `AS-${Math.floor(100000 + Math.random() * 900000)}`;
+    const orderRef = `AT-${Math.floor(100000 + Math.random() * 900000)}`;
     const shippingData: ShippingInfo = {
-      name: `${form.firstName} ${form.lastName}`.trim() || 'ARCHIVE CLIENT',
+      name: `${form.firstName} ${form.lastName}`.trim() || 'Valued Client',
       email: form.email,
       address: form.address,
       city: form.city,
@@ -63,278 +63,255 @@ export const Checkout: React.FC<CheckoutProps> = ({ onComplete }) => {
       country: form.country,
     };
 
-    sessionStorage.setItem(
-      'last_atelier_order',
-      JSON.stringify({
-        orderRef,
-        items,
-        total,
-        consignee: shippingData.name,
-        address: `${shippingData.address}, ${shippingData.city} ${shippingData.zip}`,
-        date: new Date().toISOString().slice(0, 10),
-      })
-    );
-
     if (onComplete) {
       onComplete(shippingData, orderRef);
     }
-
     if (clearCart) clearCart();
-    navigate('/confirmation');
+    navigate('/confirmation', { state: { orderRef, shippingData, total } });
   };
 
-  return (
-    <main className="min-h-screen bg-[var(--bg-canvas)]">
-      <div className="px-6 sm:px-10 py-8 hairline-b flex items-end justify-between">
-        <div>
-          <span className="font-ledger text-xs uppercase text-[var(--accent-stamp)]">
-            // FORM N° 09 — LOGISTICS & SETTLEMENT
-          </span>
-          <h1 className="font-grotesk font-extrabold text-3xl sm:text-5xl uppercase tracking-tight mt-1">
-            Dispatch <span className="font-editorial italic font-normal lowercase">Requisition</span>
-          </h1>
+  if (items.length === 0) {
+    return (
+      <main className="min-h-screen pt-32 pb-36 px-5 flex items-center justify-center">
+        <div className="glass-island rounded-[36px] p-10 sm:p-14 text-center max-w-md space-y-5">
+          <h1 className="font-editorial italic text-4xl">Your Bag is Empty</h1>
+          <p className="text-sm text-[var(--ink-secondary)] font-light">
+            You currently have no pieces selected for checkout.
+          </p>
+          <Link
+            to="/shop"
+            className="inline-block px-7 py-3.5 rounded-full bg-[var(--ink-primary)] text-[var(--bg-canvas)] text-xs font-semibold uppercase tracking-widest hover:opacity-90 transition-opacity"
+          >
+            Explore Collection →
+          </Link>
         </div>
-        <Link to="/shop" className="font-ledger text-xs uppercase underline">
-          ← MODIFY SPECIMENS
-        </Link>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen pt-28 pb-36 px-4 sm:px-8 max-w-[1440px] mx-auto">
+      <div className="mb-10 text-center max-w-xl mx-auto">
+        <span className="text-xs uppercase tracking-[0.25em] text-[var(--ink-muted)] block mb-2">
+          Secure Atelier Checkout
+        </span>
+        <h1 className="font-editorial italic text-4xl sm:text-6xl font-normal">
+          Client Order Dossier
+        </h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12">
-        {/* Left 7 Columns: Consignee & Settlement Ledger */}
-        <div className="lg:col-span-7 p-6 sm:p-10 lg:p-14 hairline-r space-y-12">
-          {/* Section 01: Consignee Details */}
-          <section className="space-y-6">
-            <div className="pb-3 hairline-b flex items-center justify-between font-ledger text-xs uppercase">
-              <span className="font-bold">01 // CONSIGNEE IDENTIFICATION</span>
-              <span className="text-[var(--ink-muted)]">REQUIRED FIELDS [*]</span>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* Left 7 Columns: Checkout Form */}
+        <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-8">
+          {/* Shipping Information Island */}
+          <div className="glass-island rounded-[32px] p-7 sm:p-10 space-y-6">
+            <h2 className="font-editorial italic text-2xl sm:text-3xl">
+              1. Delivery Coordinates
+            </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  DISPATCH DOSSIER EMAIL *
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  Email Address *
                 </label>
                 <input
                   required
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="client@domain.com"
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none focus:border-[var(--ink-primary)]"
+                  placeholder="client@atelier.com"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  GIVEN NAME *
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  First Name *
                 </label>
                 <input
                   required
                   type="text"
                   value={form.firstName}
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  SURNAME *
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  Last Name *
                 </label>
                 <input
                   required
                   type="text"
                   value={form.lastName}
                   onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  STREET DESTINATION & ARCHITECTURAL UNIT *
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  Delivery Address *
                 </label>
                 <input
                   required
                   type="text"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  MUNICIPALITY / CITY *
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  City *
                 </label>
                 <input
                   required
                   type="text"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  POSTAL INDEX *
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  Postal Code *
                 </label>
                 <input
                   required
                   type="text"
                   value={form.postalCode}
                   onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* Section 02: Courier Protocol */}
-          <section className="space-y-4">
-            <div className="pb-3 hairline-b font-ledger text-xs uppercase font-bold">
-              02 // COURIER PROTOCOL
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-ledger text-xs">
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, courier: 'DHL_EXPRESS_ARCHIVE' })}
-                className={`p-4 text-left hairline-box transition-colors ${
-                  form.courier === 'DHL_EXPRESS_ARCHIVE'
-                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
-                    : 'bg-[var(--bg-elevated)]'
-                }`}
-              >
-                <div className="flex justify-between font-bold">
-                  <span>AIR WAYBILL // STANDARD</span>
-                  <span>COMPLIMENTARY</span>
-                </div>
-                <p className="text-[11px] opacity-75 mt-1">
-                  GARMENT BAG + SEALED ARCHIVE BOX (3–5 DAYS)
-                </p>
-              </button>
+          {/* Payment Method Island */}
+          <div className="glass-island rounded-[32px] p-7 sm:p-10 space-y-6">
+            <h2 className="font-editorial italic text-2xl sm:text-3xl">
+              2. Payment Credentials
+            </h2>
 
-              <button
-                type="button"
-                onClick={() => setForm({ ...form, courier: 'PRIORITY_COURIER' })}
-                className={`p-4 text-left hairline-box transition-colors ${
-                  form.courier === 'PRIORITY_COURIER'
-                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
-                    : 'bg-[var(--bg-elevated)]'
-                }`}
-              >
-                <div className="flex justify-between font-bold">
-                  <span>DIRECT ATELIER COURIER</span>
-                  <span>+$25.00</span>
-                </div>
-                <p className="text-[11px] opacity-75 mt-1">
-                  INSURED NEXT-DAY PRIORITY DISPATCH
-                </p>
-              </button>
-            </div>
-          </section>
-
-          {/* Section 03: Financial Settlement */}
-          <section className="space-y-4">
-            <div className="pb-3 hairline-b font-ledger text-xs uppercase font-bold">
-              03 // FINANCIAL SETTLEMENT
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  INSTRUMENT NUMBER (CARD) *
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  Name on Card *
                 </label>
                 <input
                   required
                   type="text"
-                  placeholder="4532 •••• •••• ••••"
+                  value={form.cardName}
+                  onChange={(e) => setForm({ ...form, cardName: e.target.value })}
+                  placeholder="Full Cardholder Name"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                  Card Number *
+                </label>
+                <input
+                  required
+                  type="text"
                   value={form.cardNumber}
                   onChange={(e) => setForm({ ...form, cardNumber: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
+                  placeholder="•••• •••• •••• ••••"
+                  className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
                 />
               </div>
-              <div>
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  EXPIRATION (MM/YY) *
-                </label>
-                <input
-                  required
-                  type="text"
-                  placeholder="08/29"
-                  value={form.expiry}
-                  onChange={(e) => setForm({ ...form, expiry: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block font-ledger text-[11px] uppercase text-[var(--ink-secondary)] mb-1.5">
-                  SECURITY CODE (CVC) *
-                </label>
-                <input
-                  required
-                  type="text"
-                  placeholder="884"
-                  value={form.cvc}
-                  onChange={(e) => setForm({ ...form, cvc: e.target.value })}
-                  className="w-full px-4 py-3 bg-[var(--bg-elevated)] hairline-box font-ledger text-xs focus:outline-none"
-                />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                    Expiry *
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={form.expiry}
+                    onChange={(e) => setForm({ ...form, expiry: e.target.value })}
+                    placeholder="MM/YY"
+                    className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-[var(--ink-secondary)] mb-1.5">
+                    CVC *
+                  </label>
+                  <input
+                    required
+                    type="text"
+                    value={form.cvc}
+                    onChange={(e) => setForm({ ...form, cvc: e.target.value })}
+                    placeholder="•••"
+                    className="w-full px-4 py-3.5 rounded-2xl bg-[var(--bg-sub)] text-sm focus:outline-none"
+                  />
+                </div>
               </div>
             </div>
-          </section>
+          </div>
 
           <button
             type="submit"
-            className="w-full py-5 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] transition-colors font-ledger text-xs uppercase tracking-[0.2em] font-bold"
+            className="w-full py-4 rounded-full bg-[var(--ink-primary)] text-[var(--bg-canvas)] text-xs font-semibold uppercase tracking-[0.2em] hover:opacity-90 transition-opacity shadow-xl"
           >
-            AUTHORIZE & STAMP DISPATCH REQUISITION — ${total.toFixed(2)} →
+            Authorize Payment — ${total.toFixed(2)}
           </button>
-        </div>
+        </form>
 
-        {/* Right 5 Columns: Perforated Packing Manifest */}
-        <div className="lg:col-span-5 bg-[var(--bg-sub)] p-6 sm:p-10 lg:p-12">
-          <div className="bg-[var(--bg-elevated)] p-6 sm:p-8 hairline-box font-ledger text-xs space-y-6">
-            <div className="pb-4 perforated-b flex justify-between items-center">
-              <span className="font-bold uppercase">PACKING MANIFEST</span>
-              <span className="text-[var(--ink-muted)]">LOT AW//26</span>
+        {/* Right 5 Columns: Floating Summary Island */}
+        <aside className="lg:col-span-5 lg:sticky lg:top-28">
+          <div className="glass-island rounded-[32px] p-7 sm:p-10 space-y-6">
+            <h2 className="font-editorial italic text-2xl sm:text-3xl">
+              Order Summary
+            </h2>
+
+            <div className="space-y-4 max-h-[40vh] overflow-y-auto no-scrollbar divide-y divide-[var(--glass-border)]">
+              {items.map((item, idx) => {
+                const price = getNormalizedPrice(item.price);
+                const qty = item.quantity || item.qty || 1;
+                return (
+                  <div key={idx} className="pt-3 flex gap-4 items-center">
+                    <img
+                      src={item.images?.[0] || item.image}
+                      alt={item.name || item.title}
+                      className="w-16 h-20 rounded-xl object-cover shrink-0"
+                    />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium">{item.name || item.title}</h4>
+                      <p className="text-xs text-[var(--ink-muted)]">
+                        Size {item.selectedSize || item.size || 'M'} · Qty {qty}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold">${(price * qty).toFixed(2)}</span>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="space-y-4 max-h-[380px] overflow-y-auto pr-1">
-              {items.map((item, idx) => (
-                <div key={idx} className="flex justify-between gap-4 pb-3 hairline-b">
-                  <div>
-                    <div className="font-grotesk font-bold uppercase">
-                      {item.name || item.title}
-                    </div>
-                    <div className="text-[11px] text-[var(--ink-muted)]">
-                      QTY: {item.quantity || item.qty || 1} // SIZE: [{item.selectedSize || item.size || 'M'}]
-                    </div>
-                  </div>
-                  <div className="font-medium">
-                    ${(getNormalizedPrice(item.price) * (item.quantity || item.qty || 1)).toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-2 pt-2 perforated-b pb-4">
+            <div className="pt-4 border-t border-[var(--glass-border)] space-y-2 text-xs">
               <div className="flex justify-between text-[var(--ink-secondary)]">
-                <span>SUBTOTAL VALUATION</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>Subtotal</span>
+                <span className="font-medium text-[var(--ink-primary)]">${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[var(--ink-secondary)]">
-                <span>COURIER LOGISTICS</span>
-                <span>{shipping === 0 ? 'COMPLIMENTARY' : `$${shipping.toFixed(2)}`}</span>
+                <span>Carbon-Neutral Express Delivery</span>
+                <span className="font-medium text-emerald-600">Complimentary</span>
               </div>
-            </div>
-
-            <div className="flex justify-between text-base font-bold">
-              <span>TOTAL SETTLEMENT</span>
-              <span className="text-[var(--accent-stamp)]">${total.toFixed(2)}</span>
+              <div className="flex justify-between text-base font-semibold pt-3 border-t border-[var(--glass-border)]">
+                <span>Total</span>
+                <span className="font-editorial italic text-2xl">${total.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
+        </aside>
+      </div>
     </main>
   );
 };

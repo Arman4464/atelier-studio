@@ -2,37 +2,37 @@ import React, { useState } from 'react';
 
 const MONOGRAPHS = [
   {
-    issue: 'MONOGRAPH N° 01',
-    date: 'OCT 2026',
-    readTime: '04 MIN DOSSIER',
+    issue: 'Monograph N° 01',
+    date: 'Autumn 2026',
+    readTime: '4 min read',
     title: 'On Loomstate Selvedge & The Beauty of Irregular Tension',
     excerpt:
       'Why vintage shuttle looms in Okayama produce microscopic slub variations that modern air-jet looms erased from industrial fashion.',
     body: 'Modern textile engineering prizes speed and uniformity above all else. High-speed projectile looms fire weft yarns across warps at thousands of meters per minute, stripping the cloth of character. In our Autumn—Winter archive, we returned to 1950s Toyoda shuttle looms where wooden bobbins travel back and forth under low tension, preserving the organic density of raw cotton.',
     image:
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1400&q=85',
   },
   {
-    issue: 'MONOGRAPH N° 02',
-    date: 'SEP 2026',
-    readTime: '06 MIN DOSSIER',
+    issue: 'Monograph N° 02',
+    date: 'Resort 2026',
+    readTime: '6 min read',
     title: 'Cold-Vat Iron Oxide & Botanical Dye Immersion',
     excerpt:
       'Documenting our 4-hour pigment immersion baths in Biella using fermented walnut husks, iron mordants, and rainwater.',
     body: 'Synthetic reactive dyes lock flat color onto the surface of a garment. Mineral and botanical immersion works differently: the pigment bonds unevenly with the natural oils of virgin wool and heavy duck canvas, creating living surfaces that lighten along high-friction seams.',
     image:
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1400&q=85',
   },
   {
-    issue: 'MONOGRAPH N° 03',
-    date: 'AUG 2026',
-    readTime: '05 MIN DOSSIER',
+    issue: 'Monograph N° 03',
+    date: 'Summer 2026',
+    readTime: '5 min read',
     title: 'Pattern Cutting as Structural Cantilever',
     excerpt:
       'Adapting 1940s French railway workwear gussets and bias-cut raglan sleeves for unrestricted kinetic movement.',
     body: 'When a coat relies on shoulder pads for structure, it fights the wearer. By rotating the sleeve pitch forward 12 degrees and inserting a single-piece underarm gusset, heavy 540 GSM wool hangs from the collarbone like a suspension bridge.',
     image:
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1400&q=85',
   },
 ];
 
@@ -40,46 +40,44 @@ export const Journal: React.FC = () => {
   const [activeArticle, setActiveArticle] = useState(MONOGRAPHS[0]);
 
   return (
-    <main className="min-h-screen bg-[var(--bg-canvas)]">
-      {/* Header */}
-      <section className="px-6 sm:px-10 py-12 hairline-b grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-        <div className="lg:col-span-8">
-          <span className="font-ledger text-xs uppercase tracking-widest text-[var(--accent-stamp)]">
-            // DEPT. OF TEXTILE RESEARCH
-          </span>
-          <h1 className="font-grotesk font-extrabold text-4xl sm:text-6xl uppercase tracking-[-0.04em] mt-2">
-            Atelier <span className="font-editorial italic font-normal lowercase">Monographs</span>
-          </h1>
-        </div>
-        <div className="lg:col-span-4 font-ledger text-xs text-[var(--ink-secondary)] lg:text-right">
-          PUBLISHED QUARTERLY IN MILAN & KYOTO
-        </div>
-      </section>
+    <main className="min-h-screen pt-28 pb-36 px-5 sm:px-10 max-w-[1440px] mx-auto">
+      {/* Editorial Header */}
+      <header className="text-center max-w-2xl mx-auto mb-16">
+        <span className="text-xs uppercase tracking-[0.25em] text-[var(--ink-muted)] block mb-3">
+          Textile Research & Craft
+        </span>
+        <h1 className="font-editorial italic text-5xl sm:text-7xl font-normal tracking-tight">
+          Atelier Monographs
+        </h1>
+        <p className="mt-4 text-sm sm:text-base text-[var(--ink-secondary)] font-light">
+          Observations on heritage loomstate weaving, botanical dye chemistry, and architectural pattern cutting.
+        </p>
+      </header>
 
-      {/* Editorial Broadsheet Split */}
-      <section className="grid grid-cols-1 lg:grid-cols-12">
-        {/* Left 5 Columns: Issue Index */}
-        <div className="lg:col-span-5 hairline-r">
+      {/* Spatial Broadside Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Monograph Selector */}
+        <div className="lg:col-span-5 space-y-4">
           {MONOGRAPHS.map((item) => {
-            const selected = activeArticle.issue === item.issue;
+            const isSelected = activeArticle.issue === item.issue;
             return (
               <button
                 key={item.issue}
                 onClick={() => setActiveArticle(item)}
-                className={`w-full text-left p-6 sm:p-8 hairline-b transition-colors ${
-                  selected
-                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
-                    : 'hover:bg-[var(--bg-sub)]'
+                className={`w-full text-left p-6 sm:p-8 rounded-[28px] transition-all ${
+                  isSelected
+                    ? 'glass-island shadow-lg scale-[1.01]'
+                    : 'bg-[var(--bg-sub)] hover:bg-[var(--bg-sub)]/80'
                 }`}
               >
-                <div className="flex justify-between font-ledger text-[11px] opacity-75 mb-2">
+                <div className="flex justify-between text-xs text-[var(--ink-muted)] mb-2 font-medium">
                   <span>{item.issue}</span>
-                  <span>{item.date} // {item.readTime}</span>
+                  <span>{item.date} · {item.readTime}</span>
                 </div>
-                <h2 className="font-grotesk font-bold text-xl sm:text-2xl tracking-tight">
+                <h3 className="font-editorial italic text-2xl sm:text-3xl leading-snug text-[var(--ink-primary)]">
                   {item.title}
-                </h2>
-                <p className="mt-2 text-xs sm:text-sm opacity-80 leading-relaxed">
+                </h3>
+                <p className="mt-3 text-xs sm:text-sm text-[var(--ink-secondary)] line-clamp-2 font-light leading-relaxed">
                   {item.excerpt}
                 </p>
               </button>
@@ -87,22 +85,22 @@ export const Journal: React.FC = () => {
           })}
         </div>
 
-        {/* Right 7 Columns: Full Monograph Plate */}
-        <article className="lg:col-span-7 p-6 sm:p-12 lg:p-16 space-y-8">
-          <div className="flex items-center justify-between font-ledger text-xs text-[var(--ink-muted)] pb-4 hairline-b">
-            <span>{activeArticle.issue}</span>
-            <span>FIELD REPORT // {activeArticle.readTime}</span>
+        {/* Right Column: Featured Reading Canvas */}
+        <article className="lg:col-span-7 glass-island rounded-[36px] p-8 sm:p-14 space-y-8">
+          <div className="flex items-center justify-between text-xs text-[var(--ink-muted)]">
+            <span className="font-medium">{activeArticle.issue}</span>
+            <span>{activeArticle.readTime}</span>
           </div>
 
-          <h2 className="font-editorial italic text-4xl sm:text-6xl leading-[1.02]">
+          <h2 className="font-editorial italic text-4xl sm:text-6xl leading-[1.04] text-[var(--ink-primary)]">
             {activeArticle.title}
           </h2>
 
-          <div className="aspect-[16/10] hairline-box overflow-hidden bg-[var(--bg-sub)]">
+          <div className="rounded-[24px] overflow-hidden aspect-[16/10] bg-[var(--bg-sub)]">
             <img
               src={activeArticle.image}
               alt={activeArticle.title}
-              className="w-full h-full object-cover grayscale-[15%]"
+              className="w-full h-full object-cover"
             />
           </div>
 
@@ -110,11 +108,11 @@ export const Journal: React.FC = () => {
             {activeArticle.excerpt}
           </p>
 
-          <p className="text-sm sm:text-base leading-relaxed text-[var(--ink-secondary)]">
+          <p className="text-sm sm:text-base leading-relaxed text-[var(--ink-secondary)] font-light">
             {activeArticle.body}
           </p>
         </article>
-      </section>
+      </div>
     </main>
   );
 };

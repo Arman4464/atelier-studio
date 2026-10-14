@@ -8,30 +8,42 @@ export const KeyPieces: React.FC = () => {
   const products: any[] = (productsStore.products || []).slice(0, 4);
 
   return (
-    <section className="hairline-b">
-      <div className="px-6 sm:px-10 py-8 hairline-b flex flex-wrap items-end justify-between gap-4">
+    <section className="py-20 sm:py-28 px-5 sm:px-10 max-w-[1440px] mx-auto">
+      {/* Editorial Section Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
         <div>
-          <span className="font-ledger text-xs uppercase tracking-widest text-[var(--accent-stamp)]">
-            // CURATED SPECIMENS
+          <span className="text-xs uppercase tracking-[0.25em] text-[var(--ink-muted)] block mb-3">
+            Curated Silhouettes
           </span>
-          <h2 className="font-grotesk font-extrabold text-3xl sm:text-4xl uppercase tracking-tight mt-1">
-            Key Archive <span className="font-editorial italic font-normal lowercase">Pieces</span>
+          <h2 className="font-editorial italic text-4xl sm:text-6xl font-normal tracking-tight leading-none">
+            Objects of Permanence
           </h2>
         </div>
         <Link
           to="/shop"
-          className="font-ledger text-xs uppercase px-5 py-3 hairline-box hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors"
+          className="self-start md:self-end px-6 py-3 rounded-full glass-pill text-xs font-medium tracking-wider uppercase hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors"
         >
-          INSPECT FULL ARCHIVE [01—{String(products.length).padStart(2, '0')}] →
+          View All Pieces →
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {products.map((product, idx) => (
-          <div key={product.id || idx} className="hairline-r hairline-b">
-            <ProductCard product={product} index={idx} />
-          </div>
-        ))}
+      {/* Staggered Asymmetric Gallery (Offsets every 2nd column vertically) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+        {products.map((product, idx) => {
+          // Asymmetric column spans & vertical offsets
+          const layoutClasses = [
+            'lg:col-span-4',
+            'lg:col-span-3 lg:mt-20',
+            'lg:col-span-3',
+            'lg:col-span-2 lg:mt-28',
+          ][idx % 4];
+
+          return (
+            <div key={product.id || idx} className={layoutClasses}>
+              <ProductCard product={product} index={idx} />
+            </div>
+          );
+        })}
       </div>
     </section>
   );
