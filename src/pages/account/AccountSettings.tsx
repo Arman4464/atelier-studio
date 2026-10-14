@@ -18,7 +18,7 @@ export default function AccountSettings() {
   const showToast = useUIStore((s) => s.showToast);
   const currency = useCartStore((s) => s.currency);
   const setCurrency = useCartStore((s) => s.setCurrency);
-  const theme = useThemeStore((s) => s.theme);
+  const isDark = useThemeStore((s) => s.isDark);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const navigate = useNavigate();
 
@@ -143,7 +143,7 @@ export default function AccountSettings() {
               onClick={toggleTheme}
               className="border border-line px-4 py-2 text-[11px] font-semibold uppercase tracking-widest text-ink hover:border-indigo-glow"
             >
-              {theme === "dark" ? "Switch to Light" : "Switch to Dark"}
+              {isDark ? "Switch to Light" : "Switch to Dark"}
             </button>
           </div>
         </div>

@@ -1,22 +1,25 @@
 @import "tailwindcss";
 
-:root {
-  --bg-canvas: #F3EFE6;
-  --bg-sub: #E8E2D5;
-  --bg-elevated: #FAF7F2;
-  --ink-primary: #121110;
-  --ink-secondary: #57534E;
-  --ink-muted: #8C857B;
-  --accent-stamp: #C83B2B;
-  --border-hairline: rgba(18, 17, 16, 0.14);
-  --border-strong: rgba(18, 17, 16, 0.85);
+:root,
+[data-theme="klein"] {
+  --bg-canvas: #EBEEF5;
+  --bg-sub: #DFE3ED;
+  --bg-elevated: #FFFFFF;
+  --ink-primary: #060A17;
+  --ink-secondary: #464E63;
+  --ink-muted: #838C9E;
+  --accent-electric: #0038FF;
+  --accent-signal: #CEFF00;
+  --border-hairline: rgba(6, 10, 23, 0.16);
+  --border-strong: #060A17;
 
-  --font-serif: 'Instrument Serif', Georgia, serif;
   --font-display: 'Syne', sans-serif;
-  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-sans: 'Space Grotesk', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Space Grotesk', sans-serif;
 
-  /* Legacy theme aliases mapped to Garment Pattern Ledger colors */
+  /* Legacy theme aliases mapped to kinetic color engine */
+  --accent-stamp: var(--accent-electric);
   --color-void: var(--bg-canvas);
   --color-void-2: var(--bg-sub);
   --color-void-3: var(--bg-elevated);
@@ -28,53 +31,137 @@
   --color-line-soft: var(--border-hairline);
   --color-onpaper: var(--ink-primary);
   --color-onpaper-dim: var(--ink-muted);
-  --color-indigo: var(--accent-stamp);
-  --color-indigo-dim: #9e2a1d;
-  --color-indigo-glow: var(--accent-stamp);
-  --color-brass: var(--accent-stamp);
-  --color-brass-dim: #9e2a1d;
-  --color-zest: #D97706;
-  --color-flame: var(--accent-stamp);
-  --color-glass: rgba(243, 239, 230, 0.85);
-  --color-scrim: #121110;
-  --color-on-scrim: #FAF7F2;
-  --color-on-indigo: #FAF7F2;
-  --color-on-zest: #121110;
-  --color-on-flame: #FAF7F2;
+  --color-indigo: var(--accent-electric);
+  --color-indigo-dim: var(--accent-electric);
+  --color-indigo-glow: var(--accent-signal);
+  --color-brass: var(--accent-electric);
+  --color-brass-dim: var(--accent-electric);
+  --color-zest: var(--accent-signal);
+  --color-flame: var(--accent-electric);
+  --color-glass: rgba(235, 238, 245, 0.92);
+  --color-scrim: #060A17;
+  --color-on-scrim: #EBEEF5;
+  --color-on-indigo: #FFFFFF;
+  --color-on-zest: #060A17;
+  --color-on-flame: #FFFFFF;
 }
 
-.dark, html.dark {
-  --bg-canvas: #0E0D0C;
-  --bg-sub: #171614;
-  --bg-elevated: #1F1D1A;
-  --ink-primary: #EDE8DF;
-  --ink-secondary: #A69F94;
-  --ink-muted: #666057;
-  --accent-stamp: #E04F3E;
-  --border-hairline: rgba(237, 232, 223, 0.14);
-  --border-strong: rgba(237, 232, 223, 0.85);
+[data-theme="verdigris"] {
+  --bg-canvas: #081310;
+  --bg-sub: #0E1F1A;
+  --bg-elevated: #142923;
+  --ink-primary: #E4F5EF;
+  --ink-secondary: #8CAAA0;
+  --ink-muted: #4F6B62;
+  --accent-electric: #FF5100;
+  --accent-signal: #00FF9D;
+  --border-hairline: rgba(228, 245, 239, 0.16);
+  --border-strong: #E4F5EF;
 
+  --accent-stamp: var(--accent-electric);
   --color-void: var(--bg-canvas);
   --color-void-2: var(--bg-sub);
   --color-void-3: var(--bg-elevated);
-  --color-paper: #1F1D1A;
-  --color-paper-dim: #171614;
+  --color-paper: var(--bg-elevated);
+  --color-paper-dim: var(--bg-sub);
   --color-ink: var(--ink-primary);
   --color-ink-dim: var(--ink-secondary);
   --color-line: var(--border-hairline);
   --color-line-soft: var(--border-hairline);
   --color-onpaper: var(--ink-primary);
   --color-onpaper-dim: var(--ink-muted);
-  --color-indigo: var(--accent-stamp);
-  --color-indigo-dim: #A83224;
-  --color-indigo-glow: var(--accent-stamp);
-  --color-brass: var(--accent-stamp);
-  --color-brass-dim: #A83224;
-  --color-zest: #E04F3E;
-  --color-flame: #E04F3E;
-  --color-glass: rgba(14, 13, 12, 0.85);
-  --color-scrim: #0E0D0C;
-  --color-on-scrim: #EDE8DF;
+  --color-indigo: var(--accent-electric);
+  --color-indigo-dim: var(--accent-electric);
+  --color-indigo-glow: var(--accent-signal);
+  --color-brass: var(--accent-electric);
+  --color-brass-dim: var(--accent-electric);
+  --color-zest: var(--accent-signal);
+  --color-flame: var(--accent-electric);
+  --color-glass: rgba(8, 19, 16, 0.92);
+  --color-scrim: #081310;
+  --color-on-scrim: #E4F5EF;
+  --color-on-indigo: #FFFFFF;
+  --color-on-zest: #081310;
+  --color-on-flame: #FFFFFF;
+}
+
+[data-theme="infrared"],
+.dark:not([data-theme="verdigris"]) {
+  --bg-canvas: #09090C;
+  --bg-sub: #121217;
+  --bg-elevated: #1A1A22;
+  --ink-primary: #F4F6F9;
+  --ink-secondary: #9094A6;
+  --ink-muted: #545766;
+  --accent-electric: #FF1730;
+  --accent-signal: #00E5FF;
+  --border-hairline: rgba(244, 246, 249, 0.16);
+  --border-strong: #FF1730;
+
+  --accent-stamp: var(--accent-electric);
+  --color-void: var(--bg-canvas);
+  --color-void-2: var(--bg-sub);
+  --color-void-3: var(--bg-elevated);
+  --color-paper: var(--bg-elevated);
+  --color-paper-dim: var(--bg-sub);
+  --color-ink: var(--ink-primary);
+  --color-ink-dim: var(--ink-secondary);
+  --color-line: var(--border-hairline);
+  --color-line-soft: var(--border-hairline);
+  --color-onpaper: var(--ink-primary);
+  --color-onpaper-dim: var(--ink-muted);
+  --color-indigo: var(--accent-electric);
+  --color-indigo-dim: var(--accent-electric);
+  --color-indigo-glow: var(--accent-signal);
+  --color-brass: var(--accent-electric);
+  --color-brass-dim: var(--accent-electric);
+  --color-zest: var(--accent-signal);
+  --color-flame: var(--accent-electric);
+  --color-glass: rgba(9, 9, 12, 0.92);
+  --color-scrim: #09090C;
+  --color-on-scrim: #F4F6F9;
+  --color-on-indigo: #FFFFFF;
+  --color-on-zest: #09090C;
+  --color-on-flame: #FFFFFF;
+}
+
+[data-theme="bauhaus"] {
+  --bg-canvas: #FFFFFF;
+  --bg-sub: #F0F0F0;
+  --bg-elevated: #F8F8F8;
+  --ink-primary: #050505;
+  --ink-secondary: #4B4B4B;
+  --ink-muted: #7A7A7A;
+  --accent-electric: #2B00FF;
+  --accent-signal: #D9FF00;
+  --border-hairline: rgba(5, 5, 5, 0.16);
+  --border-strong: #050505;
+
+  --accent-stamp: var(--accent-electric);
+  --color-void: var(--bg-canvas);
+  --color-void-2: var(--bg-sub);
+  --color-void-3: var(--bg-elevated);
+  --color-paper: var(--bg-canvas);
+  --color-paper-dim: var(--bg-sub);
+  --color-ink: var(--ink-primary);
+  --color-ink-dim: var(--ink-secondary);
+  --color-line: var(--border-hairline);
+  --color-line-soft: var(--border-hairline);
+  --color-onpaper: var(--ink-primary);
+  --color-onpaper-dim: var(--ink-muted);
+  --color-indigo: var(--accent-electric);
+  --color-indigo-dim: var(--accent-electric);
+  --color-indigo-glow: var(--accent-signal);
+  --color-brass: var(--accent-electric);
+  --color-brass-dim: var(--accent-electric);
+  --color-zest: var(--accent-signal);
+  --color-flame: var(--accent-electric);
+  --color-glass: rgba(255, 255, 255, 0.94);
+  --color-scrim: #050505;
+  --color-on-scrim: #FFFFFF;
+  --color-on-indigo: #FFFFFF;
+  --color-on-zest: #050505;
+  --color-on-flame: #FFFFFF;
 }
 
 * {
@@ -97,25 +184,15 @@ body {
   position: relative;
 }
 
-/* Subtle tactile paper/film grain overlay */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
 ::selection {
-  background: var(--accent-stamp);
-  color: #FAF7F2;
+  background: var(--accent-electric);
+  color: #FFFFFF;
 }
 
-/* Typography & Utility Classes */
+/* Typography Classes */
 .font-editorial {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
+  letter-spacing: -0.03em;
 }
 
 .font-grotesk {
@@ -134,21 +211,91 @@ body::before {
 .hairline-r { border-right: 1px solid var(--border-hairline); }
 .hairline-box { border: 1px solid var(--border-hairline); }
 
-/* Perforated Invoice Edge */
+/* Neo-Brutalist Components */
+.brutal-card {
+  border: 1px solid var(--border-strong);
+  box-shadow: 4px 4px 0px var(--border-strong);
+  background-color: var(--bg-elevated);
+}
+
+.brutal-card-hover {
+  border: 1px solid var(--border-strong);
+  box-shadow: 4px 4px 0px var(--border-strong);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brutal-card-hover:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px var(--border-strong);
+}
+
+.brutal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-strong);
+  background-color: var(--ink-primary);
+  color: var(--bg-canvas);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 4px 4px 0px var(--accent-signal);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.brutal-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--accent-signal);
+  background-color: var(--accent-electric);
+  color: #FFFFFF;
+}
+
+.volt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  background-color: var(--accent-signal);
+  color: #060A17;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.electric-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  background-color: var(--accent-electric);
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .perforated-b {
   border-bottom: 1px dashed var(--ink-muted);
 }
 
-/* Custom minimal scrollbar */
+/* Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-canvas);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--ink-muted);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-electric);
 }
 
 .no-scrollbar::-webkit-scrollbar {

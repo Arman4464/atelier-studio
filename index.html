@@ -5,26 +5,31 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230C0C0E'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%234A5CFF' font-family='Arial,sans-serif' font-weight='900'%3EA%3C/text%3E%3C/svg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0C0C0E" />
-    <title>ATELIER — Garment Pattern Ledger & Textile Research</title>
+    <title>ATELIER — Concept Flagship & Material Laboratory</title>
     <script>
       (function () {
         try {
-          var stored = localStorage.getItem("atelier-theme");
-          if (stored === "dark") document.documentElement.classList.add("dark");
+          var stored = localStorage.getItem("atelier_palette") || "klein";
+          document.documentElement.setAttribute("data-theme", stored);
+          if (stored === "infrared" || stored === "verdigris") {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
         } catch (e) {}
       })();
     </script>
-    <meta name="description" content="Atelier Studio — Department of Textile Research. Small-batch architectural garments, unlined selvedge wool tailoring, and archival pattern studies." />
+    <meta name="description" content="Atelier Studio — Department of Textile Research & Concept Flagship. Small-batch architectural garments, technical tailoring, and material studies." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ATELIER Studio" />
-    <meta property="og:title" content="ATELIER — Garment Pattern Ledger & Textile Research" />
-    <meta property="og:description" content="Small-batch architectural garments, unlined selvedge wool tailoring, and archival pattern studies." />
+    <meta property="og:title" content="ATELIER — Concept Flagship & Material Laboratory" />
+    <meta property="og:description" content="Small-batch architectural garments, technical tailoring, and material studies." />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@500;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800;900&display=swap"
       rel="stylesheet"
     />
 

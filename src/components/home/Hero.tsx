@@ -1,132 +1,134 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const ARCHIVE_PLATES = [
+const SPECIMENS = [
   {
-    id: 'PLATE — I',
-    code: 'AS-AW26-014',
-    title: 'Raw Selvedge Wool Overcoat',
-    subtitle: 'Unlined structural tailoring with exposed horn buttons & bias-cut raglan sleeves.',
-    fabric: '540 GSM Double-Faced Virgin Wool (Biella, IT)',
-    dye: 'Cold-Vat Iron Oxide Charcoal',
-    price: '$680',
-    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1400&q=85',
-    coords: 'CUTTING TABLE 02 // PATTERN B',
-  },
-  {
-    id: 'PLATE — II',
-    code: 'AS-AW26-029',
-    title: 'Crinkled Nylon Field Parka',
-    subtitle: 'Garment-dyed Japanese memory taffeta that holds sculptural creases where touched.',
-    fabric: '210 GSM High-Density Memory Nylon (Fukui, JP)',
-    dye: 'Piece-Dyed Peat & Burnt Umber',
-    price: '$520',
+    id: 'SPEC-01',
+    code: 'AT-HV-084',
+    title: 'Anodized Membrane Parka',
+    subtitle: 'High-density micro-ripstop laminated with thermal-regulating aluminum vapor coating.',
+    material: '280 GSM Metalized Ripstop Nylon (Fukui, JP)',
+    finish: 'Cryo-Dye Carbon Mist / Hydro-Sealed',
+    price: '$580',
     image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1400&q=85',
-    coords: 'DYE BATH 07 // IMMERSION 4H',
+    chamber: 'CHAMBER 01 // CRYO-VAC',
+    status: 'BATCH 01 — ACTIVE',
   },
   {
-    id: 'PLATE — III',
-    code: 'AS-AW26-041',
-    title: 'Twisted-Seam Heavy Canvas Trouser',
-    subtitle: 'Engineered 3D curved leg architecture derived from 1940s French railway workwear.',
-    fabric: '460 GSM Unbleached Organic Cotton Duck',
-    dye: 'Natural Calico / Raw Enzyme Wash',
-    price: '$340',
+    id: 'SPEC-02',
+    code: 'AT-HV-092',
+    title: 'Twisted-Seam Selvedge Car Coat',
+    subtitle: 'Unlined structural wool tailored on a 3D bias curve to eliminate tension along sleeve lines.',
+    material: '520 GSM Virgin Selvedge Wool (Biella, IT)',
+    finish: 'Cold-Vat Mineral Black / Horn Hardware',
+    price: '$690',
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1400&q=85',
+    chamber: 'CHAMBER 02 // PATTERN CUT',
+    status: 'BATCH 02 — LIMITED',
+  },
+  {
+    id: 'SPEC-03',
+    code: 'AT-HV-105',
+    title: 'Engineered Kinetic Cargo Trouser',
+    subtitle: 'Articulated knee darts derived from French locomotive workwear with magnetic gussets.',
+    material: '440 GSM Dry Japanese Cotton Drill',
+    finish: 'High-Torque Enzyme Wash',
+    price: '$360',
     image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1400&q=85',
-    coords: 'ARCHIVE RACK 11 // SPECIMEN C',
+    chamber: 'CHAMBER 03 // SPEC-TEST',
+    status: 'BATCH 03 — ACTIVE',
   },
 ];
 
 export const Hero: React.FC = () => {
   const [activeIdx, setActiveIdx] = useState(0);
-  const activePlate = ARCHIVE_PLATES[activeIdx];
+  const activeSpecimen = SPECIMENS[activeIdx];
 
   return (
-    <section className="hairline-b relative overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-105px)]">
-        {/* Left Column: Editorial Typography & Pattern Notes */}
+    <section className="hairline-b relative overflow-hidden bg-[var(--bg-canvas)]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-100px)]">
+        {/* Left Column: Bold Industrial Typography & Manifestos */}
         <div className="lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 hairline-r">
-          {/* Top Metadata Stamp */}
+          {/* Top Live Terminal Stamp */}
           <div className="flex flex-wrap items-center justify-between gap-4 pb-6 hairline-b">
-            <div className="font-ledger text-xs uppercase tracking-wider flex items-center gap-3">
-              <span className="px-2 py-0.5 bg-[var(--accent-stamp)] text-[#FAF7F2] font-medium">
-                LOOKBOOK 04
+            <div className="flex items-center gap-3">
+              <span className="volt-pill">
+                FLAGSHIP DISPATCH
               </span>
-              <span className="text-[var(--ink-secondary)]">
-                ARCHIVAL MONOGRAPH — 2026
+              <span className="font-ledger text-xs font-semibold uppercase text-[var(--ink-secondary)]">
+                SERIES AW/26 — CONCEPT STUDY
               </span>
             </div>
-            <span className="font-ledger text-xs text-[var(--ink-muted)]">
-              [ {activePlate.code} ]
+            <span className="font-ledger text-xs font-bold text-[var(--accent-electric)]">
+              [ {activeSpecimen.code} ]
             </span>
           </div>
 
-          {/* Main Asymmetric Headline */}
-          <div className="my-10 lg:my-auto py-4">
-            <p className="font-ledger text-xs uppercase tracking-[0.2em] text-[var(--ink-secondary)] mb-4">
-              // ARCHITECTURAL GARMENTS FOR EVERYDAY UTILITY
-            </p>
-            <h1 className="font-grotesk font-extrabold text-5xl sm:text-7xl xl:text-[5.4rem] leading-[0.92] tracking-[-0.04em] uppercase">
-              Form Follows <br />
-              <span className="font-editorial italic font-normal lowercase text-6xl sm:text-8xl xl:text-[6.4rem] text-[var(--accent-stamp)] pr-3">
-                raw
-              </span>
-              Material.
+          {/* Headline Section */}
+          <div className="my-8 lg:my-auto py-2">
+            <div className="flex items-center gap-2 mb-4 font-ledger text-xs font-bold text-[var(--accent-electric)] tracking-widest uppercase">
+              <span>// 001</span>
+              <span>KINETIC MATERIAL DISSECTION</span>
+            </div>
+
+            <h1 className="font-grotesk font-black text-5xl sm:text-7xl xl:text-[5.6rem] leading-[0.9] tracking-[-0.04em] uppercase text-[var(--ink-primary)]">
+              STRUCTURAL <br />
+              <span className="text-[var(--accent-electric)] tracking-tight">KINETICS</span> <br />
+              & UTILITY.
             </h1>
 
             <p className="mt-8 max-w-xl text-base sm:text-lg text-[var(--ink-secondary)] leading-relaxed font-normal">
-              We reject seasonal trends and synthetic perfection. Every piece is cut from heavy-gauge Japanese and Italian textiles, numbered by batch, and engineered to patina with its wearer.
+              Rejecting disposable fashion trends. We engineer hyper-functional architectural garments cut from heavyweight Italian wools, Japanese memory textiles, and high-tensile technical twills.
             </p>
 
-            {/* Primary & Secondary Action Ledger */}
-            <div className="mt-10 flex flex-wrap items-stretch gap-4">
+            {/* Brutalist Action Buttons */}
+            <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link
                 to="/shop"
-                className="group inline-flex items-center gap-6 bg-[var(--ink-primary)] text-[var(--bg-canvas)] px-7 py-4 font-ledger text-xs uppercase tracking-widest hover:bg-[var(--accent-stamp)] transition-colors"
+                className="brutal-btn px-8 py-4 text-xs font-bold tracking-wider"
               >
-                <span>ENTER THE ARCHIVE</span>
-                <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
+                <span>EXPLORE ARCHIVE SPECIMENS →</span>
               </Link>
               <Link
                 to="/journal"
-                className="inline-flex items-center gap-3 px-6 py-4 hairline-box font-ledger text-xs uppercase tracking-widest hover:bg-[var(--bg-sub)] transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-4 hairline-box font-ledger text-xs font-bold uppercase tracking-widest text-[var(--ink-primary)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-sub)] transition-colors"
               >
-                <span>READ PATTERN NOTES</span>
-                <span className="text-[var(--ink-muted)]">[04]</span>
+                <span>TEXTILE RESEARCH LAB</span>
+                <span className="text-[var(--accent-electric)]">[04]</span>
               </Link>
             </div>
           </div>
 
-          {/* Bottom Interactive Contact Sheet Switcher */}
+          {/* Bottom Interactive Specimen Selector */}
           <div className="pt-8 hairline-t">
-            <div className="flex items-center justify-between mb-3">
-              <span className="font-ledger text-[11px] uppercase text-[var(--ink-muted)]">
-                SELECT CONTACT SHEET PLATE:
+            <div className="flex items-center justify-between mb-3 font-ledger text-[11px] uppercase">
+              <span className="text-[var(--ink-muted)] font-semibold">
+                ACTIVE LAB CHAMBER:
               </span>
-              <span className="font-ledger text-[11px] text-[var(--ink-secondary)]">
-                {activePlate.coords}
+              <span className="text-[var(--ink-primary)] font-bold">
+                {activeSpecimen.chamber}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              {ARCHIVE_PLATES.map((plate, index) => {
-                const selected = index === activeIdx;
+              {SPECIMENS.map((spec, index) => {
+                const isSelected = index === activeIdx;
                 return (
                   <button
-                    key={plate.id}
+                    key={spec.id}
                     onClick={() => setActiveIdx(index)}
-                    className={`text-left p-3 transition-all hairline-box ${
-                      selected
-                        ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
-                        : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-sub)]'
+                    className={`text-left p-3.5 transition-all text-[var(--ink-primary)] ${
+                      isSelected
+                        ? 'brutal-card bg-[var(--bg-elevated)]'
+                        : 'hairline-box bg-[var(--bg-sub)]/50 hover:bg-[var(--bg-sub)]'
                     }`}
                   >
-                    <div className="flex items-center justify-between font-ledger text-[10px] opacity-75 mb-1">
-                      <span>{plate.id}</span>
-                      <span>{plate.price}</span>
+                    <div className="flex items-center justify-between font-ledger text-[10px] mb-1">
+                      <span className="font-bold text-[var(--accent-electric)]">{spec.id}</span>
+                      <span className="font-semibold text-[var(--ink-primary)]">{spec.price}</span>
                     </div>
-                    <div className="font-grotesk font-bold text-xs truncate">
-                      {plate.title}
+                    <div className="font-grotesk font-black text-xs truncate">
+                      {spec.title}
                     </div>
                   </button>
                 );
@@ -135,52 +137,68 @@ export const Hero: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Live Specimen Frame & Garment Dissection */}
+        {/* Right Column: High-Voltage Specimen Frame */}
         <div className="lg:col-span-5 flex flex-col justify-between bg-[var(--bg-sub)] relative">
-          {/* Top Specimen Bar */}
-          <div className="px-6 py-3 hairline-b flex items-center justify-between font-ledger text-[11px] text-[var(--ink-secondary)]">
-            <span>FIG. 0{activeIdx + 1} — FULL SILHOUETTE</span>
-            <span>SCALE 1:12</span>
+          {/* Top Specimen Header */}
+          <div className="px-6 py-3.5 hairline-b flex items-center justify-between font-ledger text-[11px] font-bold text-[var(--ink-primary)]">
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-signal)]" />
+              FIG. 0{activeIdx + 1} // FULL SCALE SCAN
+            </span>
+            <span className="text-[var(--accent-electric)]">{activeSpecimen.status}</span>
           </div>
 
-          {/* Image Frame with Crop Marks */}
-          <div className="relative flex-1 min-h-[460px] p-6 sm:p-10 flex items-center justify-center overflow-hidden">
-            {/* Corner Crop Marks */}
-            <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[var(--ink-primary)]" />
-            <div className="absolute top-4 right-4 w-4 h-4 border-t border-r border-[var(--ink-primary)]" />
-            <div className="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-[var(--ink-primary)]" />
-            <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[var(--ink-primary)]" />
+          {/* Specimen Visual Presentation with Offset Shadow & Modern Framing */}
+          <div className="relative flex-1 min-h-[460px] p-6 sm:p-10 flex items-center justify-center">
+            {/* Architectural Coordinates Crosshairs */}
+            <div className="absolute top-4 left-4 font-ledger text-[9px] text-[var(--ink-muted)]">
+              X: 45.464 // Y: 09.190
+            </div>
+            <div className="absolute top-4 right-4 font-ledger text-[9px] text-[var(--ink-muted)]">
+              CALIBRATION: 99.8%
+            </div>
+            <div className="absolute bottom-4 left-4 font-ledger text-[9px] text-[var(--ink-muted)]">
+              REF: SPEC-AW26
+            </div>
+            <div className="absolute bottom-4 right-4 font-ledger text-[9px] text-[var(--ink-muted)]">
+              ATELIER CONCEPT
+            </div>
 
-            <div className="relative w-full h-full max-h-[580px] overflow-hidden hairline-box bg-[var(--bg-canvas)] group">
+            <div className="relative w-full h-full max-h-[580px] overflow-hidden brutal-card group">
               <img
-                key={activePlate.image}
-                src={activePlate.image}
-                alt={activePlate.title}
-                className="w-full h-full object-cover object-center grayscale-[20%] contrast-[1.06] group-hover:scale-105 transition-transform duration-700"
+                key={activeSpecimen.image}
+                src={activeSpecimen.image}
+                alt={activeSpecimen.title}
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              {/* Woven Spec Tag Pinned to Bottom-Left of Photo */}
-              <div className="absolute bottom-4 left-4 right-4 bg-[var(--bg-canvas)]/95 backdrop-blur-sm p-4 hairline-box">
-                <div className="flex items-baseline justify-between gap-2 pb-2 perforated-b">
-                  <span className="font-grotesk font-bold text-sm uppercase">
-                    {activePlate.title}
+
+              {/* Floating Specification Card */}
+              <div className="absolute bottom-4 left-4 right-4 bg-[var(--bg-canvas)]/95 backdrop-blur-md p-4 hairline-box border-[var(--border-strong)]">
+                <div className="flex items-baseline justify-between gap-2 pb-2 hairline-b">
+                  <span className="font-grotesk font-black text-sm uppercase text-[var(--ink-primary)]">
+                    {activeSpecimen.title}
                   </span>
-                  <span className="font-ledger text-sm font-semibold text-[var(--accent-stamp)]">
-                    {activePlate.price}
+                  <span className="font-ledger text-sm font-bold text-[var(--accent-electric)]">
+                    {activeSpecimen.price}
                   </span>
                 </div>
                 <div className="mt-2 space-y-1 font-ledger text-[11px] text-[var(--ink-secondary)]">
-                  <div>TEXTILE: {activePlate.fabric}</div>
-                  <div>TREATMENT: {activePlate.dye}</div>
+                  <div><strong className="text-[var(--ink-primary)]">TEXTILE:</strong> {activeSpecimen.material}</div>
+                  <div><strong className="text-[var(--ink-primary)]">FINISH:</strong> {activeSpecimen.finish}</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Bottom Provenance Strip */}
-          <div className="px-6 py-3 hairline-t font-ledger text-[11px] flex items-center justify-between text-[var(--ink-secondary)]">
-            <span>HAND-FINISHED IN MILAN & KYOTO</span>
-            <Link to="/shop" className="underline hover:text-[var(--accent-stamp)]">
-              INSPECT PIECE ↗
+          <div className="px-6 py-3.5 hairline-t font-ledger text-[11px] flex items-center justify-between text-[var(--ink-secondary)] bg-[var(--bg-canvas)]">
+            <span className="font-semibold text-[var(--ink-primary)]">HAND-FINISHED IN MILAN & KYOTO</span>
+            <Link
+              to="/shop"
+              className="font-bold text-[var(--accent-electric)] hover:underline flex items-center gap-1"
+            >
+              <span>ORDER PIECE</span>
+              <span>↗</span>
             </Link>
           </div>
         </div>

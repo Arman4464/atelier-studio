@@ -26,8 +26,8 @@ const LIGHT = {
 
 /** Literal (non-CSS-variable) colors matching the active theme, for use in recharts. */
 export function useChartColors() {
-  const theme = useThemeStore((s) => s.theme);
-  return theme === "light" ? LIGHT : DARK;
+  const isDark = useThemeStore((s) => s.isDark);
+  return isDark ? DARK : LIGHT;
 }
 
 export const CHART_SERIES = ["#4553ff", "#c9a15d", "#e8a93a", "#7c86ff", "#b84b31"];
