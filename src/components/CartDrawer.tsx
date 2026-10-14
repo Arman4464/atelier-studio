@@ -13,7 +13,10 @@ export const CartDrawer: React.FC = () => {
     else if (uiStore.setCartOpen) uiStore.setCartOpen(false);
   };
 
-  const rawItems: any[] = cartStore.items || cartStore.cart || [];
+  const rawItems: any[] =
+    cartStore.items && cartStore.items.length > 0
+      ? cartStore.items
+      : cartStore.cart || [];
   const removeItem = cartStore.removeItem || cartStore.removeFromCart;
   const updateQuantity = cartStore.updateQuantity;
 
