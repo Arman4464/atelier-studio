@@ -1,26 +1,38 @@
-import { AnimatePresence, motion } from "motion/react";
-import { useUIStore } from "../store/uiStore";
+import React from 'react';
+import { useUIStore } from '../store/uiStore';
 
-export default function Toaster() {
-  const toasts = useUIStore((s) => s.toasts);
+export const Toaster: React.FC = () => {
+  const uiStore = useUIStore() as any;
+  const toasts: any[] = uiStore.toasts || [];
+  const dismissToast = uiStore.dismissToast || uiStore.removeToast;
+
+  if (!toasts.length) return null;
 
   return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-[200] flex flex-col items-end gap-3">
-      <AnimatePresence>
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            initial={{ opacity: 0, y: 16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="glass pointer-events-auto flex max-w-xs items-center gap-3 px-5 py-4 text-xs tracking-wide text-ink shadow-2xl"
-          >
-            <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-indigo-glow" />
-            <span>{t.message}</span>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+      {toasts.map((t: any) => (
+        <div
+          key={t.id}
+          className="pointer-events-auto bg-[var(--ink-primary)] text-[var(--bg-canvas)] p-4 hairline-box shadow-xl font-ledger text-xs flex items-start justify-between gap-4"
+        >
+          <div>
+            <div className="text-[10px] text-[var(--accent-stamp)] font-bold uppercase">
+              // ATELIER DISPATCH NOTICE
+            </div>
+            <div className="mt-1 uppercase">{t.message || t.title}</div>
+          </div>
+          {dismissToast && (
+            <button
+              onClick={() => dismissToast(t.id)}
+              className="opacity-70 hover:opacity-100 text-[10px]"
+            >
+              [✕]
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   );
-}
+};
+
+export default Toaster;

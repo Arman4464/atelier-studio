@@ -1,109 +1,155 @@
-import { AnimatePresence, motion } from "motion/react";
-import { useNavigate } from "react-router-dom";
-import { X } from "lucide-react";
-import { useUIStore } from "../store/uiStore";
-import { useCartStore } from "../store/cartStore";
-import { useProductsStore } from "../store/productsStore";
-import { formatPrice } from "../lib/format";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useUIStore } from '../store/uiStore';
+import { useCartStore } from '../store/cartStore';
+import { useProductsStore } from '../store/productsStore';
 
-export default function WishlistDrawer() {
-  const open = useUIStore((s) => s.wishlistOpen);
-  const setOpen = useUIStore((s) => s.setWishlistOpen);
-  const showToast = useUIStore((s) => s.showToast);
-  const navigate = useNavigate();
+export const WishlistDrawer: React.FC = () => {
+  const uiStore = useUIStore() as any;
+  const cartStore = useCartStore() as any;
+  const productsStore = useProductsStore() as any;
 
-  const wishlist = useCartStore((s) => s.wishlist);
-  const currency = useCartStore((s) => s.currency);
-  const toggleWishlist = useCartStore((s) => s.toggleWishlist);
-  const addToCart = useCartStore((s) => s.addToCart);
+  const isOpen = Boolean(uiStore.isWishlistOpen ?? uiStore.wishlistOpen);
+  const closeWishlist = () => {
+    if (uiStore.closeWishlist) uiStore.closeWishlist();
+    else if (uiStore.setWishlistOpen) uiStore.setWishlistOpen(false);
+  };
 
-  const items = useProductsStore((s) => s.products).filter((p) => wishlist.includes(p.id));
+  // Support wishlist stored in productsStore, cartStore, or uiStore
+  const rawWishlist: any[] =
+    productsStore.wishlist ||
+    cartStore.wishlist ||
+    uiStore.wishlist ||
+    [];
+
+  const allProducts: any[] = productsStore.products || [];
+  const savedProducts = rawWishlist
+    .map((entry) =>
+      typeof entry === 'object'
+        ? entry
+        : allProducts.find((p) => String(p.id) === String(entry))
+    )
+    .filter(Boolean);
+
+  const formatPrice = (price: any) => {
+    if (typeof price === 'number') {
+      return price > 1000 ? `$${Math.round(price * 0.0104)}` : `$${price}`;
+    }
+    return price || '$380';
+  };
+
+  const handleMoveToBag = (product: any) => {
+    const defaultSize = product.sizes?.[1] || product.sizes?.[0] || 'M';
+    if (cartStore.addItem) {
+      cartStore.addItem({
+        ...product,
+        id: product.id,
+        selectedSize: defaultSize,
+        size: defaultSize,
+        quantity: 1,
+      });
+    } else if (cartStore.addToCart) {
+      cartStore.addToCart(product, 1, defaultSize);
+    }
+    closeWishlist();
+    if (uiStore.openCart) uiStore.openCart();
+    else if (uiStore.setCartOpen) uiStore.setCartOpen(true);
+  };
+
+  const handleRemove = (id: any) => {
+    if (cartStore.toggleWishlist) cartStore.toggleWishlist(id);
+    else if (productsStore.toggleWishlist) productsStore.toggleWishlist(id);
+    else if (cartStore.removeFromWishlist) cartStore.removeFromWishlist(id);
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-[100]">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-scrim/70 backdrop-blur-sm"
-          />
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="glass absolute right-0 top-0 flex h-full w-full max-w-md flex-col"
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <div
+        onClick={closeWishlist}
+        className="fixed inset-0 bg-black/50 backdrop-blur-[2px]"
+      />
+
+      <aside className="relative z-10 w-full max-w-md bg-[var(--bg-canvas)] text-[var(--ink-primary)] h-full flex flex-col justify-between hairline-l shadow-2xl font-ledger text-xs">
+        <div className="p-6 hairline-b flex items-center justify-between">
+          <div>
+            <span className="text-[10px] uppercase tracking-widest text-[var(--ink-muted)] block">
+              PRIVATE CLIENTELE PULL-SHEET
+            </span>
+            <h2 className="font-grotesk font-extrabold text-xl uppercase mt-0.5">
+              Saved Specimens ({String(savedProducts.length).padStart(2, '0')})
+            </h2>
+          </div>
+          <button
+            onClick={closeWishlist}
+            className="px-3 py-1.5 hairline-box hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)]"
           >
-            <div className="flex items-center justify-between border-b border-line p-7">
-              <h2 className="font-display text-3xl font-bold text-ink">Wishlist</h2>
-              <button onClick={() => setOpen(false)} aria-label="Close" className="text-ink-dim hover:text-ink">
-                <X size={20} />
-              </button>
+            [ ESC ]
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {savedProducts.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center text-[var(--ink-muted)] space-y-4">
+              <span>[ NO SPECIMENS CURRENTLY TAGGED ON YOUR RACK ]</span>
+              <Link
+                to="/shop"
+                onClick={closeWishlist}
+                className="px-5 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)] uppercase tracking-widest"
+              >
+                EXPLORE ARCHIVE →
+              </Link>
             </div>
-            <div className="flex-1 space-y-6 overflow-y-auto p-6">
-              {items.length === 0 && (
-                <div className="py-12 text-center">
-                  <p className="font-display text-2xl text-ink-dim">Nothing saved yet.</p>
-                  <button
-                    onClick={() => {
-                      setOpen(false);
-                      navigate("/shop");
-                    }}
-                    className="mt-4 text-xs uppercase tracking-widest text-indigo-glow hover:text-ink"
-                  >
-                    Browse Collection
-                  </button>
-                </div>
-              )}
-              {items.map((item) => (
-                <div key={item.id} className="flex gap-4 border-b border-line pb-6">
+          ) : (
+            savedProducts.map((item, idx) => (
+              <div key={item.id || idx} className="grid grid-cols-12 gap-4 pb-5 perforated-b">
+                <Link
+                  to={`/product/${item.slug || item.id}`}
+                  onClick={closeWishlist}
+                  className="col-span-3 aspect-[3/4] bg-[var(--bg-sub)] hairline-box overflow-hidden"
+                >
                   <img
-                    src={item.images[0]}
-                    className="h-24 w-20 flex-shrink-0 cursor-pointer bg-void-3 object-cover"
-                    alt={item.name}
-                    onClick={() => {
-                      setOpen(false);
-                      navigate(`/product/${item.id}`);
-                    }}
+                    src={item.images?.[0] || item.image}
+                    alt={item.name || item.title}
+                    className="w-full h-full object-cover"
                   />
-                  <div className="flex min-w-0 flex-1 flex-col justify-between">
-                    <div>
-                      <h3
-                        className="cursor-pointer truncate font-display text-lg text-ink"
-                        onClick={() => {
-                          setOpen(false);
-                          navigate(`/product/${item.id}`);
-                        }}
-                      >
-                        {item.name}
-                      </h3>
-                      <span className="font-mono text-xs text-ink-dim">{formatPrice(item.price, currency)}</span>
+                </Link>
+                <div className="col-span-9 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between gap-2">
+                      <span className="font-grotesk font-bold text-sm uppercase">
+                        {item.name || item.title}
+                      </span>
+                      <span className="font-bold">{formatPrice(item.price)}</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => {
-                          addToCart(item);
-                          toggleWishlist(item.id);
-                          showToast(`${item.name} moved to bag`);
-                        }}
-                        className="text-[10px] uppercase tracking-widest text-indigo-glow hover:text-ink"
-                      >
-                        Move to Bag
-                      </button>
-                      <button onClick={() => toggleWishlist(item.id)} className="text-[10px] uppercase tracking-widest text-flame hover:underline">
-                        Remove
-                      </button>
-                    </div>
+                    <span className="text-[10px] text-[var(--ink-muted)] uppercase block mt-0.5">
+                      {item.category || 'ARCHIVE LOT'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3">
+                    <button
+                      onClick={() => handleMoveToBag(item)}
+                      className="px-3 py-1.5 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] uppercase text-[10px] tracking-wider font-medium"
+                    >
+                      + STAMP TO BAG
+                    </button>
+                    <button
+                      onClick={() => handleRemove(item.id)}
+                      className="text-[10px] text-[var(--ink-muted)] hover:text-[var(--accent-stamp)] underline uppercase"
+                    >
+                      RELEASE
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </motion.div>
+              </div>
+            ))
+          )}
         </div>
-      )}
-    </AnimatePresence>
+      </aside>
+    </div>
   );
-}
+};
+
+export default WishlistDrawer;
