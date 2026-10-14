@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import Hero from "../components/home/Hero";
-import TrustStrip from "../components/home/TrustStrip";
 import Marquee from "../components/Marquee";
 import KeyPieces from "../components/home/KeyPieces";
 import Manifesto from "../components/home/Manifesto";
@@ -10,24 +9,21 @@ import FAQSection from "../components/home/FAQSection";
 import Newsletter from "../components/home/Newsletter";
 
 const tickerItems = [
-  "Lisbon Craftsmanship",
-  "Ethically Sourced Materials",
-  "Complimentary Global Delivery",
-  "Six Runs a Year, Never More",
+  "EDITION N° 26 // RAW SELVEDGE TEXTILES",
+  "MILAN PATTERN CUTTING STUDIO",
+  "COMPLIMENTARY WORLDWIDE DISPATCH",
+  "SMALL-BATCH NUMBERED RUNS // ZERO DEADSTOCK",
 ];
 
 export default function Home() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <Hero />
-      <TrustStrip />
-      <div className="border-y border-line bg-void-2 py-4 font-display text-sm font-bold uppercase tracking-widest text-ink">
+      <div className="hairline-b bg-[var(--bg-sub)] py-3 font-ledger text-xs uppercase tracking-widest text-[var(--ink-secondary)]">
         <Marquee items={tickerItems} />
       </div>
       <KeyPieces />
-      <div className="px-1.5">
-        <Manifesto />
-      </div>
+      <Manifesto />
       <Testimonials />
       <Community />
       <FAQSection />

@@ -1,181 +1,189 @@
-import { AnimatePresence, motion } from "motion/react";
-import { useNavigate } from "react-router-dom";
-import { X, Minus, Plus } from "lucide-react";
-import { useUIStore } from "../store/uiStore";
-import { useCartStore } from "../store/cartStore";
-import { useSettingsStore } from "../store/settingsStore";
-import { formatPrice } from "../lib/format";
-import { useProductsStore } from "../store/productsStore";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useCartStore } from '../store/cartStore';
+import { useUIStore } from '../store/uiStore';
 
-export default function CartDrawer() {
-  const open = useUIStore((s) => s.cartOpen);
-  const setOpen = useUIStore((s) => s.setCartOpen);
-  const navigate = useNavigate();
+export const CartDrawer: React.FC = () => {
+  const cartStore = useCartStore() as any;
+  const uiStore = useUIStore() as any;
 
-  const cart = useCartStore((s) => s.cart);
-  const currency = useCartStore((s) => s.currency);
-  const updateQty = useCartStore((s) => s.updateQty);
-  const removeFromCart = useCartStore((s) => s.removeFromCart);
-  const cartTotal = useCartStore((s) => s.cartTotal());
-  const cartGrandTotal = useCartStore((s) => s.cartGrandTotal());
-  const discountAmount = useCartStore((s) => s.discountAmount());
-  const promoCode = useCartStore((s) => s.promoCode);
-  const setPromoCode = useCartStore((s) => s.setPromoCode);
-  const applyPromo = useCartStore((s) => s.applyPromo);
-  const removePromo = useCartStore((s) => s.removePromo);
-  const appliedDiscount = useCartStore((s) => s.appliedDiscount);
-  const promoError = useCartStore((s) => s.promoError);
-  const addToCart = useCartStore((s) => s.addToCart);
-  const freeShippingThreshold = useSettingsStore((s) => s.freeShippingThreshold);
+  const isOpen = Boolean(uiStore.isCartOpen ?? uiStore.cartOpen);
+  const closeCart = () => {
+    if (uiStore.closeCart) uiStore.closeCart();
+    else if (uiStore.setCartOpen) uiStore.setCartOpen(false);
+  };
 
-  const products = useProductsStore((s) => s.products);
-  const crossSell = products.find((p) => !cart.some((c) => c.id === p.id));
-  const progress = Math.min((cartTotal / freeShippingThreshold) * 100, 100);
+  const rawItems: any[] = cartStore.items || cartStore.cart || [];
+  const removeItem = cartStore.removeItem || cartStore.removeFromCart;
+  const updateQuantity = cartStore.updateQuantity;
+
+  const getNormalizedPrice = (price: any): number => {
+    if (typeof price === 'number') {
+      return price > 1000 ? Math.round(price * 0.0104) : price;
+    }
+    const parsed = parseFloat(String(price).replace(/[^0-9.]/g, ''));
+    return isNaN(parsed) ? 0 : parsed > 1000 ? Math.round(parsed * 0.0104) : parsed;
+  };
+
+  const subtotal = rawItems.reduce(
+    (sum, item) => sum + getNormalizedPrice(item.price) * (item.quantity || item.qty || 1),
+    0
+  );
+
+  if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-[100]">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-scrim/70 backdrop-blur-sm"
-          />
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="glass absolute right-0 top-0 flex h-full w-full max-w-md flex-col"
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Backdrop */}
+      <div
+        onClick={closeCart}
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity"
+      />
+
+      {/* Packing Slip Drawer */}
+      <aside className="relative z-10 w-full max-w-md bg-[var(--bg-canvas)] text-[var(--ink-primary)] h-full flex flex-col justify-between hairline-l shadow-2xl">
+        {/* Top Requisition Header */}
+        <div className="p-6 hairline-b flex items-center justify-between">
+          <div>
+            <span className="font-ledger text-[10px] uppercase tracking-widest text-[var(--ink-muted)] block">
+              REQUISITION SLIP // MILAN WORKSHOP
+            </span>
+            <h2 className="font-grotesk font-extrabold text-xl uppercase tracking-tight">
+              Client Bag ({String(rawItems.length).padStart(2, '0')})
+            </h2>
+          </div>
+          <button
+            onClick={closeCart}
+            className="font-ledger text-xs uppercase px-3 py-1.5 hairline-box hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors"
           >
-            <div className="flex flex-1 flex-col overflow-y-auto">
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-void-2/95 p-7 backdrop-blur">
-                <h2 className="font-display text-3xl font-bold text-ink">Your Bag</h2>
-                <button onClick={() => setOpen(false)} aria-label="Close" className="text-ink-dim hover:text-ink">
-                  <X size={20} />
-                </button>
-              </div>
+            [ ESC ]
+          </button>
+        </div>
 
-              <div className="border-b border-line bg-void-3 p-6">
-                <div className="mb-2 flex justify-between text-[10px] font-semibold uppercase tracking-widest text-ink">
-                  <span>{cartTotal >= freeShippingThreshold ? "Free shipping unlocked" : `Add ${formatPrice(freeShippingThreshold - cartTotal, currency)} for free express shipping`}</span>
-                  <span className="font-mono">{Math.round(progress)}%</span>
-                </div>
-                <div className="h-1 w-full overflow-hidden bg-line">
-                  <div className="h-full bg-indigo-glow transition-all duration-500" style={{ width: `${progress}%` }} />
-                </div>
-              </div>
+        {/* Line Items */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {rawItems.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center font-ledger text-xs text-[var(--ink-muted)] space-y-4">
+              <span>[ YOUR ARCHIVE REQUISITION SLIP IS EMPTY ]</span>
+              <Link
+                to="/shop"
+                onClick={closeCart}
+                className="px-5 py-3 bg-[var(--ink-primary)] text-[var(--bg-canvas)] uppercase tracking-widest"
+              >
+                BROWSE SPECIMENS →
+              </Link>
+            </div>
+          ) : (
+            rawItems.map((item, idx) => {
+              const itemKey = `${item.id}-${item.selectedSize || item.size || idx}`;
+              const size = item.selectedSize || item.size || 'OS';
+              const color = item.selectedColor || item.color || 'RAW';
+              const unitPrice = getNormalizedPrice(item.price);
+              const qty = item.quantity || item.qty || 1;
 
-              <div className="space-y-6 p-6">
-                {cart.length === 0 && (
-                  <div className="py-12 text-center">
-                    <p className="font-display text-2xl text-ink-dim">Your bag is empty.</p>
-                    <button
-                      onClick={() => {
-                        setOpen(false);
-                        navigate("/shop");
-                      }}
-                      className="mt-4 text-xs uppercase tracking-widest text-indigo-glow hover:text-ink"
-                    >
-                      Browse Collection
-                    </button>
+              return (
+                <div
+                  key={itemKey}
+                  className="grid grid-cols-12 gap-4 pb-5 perforated-b items-start"
+                >
+                  <div className="col-span-3 aspect-[3/4] bg-[var(--bg-sub)] hairline-box overflow-hidden">
+                    <img
+                      src={item?.images?.[0] || item?.image}
+                      alt={item?.name || item?.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                )}
-                {cart.map((item) => (
-                  <div key={item.id} className="flex gap-4 border-b border-line pb-6">
-                    <img src={item.images[0]} className="h-24 w-20 flex-shrink-0 bg-void-3 object-cover" alt={item.name} />
-                    <div className="flex min-w-0 flex-1 flex-col justify-between">
-                      <div className="flex justify-between gap-2">
-                        <h3 className="truncate font-display text-lg text-ink">{item.name}</h3>
-                        <span className="flex-shrink-0 font-mono text-xs text-ink-dim">{formatPrice(item.price * item.qty, currency)}</span>
+
+                  <div className="col-span-9 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-grotesk font-bold text-sm uppercase">
+                          {item?.name || item?.title}
+                        </h3>
+                        <span className="font-ledger text-xs font-semibold">
+                          ${(unitPrice * qty).toFixed(2)}
+                        </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center border border-line font-mono text-xs text-ink">
-                          <button onClick={() => updateQty(item.id, -1)} className="px-2.5 py-1 hover:bg-void-3" aria-label="Decrease quantity"><Minus size={11} /></button>
-                          <span className="px-2">{item.qty}</span>
-                          <button onClick={() => updateQty(item.id, 1)} className="px-2.5 py-1 hover:bg-void-3" aria-label="Increase quantity"><Plus size={11} /></button>
-                        </div>
-                        <button onClick={() => removeFromCart(item.id)} className="text-[10px] uppercase tracking-widest text-flame hover:underline">
-                          Remove
+                      <div className="font-ledger text-[11px] text-[var(--ink-secondary)] mt-1">
+                        SIZE: [{size}] // LOT: {String(color).toUpperCase()}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="inline-flex items-center hairline-box font-ledger text-xs">
+                        <button
+                          onClick={() => {
+                            if (updateQuantity) {
+                              updateQuantity(item.id, Math.max(1, qty - 1), size, color);
+                            } else if (cartStore.updateQty) {
+                              cartStore.updateQty(item.id, -1);
+                            }
+                          }}
+                          className="px-2.5 py-1 hover:bg-[var(--bg-sub)]"
+                        >
+                          -
+                        </button>
+                        <span className="px-3 py-1 hairline-l hairline-r">
+                          {qty}
+                        </span>
+                        <button
+                          onClick={() => {
+                            if (updateQuantity) {
+                              updateQuantity(item.id, qty + 1, size, color);
+                            } else if (cartStore.updateQty) {
+                              cartStore.updateQty(item.id, 1);
+                            }
+                          }}
+                          className="px-2.5 py-1 hover:bg-[var(--bg-sub)]"
+                        >
+                          +
                         </button>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              {cart.length > 0 && crossSell && (
-                <div className="px-6 pb-6">
-                  <span className="mb-3 block text-[10px] uppercase tracking-widest text-ink-dim">Often Added Together</span>
-                  <div className="flex items-center gap-3 border border-line p-3">
-                    <img src={crossSell.images[0]} className="h-14 w-12 flex-shrink-0 object-cover" alt={crossSell.name} />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-medium text-ink">{crossSell.name}</p>
-                      <p className="font-mono text-[11px] text-ink-dim">{formatPrice(crossSell.price, currency)}</p>
-                    </div>
-                    <button
-                      onClick={() => addToCart(crossSell)}
-                      className="flex-shrink-0 border border-indigo-glow px-3 py-2 text-[10px] uppercase tracking-widest text-indigo-glow transition-colors hover:bg-indigo-glow hover:text-void"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {cart.length > 0 && (
-                <div className="px-6 pb-6">
-                  {appliedDiscount ? (
-                    <div className="flex items-center justify-between border border-indigo-glow/40 bg-indigo-glow/10 px-3 py-2.5 text-xs text-ink">
-                      <span className="font-mono">{appliedDiscount.code} applied</span>
-                      <button onClick={removePromo} className="text-[10px] uppercase tracking-widest text-flame hover:underline">
-                        Remove
+                      <button
+                        onClick={() => {
+                          if (removeItem) removeItem(item.id, size, color);
+                          else if (cartStore.removeFromCart) cartStore.removeFromCart(item.id);
+                        }}
+                        className="font-ledger text-[11px] uppercase text-[var(--ink-muted)] hover:text-[var(--accent-stamp)] underline"
+                      >
+                        REMOVE
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value)}
-                        placeholder="Promo code"
-                        className="flex-1 border border-line bg-transparent px-3 py-2.5 text-xs uppercase text-ink focus:outline-none focus:border-indigo-glow"
-                      />
-                      <button onClick={applyPromo} className="border border-ink px-4 text-[10px] font-semibold uppercase tracking-widest text-ink transition-colors hover:bg-ink hover:text-void">
-                        Apply
-                      </button>
-                    </div>
-                  )}
-                  {promoError && <p className="mt-2 text-[11px] text-flame">{promoError}</p>}
+                  </div>
                 </div>
-              )}
-            </div>
-
-            <div className="flex-shrink-0 border-t border-line bg-void-2 p-7">
-              <div className="mb-5 space-y-1.5 text-xs">
-                <div className="flex justify-between text-ink-dim"><span>Subtotal</span><span className="font-mono">{formatPrice(cartTotal, currency)}</span></div>
-                {appliedDiscount && <div className="flex justify-between text-indigo-glow"><span>Promo ({appliedDiscount.code})</span><span className="font-mono">-{formatPrice(discountAmount, currency)}</span></div>}
-                <div className="flex items-center justify-between border-t border-line pt-2">
-                  <span className="text-xs uppercase tracking-widest text-ink-dim">Total</span>
-                  <span className="font-mono text-xl font-medium text-ink">{formatPrice(cartGrandTotal, currency)}</span>
-                </div>
-              </div>
-              <button
-                disabled={!cart.length}
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/checkout");
-                }}
-                className="w-full bg-ink py-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-void transition-colors hover:bg-indigo-glow disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Proceed to Checkout
-              </button>
-            </div>
-          </motion.div>
+              );
+            })
+          )}
         </div>
-      )}
-    </AnimatePresence>
+
+        {/* Bottom Invoice Ledger */}
+        {rawItems.length > 0 && (
+          <div className="p-6 bg-[var(--bg-sub)] hairline-t space-y-4">
+            <div className="space-y-1.5 font-ledger text-xs">
+              <div className="flex justify-between text-[var(--ink-secondary)]">
+                <span>COURIER DISPATCH</span>
+                <span>COMPLIMENTARY</span>
+              </div>
+              <div className="flex justify-between text-sm font-bold pt-2 perforated-b pb-2">
+                <span>TOTAL VALUATION</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <Link
+              to="/checkout"
+              onClick={closeCart}
+              className="w-full py-4 bg-[var(--ink-primary)] text-[var(--bg-canvas)] hover:bg-[var(--accent-stamp)] transition-colors font-ledger text-xs uppercase tracking-widest flex items-center justify-center gap-3 font-medium"
+            >
+              <span>PROCEED TO DISPATCH LEDGER</span>
+              <span>→</span>
+            </Link>
+          </div>
+        )}
+      </aside>
+    </div>
   );
-}
+};
+
+export default CartDrawer;

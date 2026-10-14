@@ -85,12 +85,12 @@ export default function App() {
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
-    <div className="noise min-h-screen bg-void text-ink">
+    <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--ink-primary)]">
       <ScrollToTop />
       <GlobalShortcuts isAdminRoute={isAdminRoute} />
       <PreloaderController />
       {!isAdminRoute && <Header />}
-      <main className={isAdminRoute ? "" : "pt-[92px] md:pt-[100px]"}>
+      <main>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />

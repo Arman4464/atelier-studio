@@ -5,14 +5,15 @@ export type Theme = "dark" | "light";
 const STORAGE_KEY = "atelier-theme";
 
 function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return "light";
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === "light" ? "light" : "dark";
+  return stored === "dark" ? "dark" : "light";
 }
 
 function applyThemeClass(theme: Theme) {
   const root = window.document.documentElement;
   root.classList.toggle("light", theme === "light");
+  root.classList.toggle("dark", theme === "dark");
 }
 
 interface ThemeState {

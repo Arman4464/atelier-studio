@@ -1,119 +1,192 @@
-import { motion, type Variants } from "motion/react";
-import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
-import { formatPrice } from "../../lib/format";
-import { useCartStore } from "../../store/cartStore";
-import { useProductsStore } from "../../store/productsStore";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-const wordVariants: Variants = {
-  hidden: { y: "110%" },
-  visible: (i: number) => ({
-    y: "0%",
-    transition: { delay: 0.06 * i, duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
-  }),
-};
+const ARCHIVE_PLATES = [
+  {
+    id: 'PLATE — I',
+    code: 'AS-AW26-014',
+    title: 'Raw Selvedge Wool Overcoat',
+    subtitle: 'Unlined structural tailoring with exposed horn buttons & bias-cut raglan sleeves.',
+    fabric: '540 GSM Double-Faced Virgin Wool (Biella, IT)',
+    dye: 'Cold-Vat Iron Oxide Charcoal',
+    price: '$680',
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1400&q=85',
+    coords: 'CUTTING TABLE 02 // PATTERN B',
+  },
+  {
+    id: 'PLATE — II',
+    code: 'AS-AW26-029',
+    title: 'Crinkled Nylon Field Parka',
+    subtitle: 'Garment-dyed Japanese memory taffeta that holds sculptural creases where touched.',
+    fabric: '210 GSM High-Density Memory Nylon (Fukui, JP)',
+    dye: 'Piece-Dyed Peat & Burnt Umber',
+    price: '$520',
+    image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1400&q=85',
+    coords: 'DYE BATH 07 // IMMERSION 4H',
+  },
+  {
+    id: 'PLATE — III',
+    code: 'AS-AW26-041',
+    title: 'Twisted-Seam Heavy Canvas Trouser',
+    subtitle: 'Engineered 3D curved leg architecture derived from 1940s French railway workwear.',
+    fabric: '460 GSM Unbleached Organic Cotton Duck',
+    dye: 'Natural Calico / Raw Enzyme Wash',
+    price: '$340',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1400&q=85',
+    coords: 'ARCHIVE RACK 11 // SPECIMEN C',
+  },
+];
 
-function KineticWord({ children, i }: { children: string; i: number }) {
+export const Hero: React.FC = () => {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const activePlate = ARCHIVE_PLATES[activeIdx];
+
   return (
-    <span className="inline-block overflow-hidden pb-1 align-bottom">
-      <motion.span custom={i} initial="hidden" animate="visible" variants={wordVariants} className="inline-block">
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
-export default function Hero() {
-  const currency = useCartStore((s) => s.currency);
-  const heroProduct = useProductsStore((s) => s.products.find((p) => p.id === 1));
-
-  return (
-    <section className="mx-auto grid max-w-[1800px] grid-cols-1 gap-1.5 p-1.5 pt-1.5 md:grid-cols-12 md:auto-rows-[minmax(0,1fr)]">
-      {/* Headline tile */}
-      <div className="flex flex-col justify-between border border-line bg-void-2 p-8 md:col-span-7 md:row-span-2 md:p-14">
-        <div className="flex items-center gap-3">
-          <span className="border border-line px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-ink">Volume 04 — FW26</span>
-          <span className="text-xs text-ink-dim">Lisbon Workshop</span>
-        </div>
-
-        <h1 className="my-10 font-display text-[clamp(2.6rem,7vw,6.2rem)] font-black uppercase leading-[0.92] tracking-tight text-ink">
-          <KineticWord i={0}>Objects</KineticWord> <KineticWord i={1}>worth</KineticWord>
-          <br />
-          <span className="text-indigo-glow"><KineticWord i={2}>keeping.</KineticWord></span>
-        </h1>
-
-        <div className="flex flex-wrap items-center gap-6">
-          <Link
-            to="/shop"
-            className="group flex items-center gap-3 bg-ink px-7 py-4 text-xs font-semibold uppercase tracking-widest text-void transition-colors hover:bg-indigo-glow"
-          >
-            Explore Catalog
-            <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-          </Link>
-          <p className="max-w-[220px] text-xs leading-relaxed text-ink-dim">
-            Six small runs a year. No seasons to chase, nothing made to be thrown away.
-          </p>
-        </div>
-      </div>
-
-      {/* Hero image tile */}
-      <Link
-        to="/product/1"
-        className="group relative col-span-1 min-h-[320px] overflow-hidden border border-line md:col-span-5 md:row-span-2"
-      >
-        <img
-          src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1400&auto=format&fit=crop"
-          alt="Structured Wool Trench"
-          className="absolute inset-0 h-full w-full object-cover saturate-[0.85] transition-all duration-1000 ease-out group-hover:scale-105 group-hover:saturate-100"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-scrim via-scrim/10 to-transparent" />
-        <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between text-on-scrim">
-          <div>
-            <span className="block text-[10px] font-semibold uppercase tracking-widest text-brass-bright">Hero Spotlight</span>
-            <h3 className="font-display text-2xl font-bold">Structured Wool Trench</h3>
+    <section className="hairline-b relative overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-105px)]">
+        {/* Left Column: Editorial Typography & Pattern Notes */}
+        <div className="lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 hairline-r">
+          {/* Top Metadata Stamp */}
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 hairline-b">
+            <div className="font-ledger text-xs uppercase tracking-wider flex items-center gap-3">
+              <span className="px-2 py-0.5 bg-[var(--accent-stamp)] text-[#FAF7F2] font-medium">
+                LOOKBOOK 04
+              </span>
+              <span className="text-[var(--ink-secondary)]">
+                ARCHIVAL MONOGRAPH — 2026
+              </span>
+            </div>
+            <span className="font-ledger text-xs text-[var(--ink-muted)]">
+              [ {activePlate.code} ]
+            </span>
           </div>
-          <span className="border border-on-scrim/30 px-3 py-1.5 font-mono text-xs backdrop-blur-sm">{formatPrice(heroProduct?.price, currency)}</span>
+
+          {/* Main Asymmetric Headline */}
+          <div className="my-10 lg:my-auto py-4">
+            <p className="font-ledger text-xs uppercase tracking-[0.2em] text-[var(--ink-secondary)] mb-4">
+              // ARCHITECTURAL GARMENTS FOR EVERYDAY UTILITY
+            </p>
+            <h1 className="font-grotesk font-extrabold text-5xl sm:text-7xl xl:text-[5.4rem] leading-[0.92] tracking-[-0.04em] uppercase">
+              Form Follows <br />
+              <span className="font-editorial italic font-normal lowercase text-6xl sm:text-8xl xl:text-[6.4rem] text-[var(--accent-stamp)] pr-3">
+                raw
+              </span>
+              Material.
+            </h1>
+
+            <p className="mt-8 max-w-xl text-base sm:text-lg text-[var(--ink-secondary)] leading-relaxed font-normal">
+              We reject seasonal trends and synthetic perfection. Every piece is cut from heavy-gauge Japanese and Italian textiles, numbered by batch, and engineered to patina with its wearer.
+            </p>
+
+            {/* Primary & Secondary Action Ledger */}
+            <div className="mt-10 flex flex-wrap items-stretch gap-4">
+              <Link
+                to="/shop"
+                className="group inline-flex items-center gap-6 bg-[var(--ink-primary)] text-[var(--bg-canvas)] px-7 py-4 font-ledger text-xs uppercase tracking-widest hover:bg-[var(--accent-stamp)] transition-colors"
+              >
+                <span>ENTER THE ARCHIVE</span>
+                <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
+              </Link>
+              <Link
+                to="/journal"
+                className="inline-flex items-center gap-3 px-6 py-4 hairline-box font-ledger text-xs uppercase tracking-widest hover:bg-[var(--bg-sub)] transition-colors"
+              >
+                <span>READ PATTERN NOTES</span>
+                <span className="text-[var(--ink-muted)]">[04]</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Bottom Interactive Contact Sheet Switcher */}
+          <div className="pt-8 hairline-t">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-ledger text-[11px] uppercase text-[var(--ink-muted)]">
+                SELECT CONTACT SHEET PLATE:
+              </span>
+              <span className="font-ledger text-[11px] text-[var(--ink-secondary)]">
+                {activePlate.coords}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              {ARCHIVE_PLATES.map((plate, index) => {
+                const selected = index === activeIdx;
+                return (
+                  <button
+                    key={plate.id}
+                    onClick={() => setActiveIdx(index)}
+                    className={`text-left p-3 transition-all hairline-box ${
+                      selected
+                        ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)]'
+                        : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-sub)]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between font-ledger text-[10px] opacity-75 mb-1">
+                      <span>{plate.id}</span>
+                      <span>{plate.price}</span>
+                    </div>
+                    <div className="font-grotesk font-bold text-xs truncate">
+                      {plate.title}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </Link>
 
-      {/* Small tiles row */}
-      <div className="flex flex-col justify-between border border-line bg-indigo p-6 md:col-span-3">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-void/70">Since 2016</span>
-        <span className="font-display text-5xl font-black text-void">06</span>
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-void">Runs per year</span>
-      </div>
+        {/* Right Column: Live Specimen Frame & Garment Dissection */}
+        <div className="lg:col-span-5 flex flex-col justify-between bg-[var(--bg-sub)] relative">
+          {/* Top Specimen Bar */}
+          <div className="px-6 py-3 hairline-b flex items-center justify-between font-ledger text-[11px] text-[var(--ink-secondary)]">
+            <span>FIG. 0{activeIdx + 1} — FULL SILHOUETTE</span>
+            <span>SCALE 1:12</span>
+          </div>
 
-      <Link
-        to="/shop?cat=Objects"
-        className="group relative col-span-1 min-h-[160px] overflow-hidden border border-line md:col-span-3"
-      >
-        <img
-          src="https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?q=80&w=800&auto=format&fit=crop"
-          alt="Objects"
-          className="absolute inset-0 h-full w-full object-cover saturate-[0.85] transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-scrim/50 transition-colors group-hover:bg-scrim/30" />
-        <span className="absolute bottom-4 left-4 font-display text-xl font-bold text-on-scrim">Objects</span>
-      </Link>
+          {/* Image Frame with Crop Marks */}
+          <div className="relative flex-1 min-h-[460px] p-6 sm:p-10 flex items-center justify-center overflow-hidden">
+            {/* Corner Crop Marks */}
+            <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[var(--ink-primary)]" />
+            <div className="absolute top-4 right-4 w-4 h-4 border-t border-r border-[var(--ink-primary)]" />
+            <div className="absolute bottom-4 left-4 w-4 h-4 border-b border-l border-[var(--ink-primary)]" />
+            <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[var(--ink-primary)]" />
 
-      <Link
-        to="/shop?cat=Outerwear"
-        className="group relative col-span-1 min-h-[160px] overflow-hidden border border-line md:col-span-3"
-      >
-        <img
-          src="https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?q=80&w=800&auto=format&fit=crop"
-          alt="Outerwear"
-          className="absolute inset-0 h-full w-full object-cover saturate-[0.85] transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-scrim/50 transition-colors group-hover:bg-scrim/30" />
-        <span className="absolute bottom-4 left-4 font-display text-xl font-bold text-on-scrim">Outerwear</span>
-      </Link>
+            <div className="relative w-full h-full max-h-[580px] overflow-hidden hairline-box bg-[var(--bg-canvas)] group">
+              <img
+                key={activePlate.image}
+                src={activePlate.image}
+                alt={activePlate.title}
+                className="w-full h-full object-cover object-center grayscale-[20%] contrast-[1.06] group-hover:scale-105 transition-transform duration-700"
+              />
+              {/* Woven Spec Tag Pinned to Bottom-Left of Photo */}
+              <div className="absolute bottom-4 left-4 right-4 bg-[var(--bg-canvas)]/95 backdrop-blur-sm p-4 hairline-box">
+                <div className="flex items-baseline justify-between gap-2 pb-2 perforated-b">
+                  <span className="font-grotesk font-bold text-sm uppercase">
+                    {activePlate.title}
+                  </span>
+                  <span className="font-ledger text-sm font-semibold text-[var(--accent-stamp)]">
+                    {activePlate.price}
+                  </span>
+                </div>
+                <div className="mt-2 space-y-1 font-ledger text-[11px] text-[var(--ink-secondary)]">
+                  <div>TEXTILE: {activePlate.fabric}</div>
+                  <div>TREATMENT: {activePlate.dye}</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div className="flex flex-col justify-between border border-line bg-paper p-6 text-onpaper md:col-span-3">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-onpaper-dim">Rated</span>
-        <span className="font-display text-5xl font-black">4.8</span>
-        <span className="text-[11px] font-semibold uppercase tracking-widest">Across 1,204 reviews</span>
+          {/* Bottom Provenance Strip */}
+          <div className="px-6 py-3 hairline-t font-ledger text-[11px] flex items-center justify-between text-[var(--ink-secondary)]">
+            <span>HAND-FINISHED IN MILAN & KYOTO</span>
+            <Link to="/shop" className="underline hover:text-[var(--accent-stamp)]">
+              INSPECT PIECE ↗
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
-}
+};
+
+export default Hero;

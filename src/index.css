@@ -1,181 +1,160 @@
 @import "tailwindcss";
 
-@theme {
-  --color-void: #0c0c0e;
-  --color-void-2: #151517;
-  --color-void-3: #1e1e21;
-  --color-paper: #f3efe4;
-  --color-paper-dim: #e7e1cf;
-  --color-ink: #f5f4ef;
-  --color-ink-dim: #98978d;
-  --color-line: #2a2a2d;
-  --color-line-soft: rgba(245, 244, 239, 0.09);
-  --color-onpaper: #131210;
-  --color-onpaper-dim: #6b6759;
-  --color-indigo: #4553ff;
-  --color-indigo-dim: #232d99;
-  --color-indigo-glow: #7c86ff;
-  --color-brass: #c9a15d;
-  --color-brass-dim: #8a6f3f;
-  --color-brass-bright: #c9a15d;
-  --color-zest: #ffd23f;
-  --color-flame: #ff5b39;
-  --color-glass: rgba(21, 21, 23, 0.72);
+:root {
+  --bg-canvas: #F3EFE6;
+  --bg-sub: #E8E2D5;
+  --bg-elevated: #FAF7F2;
+  --ink-primary: #121110;
+  --ink-secondary: #57534E;
+  --ink-muted: #8C857B;
+  --accent-stamp: #C83B2B;
+  --border-hairline: rgba(18, 17, 16, 0.14);
+  --border-strong: rgba(18, 17, 16, 0.85);
 
-  /* Fixed text colors for badges sitting on saturated accent backgrounds
-     (indigo/zest/flame). These are tuned per-background, not per-theme —
-     text-ink/text-onpaper are for page content and invert the wrong way
-     when placed on a badge instead of the page canvas. */
-  --color-on-indigo: #fafaf7;
-  --color-on-zest: #141310;
-  --color-on-flame: #141310;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-display: 'Syne', sans-serif;
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  /* Always-dark scrim for gradient overlays on photography (hero/product
-     images need a dark fade for the white caption text regardless of
-     whether the site chrome around them is in light or dark mode). */
-  --color-scrim: #0c0c0e;
-  --color-on-scrim: #fafaf7;
-
-  --font-display: "Archivo", "Helvetica Neue", sans-serif;
-  --font-sans: "Instrument Sans", "Helvetica Neue", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-
-  --animate-marquee: marquee 32s linear infinite;
-  --animate-marquee-fast: marquee 14s linear infinite;
+  /* Legacy theme aliases mapped to Garment Pattern Ledger colors */
+  --color-void: var(--bg-canvas);
+  --color-void-2: var(--bg-sub);
+  --color-void-3: var(--bg-elevated);
+  --color-paper: var(--bg-canvas);
+  --color-paper-dim: var(--bg-sub);
+  --color-ink: var(--ink-primary);
+  --color-ink-dim: var(--ink-secondary);
+  --color-line: var(--border-hairline);
+  --color-line-soft: var(--border-hairline);
+  --color-onpaper: var(--ink-primary);
+  --color-onpaper-dim: var(--ink-muted);
+  --color-indigo: var(--accent-stamp);
+  --color-indigo-dim: #9e2a1d;
+  --color-indigo-glow: var(--accent-stamp);
+  --color-brass: var(--accent-stamp);
+  --color-brass-dim: #9e2a1d;
+  --color-zest: #D97706;
+  --color-flame: var(--accent-stamp);
+  --color-glass: rgba(243, 239, 230, 0.85);
+  --color-scrim: #121110;
+  --color-on-scrim: #FAF7F2;
+  --color-on-indigo: #FAF7F2;
+  --color-on-zest: #121110;
+  --color-on-flame: #FAF7F2;
 }
 
-/*
-  Light mode — the "original cream" palette, applied by toggling a `.light`
-  class on <html> (see src/store/themeStore.ts). Every Tailwind color utility
-  in this project (bg-void, text-ink, border-line, etc.) compiles to
-  `var(--color-*)`, so overriding the custom properties here is enough to
-  retheme the entire app — no component changes needed. Dark mode (no class)
-  is untouched and stays the default.
-*/
-html.light {
-  color-scheme: light;
-  --color-void: #efe9da;
-  --color-void-2: #e4dcc6;
-  --color-void-3: #dcd2b4;
-  --color-paper: #1b1a13;
-  --color-paper-dim: #2a2a2d;
-  --color-ink: #1b1a13;
-  --color-ink-dim: #6b6653;
-  --color-line: #d2c7a6;
-  --color-line-soft: rgba(27, 26, 19, 0.08);
-  --color-onpaper: #efe9da;
-  --color-onpaper-dim: #aba593;
-  --color-indigo: #4553ff;
-  --color-indigo-dim: #232d99;
-  --color-indigo-glow: #3644d6;
-  --color-brass: #755a2c;
-  --color-brass-dim: #8a6f3f;
-  --color-zest: #e8a93a;
-  --color-flame: #b84b31;
-  --color-glass: rgba(239, 233,218, 0.78);
-  --color-on-flame: #fafaf7;
+.dark, html.dark {
+  --bg-canvas: #0E0D0C;
+  --bg-sub: #171614;
+  --bg-elevated: #1F1D1A;
+  --ink-primary: #EDE8DF;
+  --ink-secondary: #A69F94;
+  --ink-muted: #666057;
+  --accent-stamp: #E04F3E;
+  --border-hairline: rgba(237, 232, 223, 0.14);
+  --border-strong: rgba(237, 232, 223, 0.85);
+
+  --color-void: var(--bg-canvas);
+  --color-void-2: var(--bg-sub);
+  --color-void-3: var(--bg-elevated);
+  --color-paper: #1F1D1A;
+  --color-paper-dim: #171614;
+  --color-ink: var(--ink-primary);
+  --color-ink-dim: var(--ink-secondary);
+  --color-line: var(--border-hairline);
+  --color-line-soft: var(--border-hairline);
+  --color-onpaper: var(--ink-primary);
+  --color-onpaper-dim: var(--ink-muted);
+  --color-indigo: var(--accent-stamp);
+  --color-indigo-dim: #A83224;
+  --color-indigo-glow: var(--accent-stamp);
+  --color-brass: var(--accent-stamp);
+  --color-brass-dim: #A83224;
+  --color-zest: #E04F3E;
+  --color-flame: #E04F3E;
+  --color-glass: rgba(14, 13, 12, 0.85);
+  --color-scrim: #0E0D0C;
+  --color-on-scrim: #EDE8DF;
 }
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-    background: var(--color-void);
-    color-scheme: dark;
-    transition: background-color 0.4s ease;
-  }
-  body {
-    background: var(--color-void);
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    transition: background-color 0.4s ease, color 0.4s ease;
-  }
-  ::selection {
-    background: var(--color-indigo);
-    color: var(--color-ink);
-  }
-  a, button {
-    -webkit-tap-highlight-color: transparent;
-  }
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--color-void);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-line);
-  }
-  :focus-visible {
-    outline: 2px solid var(--color-indigo-glow);
-    outline-offset: 3px;
-  }
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 2px;
-    background: var(--color-line);
-    border-radius: 0;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--color-indigo-glow);
-    cursor: pointer;
-    border: 2px solid var(--color-void);
-    box-shadow: 0 0 0 1px var(--color-indigo-glow);
-  }
+* {
+  box-sizing: border-box;
+  border-color: var(--border-hairline);
 }
 
-@layer utilities {
-  .noise::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  .glass {
-    background: var(--color-glass);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid var(--color-line-soft);
-  }
-
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-  .text-stroke {
-    -webkit-text-stroke: 1.5px currentColor;
-    color: transparent;
-  }
-
-  .bg-grain-light {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  }
-
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  .pause-on-hover:hover {
-    animation-play-state: paused;
-  }
+html {
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+body {
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Subtle tactile paper/film grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--accent-stamp);
+  color: #FAF7F2;
+}
+
+/* Typography & Utility Classes */
+.font-editorial {
+  font-family: var(--font-serif);
+}
+
+.font-grotesk {
+  font-family: var(--font-display);
+}
+
+.font-ledger {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
+/* Structural Hairline Borders */
+.hairline-t { border-top: 1px solid var(--border-hairline); }
+.hairline-b { border-bottom: 1px solid var(--border-hairline); }
+.hairline-l { border-left: 1px solid var(--border-hairline); }
+.hairline-r { border-right: 1px solid var(--border-hairline); }
+.hairline-box { border: 1px solid var(--border-hairline); }
+
+/* Perforated Invoice Edge */
+.perforated-b {
+  border-bottom: 1px dashed var(--ink-muted);
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-muted);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
