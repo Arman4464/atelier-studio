@@ -1,7 +1,7 @@
+// src/components/ProductCard.tsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCartStore } from '../store/cartStore';
-import { useUIStore } from '../store/uiStore';
+import { useAtelierBridge, normalizeProduct } from '../lib/storeBridge';
 
 interface ProductCardProps {
   product: any;
@@ -11,116 +11,138 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
+  product: rawProduct,
   index = 0,
   featured = false,
   aspectClass,
 }) => {
-  const [hovered, setHovered] = useState(false);
-  const [addedSize, setAddedSize] = useState<string | null>(null);
+  const {
+    addToCart,
+    openCart,
+    openQuickView,
+    toggleWishlist,
+    isWishlisted,
+  } = useAtelierBridge();
 
-  const cartStore = useCartStore() as any;
-  const uiStore = useUIStore() as any;
+  const product = normalizeProduct(rawProduct, index);
+  const [scrubIdx, setScrubIdx] = useState(0);
+  const [justAddedSize, setJustAddedSize] = useState<string | null>(null);
 
-  const id = product?.id || product?.slug || `item-${index}`;
-  const slug = product?.slug || product?.id || id;
-  const title = product?.name || product?.title || 'Tailored Silhouette';
-  const category = product?.category || 'Ready to Wear';
-  const price =
-    typeof product?.price === 'number'
-      ? product.price > 1000
-        ? `$${Math.round(product.price * 0.0104)}`
-        : `$${product.price}`
-      : product?.price || '$420';
-  const primaryImage =
-    product?.images?.[0] ||
-    product?.image ||
-    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=85';
-  const secondaryImage = product?.images?.[1] || primaryImage;
-  const sizes: string[] = product?.sizes || ['XS', 'S', 'M', 'L', 'XL'];
+  if (!product) return null;
 
-  const isWishlisted = cartStore.isWishlisted?.(product.id) || false;
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    cartStore.toggleWishlist?.(product.id);
+  const images = product.images;
+  const saved = isWishlisted(product.id);
+
+  // Horizontal mouse scrubbing across image gallery
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (images.length <= 1) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const nextIdx = Math.min(images.length - 1, Math.floor(relX * images.length));
+    setScrubIdx(nextIdx);
   };
 
-  const handleQuickAdd = (e: React.MouseEvent, size: string) => {
+  const handleSizeClick = (e: React.MouseEvent, size: string) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (cartStore.addItem) {
-      cartStore.addItem({
-        ...product,
-        id: product.id,
-        selectedSize: size,
-        size,
-        selectedColor: product?.colors?.[0]?.name || product?.colors?.[0] || 'Obsidian',
-        color: product?.colors?.[0]?.name || product?.colors?.[0] || 'Obsidian',
-        quantity: 1,
-      });
-    } else if (cartStore.addToCart) {
-      cartStore.addToCart(product, 1, size);
-    }
-
-    setAddedSize(size);
-    setTimeout(() => setAddedSize(null), 900);
-    if (uiStore.openCart) uiStore.openCart();
-    else if (uiStore.setCartOpen) uiStore.setCartOpen(true);
+    addToCart(product, size, product.colors?.[0]?.name || 'Obsidian', 1);
+    setJustAddedSize(size);
+    setTimeout(() => setJustAddedSize(null), 1000);
+    openCart();
   };
 
-  const ratio =
+  const ratioClass =
     aspectClass || (featured ? 'aspect-[4/5] sm:aspect-[16/11]' : 'aspect-[3/4]');
 
   return (
-    <article
-      className="group flex flex-col"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Sculptural Image Container */}
-      <Link
-        to={`/product/${slug}`}
-        className={`relative block overflow-hidden rounded-[26px] bg-[var(--bg-sub)] ${ratio}`}
+    <article className="group surface-card p-2.5 flex flex-col justify-between">
+      {/* Image Stage with Cursor Scrubbing */}
+      <div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setScrubIdx(0)}
+        className={`relative overflow-hidden rounded-[18px] bg-[var(--bg-sub)] ${ratioClass}`}
       >
-        <img
-          src={hovered ? secondaryImage : primaryImage}
-          alt={title}
-          loading="lazy"
-          className="w-full h-full object-cover object-center sculptural-img"
-        />
+        <Link to={`/product/${product.slug}`} className="block w-full h-full">
+          <img
+            src={images[scrubIdx] || product.image}
+            alt={product.name}
+            loading="lazy"
+            className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          />
+        </Link>
 
-        {/* Top-Left Pill Badge */}
-        {(product?.isNew || product?.badge) && (
-          <span className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full glass-pill text-[10px] font-medium tracking-wider uppercase">
-            {product?.badge || 'New Season'}
-          </span>
+        {/* Multi-Angle Scrubbing Indicator Bars at Top */}
+        {images.length > 1 && (
+          <div className="absolute top-2.5 inset-x-3 flex gap-1 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+            {images.map((_: string, i: number) => (
+              <span
+                key={i}
+                className={`h-1 flex-1 rounded-full transition-colors ${
+                  i === scrubIdx ? 'bg-[var(--accent-signal)]' : 'bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
         )}
 
-        {/* Top-Right Wishlist Pill */}
-        <button
-          onClick={toggleWishlist}
-          aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
-          className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full glass-pill flex items-center justify-center text-xs transition-transform hover:scale-110 z-10"
-        >
-          <span className={isWishlisted ? 'text-rose-500 scale-110' : 'text-[var(--ink-secondary)]'}>
-            {isWishlisted ? '♥' : '♡'}
+        {/* Top-Left Category / New Pill */}
+        <div className="absolute top-3.5 left-3.5 flex items-center gap-1.5 pointer-events-none">
+          {product.isNew && (
+            <span className="px-2.5 py-1 rounded-full bg-[var(--accent-signal)] text-white font-mono-tech text-[10px] font-bold uppercase">
+              NEW
+            </span>
+          )}
+          <span className="px-2.5 py-1 rounded-full surface-glass font-mono-tech text-[10px] uppercase font-medium">
+            {product.category}
           </span>
-        </button>
+        </div>
 
-        {/* Floating Frosted Glass Quick-Size Capsule on Hover */}
-        <div className="absolute inset-x-3 bottom-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 z-10">
-          <div className="glass-modal rounded-2xl p-2.5">
-            <div className="text-[10px] text-center font-medium text-[var(--ink-secondary)] mb-1.5">
-              {addedSize ? `Added ${addedSize} to Bag ✓` : 'Quick Add Size'}
+        {/* Top-Right Wishlist Heart & Quick-Loupe Buttons */}
+        <div className="absolute top-3.5 right-3.5 flex flex-col gap-1.5 z-10">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(product.id);
+            }}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs transition-transform active:scale-125 ${
+              saved
+                ? 'bg-[var(--accent-signal)] text-white shadow-md'
+                : 'surface-glass hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)]'
+            }`}
+            title={saved ? 'Remove from Saved' : 'Save Piece'}
+          >
+            ♥
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              openQuickView(product);
+            }}
+            className="w-8 h-8 rounded-full surface-glass hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Quick View"
+          >
+            ⊕
+          </button>
+        </div>
+
+        {/* Slide-Up Instant Size Matrix */}
+        <div className="absolute inset-x-2.5 bottom-2.5 translate-y-[115%] group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
+          <div className="surface-modal rounded-2xl p-2.5">
+            <div className="flex items-center justify-between font-mono-tech text-[10px] uppercase mb-1.5 px-1">
+              <span className="font-semibold">
+                {justAddedSize ? `✓ Added [${justAddedSize}]` : 'Instant Add Size'}
+              </span>
+              <span className="text-[var(--ink-muted)]">In Stock</span>
             </div>
             <div className="grid grid-cols-5 gap-1">
-              {sizes.slice(0, 5).map((sz) => (
+              {product.sizes.slice(0, 5).map((sz: string) => (
                 <button
                   key={sz}
-                  onClick={(e) => handleQuickAdd(e, sz)}
-                  className="py-1.5 rounded-xl text-[11px] font-medium hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors"
+                  onClick={(e) => handleSizeClick(e, sz)}
+                  className="py-1.5 rounded-xl font-mono-tech text-[11px] font-semibold bg-[var(--bg-sub)] hover:bg-[var(--accent-signal)] hover:text-white transition-colors"
                 >
                   {sz}
                 </button>
@@ -128,24 +150,35 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
         </div>
-      </Link>
+      </div>
 
-      {/* Minimalist Uncluttered Meta Below */}
-      <div className="pt-3.5 px-1 flex items-start justify-between gap-4">
-        <div>
+      {/* Bottom Product Details */}
+      <div className="pt-3.5 px-2 pb-1 flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <Link
-            to={`/product/${slug}`}
-            className="text-sm font-medium tracking-tight text-[var(--ink-primary)] group-hover:opacity-70 transition-opacity block"
+            to={`/product/${product.slug}`}
+            className="font-display font-bold text-sm sm:text-base tracking-tight hover:text-[var(--accent-signal)] transition-colors block truncate"
           >
-            {title}
+            {product.name}
           </Link>
-          <span className="text-xs text-[var(--ink-muted)] mt-0.5 block">
-            {category}
-          </span>
+          <div className="flex items-center gap-1.5 mt-1">
+            {product.colors.slice(0, 4).map((c: any, i: number) => (
+              <span
+                key={i}
+                className="w-2.5 h-2.5 rounded-full border border-[var(--border-strong)]"
+                style={{ backgroundColor: c.hex }}
+                title={c.name}
+              />
+            ))}
+            <span className="font-mono-tech text-[10px] text-[var(--ink-muted)] ml-1">
+              {product.colors.length} shades
+            </span>
+          </div>
         </div>
-        <span className="text-sm font-medium text-[var(--ink-primary)] shrink-0">
-          {price}
-        </span>
+
+        <div className="text-right shrink-0">
+          <span className="font-mono-tech font-bold text-sm">${product.price}</span>
+        </div>
       </div>
     </article>
   );

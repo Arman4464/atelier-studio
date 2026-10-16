@@ -1,59 +1,108 @@
-import React, { useState, useMemo } from 'react';
-import { useProductsStore } from '../store/productsStore';
+// src/pages/Shop.tsx
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useAtelierBridge } from '../lib/storeBridge';
 import { ProductCard } from '../components/ProductCard';
 
 export const Shop: React.FC = () => {
-  const productsStore = useProductsStore() as any;
-  const rawProducts: any[] = productsStore.products || [];
+  const { products } = useAtelierBridge();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [density, setDensity] = useState<'EDITORIAL' | 'GALLERY' | 'COMPACT'>('EDITORIAL');
+  const initialCat = searchParams.get('category') || 'All';
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCat);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
+  const [layout, setLayout] = useState<'bento' | 'grid3' | 'grid4'>('grid3');
+
+  useEffect(() => {
+    const urlCat = searchParams.get('category') || 'All';
+    setSelectedCategory(urlCat);
+  }, [searchParams]);
 
   const categories = useMemo(() => {
     const set = new Set<string>(['All']);
-    rawProducts.forEach((p) => {
-      if (p?.category) set.add(String(p.category));
+    products.forEach((p) => {
+      if (p.category) set.add(p.category);
     });
     return Array.from(set);
-  }, [rawProducts]);
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
-    return rawProducts.filter((p) => {
+    const list = products.filter((p) => {
       const catMatch =
         selectedCategory === 'All' ||
-        String(p?.category || '').toLowerCase() === selectedCategory.toLowerCase();
-      const title = String(p?.name || p?.title || '').toLowerCase();
-      const queryMatch = !searchQuery || title.includes(searchQuery.toLowerCase());
-      return catMatch && queryMatch;
+        p.category.toLowerCase() === selectedCategory.toLowerCase();
+      const q = searchQuery.trim().toLowerCase();
+      const qMatch =
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q);
+      return catMatch && qMatch;
     });
-  }, [rawProducts, selectedCategory, searchQuery]);
+
+    if (sortBy === 'price-asc') return [...list].sort((a, b) => a.price - b.price);
+    if (sortBy === 'price-desc') return [...list].sort((a, b) => b.price - a.price);
+    return list;
+  }, [products, selectedCategory, searchQuery, sortBy]);
+
+  const handleCategorySelect = (cat: string) => {
+    setSelectedCategory(cat);
+    if (cat === 'All') {
+      searchParams.delete('category');
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ category: cat });
+    }
+  };
 
   return (
-    <main className="min-h-screen pt-28 pb-32 px-5 sm:px-10 max-w-[1440px] mx-auto">
-      {/* Minimalist Centered Editorial Title */}
-      <header className="text-center max-w-2xl mx-auto mb-12">
-        <span className="text-xs uppercase tracking-[0.25em] text-[var(--ink-muted)] block mb-3">
-          Autumn — Winter Collection
-        </span>
-        <h1 className="font-editorial italic text-5xl sm:text-7xl font-normal tracking-tight">
-          The Complete Wardrobe
-        </h1>
-      </header>
+    <main className="min-h-screen py-10 px-3 sm:px-6 max-w-[1440px] mx-auto">
+      {/* Header Banner */}
+      <div className="surface-card p-6 sm:p-10 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span className="font-mono-tech text-xs uppercase tracking-widest text-[var(--accent-signal)] block mb-2">
+            // ARCHIVE CATALOG · {filteredProducts.length} PIECES
+          </span>
+          <h1 className="font-display font-extrabold text-4xl sm:text-6xl uppercase tracking-tight leading-none">
+            {selectedCategory === 'All' ? 'Complete Collection' : selectedCategory}
+          </h1>
+        </div>
 
-      {/* Floating Frosted Filter & Layout Bar */}
-      <div className="sticky top-20 z-30 mb-14 flex flex-wrap items-center justify-between gap-4 glass-island p-2 rounded-full max-w-5xl mx-auto">
-        {/* Category Pills */}
-        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar px-1">
+        {/* Search + Sort Controls */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search pieces..."
+            className="input-studio !w-48 sm:!w-56 !py-2.5 !rounded-full text-xs"
+          />
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="input-studio !w-auto !py-2.5 ! px-4 !rounded-full text-xs font-medium cursor-pointer"
+          >
+            <option value="featured">Sort: Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Sticky Category Pills + Grid Switcher */}
+      <div className="sticky top-20 z-30 mb-8 surface-glass rounded-full p-2 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
           {categories.map((cat) => {
-            const active = selectedCategory === cat;
+            const active = selectedCategory.toLowerCase() === cat.toLowerCase();
             return (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                onClick={() => handleCategorySelect(cat)}
+                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   active
-                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] shadow-sm'
+                    ? 'bg-[var(--accent-signal)] text-white shadow-sm'
                     : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
                 }`}
               >
@@ -63,81 +112,70 @@ export const Shop: React.FC = () => {
           })}
         </div>
 
-        {/* Search + Density Switcher */}
-        <div className="flex items-center gap-2 ml-auto pr-2">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filter pieces..."
-            className="px-4 py-1.5 rounded-full bg-[var(--bg-sub)] text-xs placeholder:text-[var(--ink-muted)] focus:outline-none w-36 sm:w-48 text-[var(--ink-primary)]"
-          />
-
-          <div className="hidden md:flex items-center gap-1 bg-[var(--bg-sub)] p-1 rounded-full text-[11px]">
-            <button
-              onClick={() => setDensity('EDITORIAL')}
-              className={`px-3 py-1 rounded-full transition-colors ${
-                density === 'EDITORIAL' ? 'bg-[var(--bg-elevated)] font-semibold shadow-sm' : 'opacity-60'
-              }`}
-            >
-              Editorial
-            </button>
-            <button
-              onClick={() => setDensity('GALLERY')}
-              className={`px-3 py-1 rounded-full transition-colors ${
-                density === 'GALLERY' ? 'bg-[var(--bg-elevated)] font-semibold shadow-sm' : 'opacity-60'
-              }`}
-            >
-              3 Col
-            </button>
-            <button
-              onClick={() => setDensity('COMPACT')}
-              className={`px-3 py-1 rounded-full transition-colors ${
-                density === 'COMPACT' ? 'bg-[var(--bg-elevated)] font-semibold shadow-sm' : 'opacity-60'
-              }`}
-            >
-              4 Col
-            </button>
-          </div>
+        <div className="hidden md:flex items-center gap-1 bg-[var(--bg-sub)] p-1 rounded-full shrink-0">
+          <button
+            onClick={() => setLayout('bento')}
+            className={`px-3 py-1 rounded-full font-mono-tech text-[11px] ${
+              layout === 'bento' ? 'bg-[var(--bg-card)] font-bold shadow-sm' : 'opacity-60'
+            }`}
+          >
+            Bento
+          </button>
+          <button
+            onClick={() => setLayout('grid3')}
+            className={`px-3 py-1 rounded-full font-mono-tech text-[11px] ${
+              layout === 'grid3' ? 'bg-[var(--bg-card)] font-bold shadow-sm' : 'opacity-60'
+            }`}
+          >
+            3 Col
+          </button>
+          <button
+            onClick={() => setLayout('grid4')}
+            className={`px-3 py-1 rounded-full font-mono-tech text-[11px] ${
+              layout === 'grid4' ? 'bg-[var(--bg-card)] font-bold shadow-sm' : 'opacity-60'
+            }`}
+          >
+            4 Col
+          </button>
         </div>
       </div>
 
-      {/* Product Showcase Grid */}
-      {density === 'EDITORIAL' ? (
-        /* Staggered Asymmetric Bento Rhythm */
-        <section className="grid grid-cols-1 md:grid-cols-12 gap-y-14 gap-x-8 items-start">
+      {/* Product Grid */}
+      {filteredProducts.length === 0 ? (
+        <div className="surface-card p-16 text-center space-y-4">
+          <p className="font-display text-xl font-bold">No pieces match your filter</p>
+          <button
+            onClick={() => {
+              handleCategorySelect('All');
+              setSearchQuery('');
+            }}
+            className="btn-primary px-6 py-3 text-xs uppercase"
+          >
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${
+            layout === 'grid4' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+          }`}
+        >
           {filteredProducts.map((product, idx) => {
-            const pattern = idx % 5;
-            let spanClass = 'md:col-span-4';
-            let aspect = 'aspect-[3/4]';
-
-            if (pattern === 0) {
-              spanClass = 'md:col-span-7';
-              aspect = 'aspect-[4/4] sm:aspect-[16/12]';
-            } else if (pattern === 1) {
-              spanClass = 'md:col-span-5 md:mt-20';
-              aspect = 'aspect-[3/4]';
-            } else if (pattern === 3) {
-              spanClass = 'md:col-span-4 md:mt-12';
-            }
-
+            const isBentoFeature = layout === 'bento' && idx % 5 === 0;
             return (
-              <div key={product.id || idx} className={spanClass}>
-                <ProductCard product={product} index={idx} aspectClass={aspect} />
+              <div
+                key={product.id || idx}
+                className={isBentoFeature ? 'sm:col-span-2' : 'col-span-1'}
+              >
+                <ProductCard
+                  product={product}
+                  index={idx}
+                  featured={isBentoFeature}
+                />
               </div>
             );
           })}
-        </section>
-      ) : (
-        <section
-          className={`grid grid-cols-1 sm:grid-cols-2 gap-x-7 gap-y-12 ${
-            density === 'GALLERY' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
-          }`}
-        >
-          {filteredProducts.map((product, idx) => (
-            <ProductCard key={product.id || idx} product={product} index={idx} />
-          ))}
-        </section>
+        </div>
       )}
     </main>
   );
