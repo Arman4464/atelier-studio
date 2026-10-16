@@ -1,85 +1,101 @@
+// src/components/MobileNav.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useUIStore } from '../store/uiStore';
-import { useThemeStore } from '../store/themeStore';
+import { useAtelierBridge } from '../lib/storeBridge';
+import { Logo } from './Logo';
 
 export const MobileNav: React.FC = () => {
-  const uiStore = useUIStore() as any;
-  const themeStore = useThemeStore() as any;
+  const {
+    isMobileNavOpen,
+    closeMobileNav,
+    openSearch,
+    openWishlist,
+    wishlistCount,
+    toggleTheme,
+  } = useAtelierBridge();
 
-  const isOpen = Boolean(uiStore.isMobileNavOpen ?? uiStore.mobileNavOpen);
-  const closeNav = () => {
-    if (uiStore.closeMobileNav) uiStore.closeMobileNav();
-    else if (uiStore.setMobileNavOpen) uiStore.setMobileNavOpen(false);
-  };
-
-  const toggleTheme = () => {
-    if (themeStore.toggleTheme) themeStore.toggleTheme();
-    else document.documentElement.classList.toggle('dark');
-  };
-
-  if (!isOpen) return null;
+  if (!isMobileNavOpen) return null;
 
   const links = [
-    { label: 'Home', to: '/' },
-    { label: 'Collection', to: '/shop' },
-    { label: 'Tailored Outerwear', to: '/shop?cat=Outerwear' },
-    { label: 'Editorial Monographs', to: '/journal' },
-    { label: 'Clientele Account', to: '/account' },
-    { label: 'Studio Portal', to: '/admin' },
+    { label: 'Index / Home', path: '/' },
+    { label: 'Complete Collection', path: '/shop' },
+    { label: 'Outerwear Archive', path: '/shop?category=Outerwear' },
+    { label: 'Editorial Journal', path: '/journal' },
+    { label: 'Client Portal', path: '/account' },
+    { label: 'Atelier OS (Admin)', path: '/admin' },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 lg:hidden flex p-4 sm:p-6">
-      <div onClick={closeNav} className="fixed inset-0 bg-black/45 backdrop-blur-md" />
+    <div className="fixed inset-0 z-50 lg:hidden flex p-3">
+      <div
+        onClick={closeMobileNav}
+        className="fixed inset-0 bg-black/55 backdrop-blur-sm"
+      />
 
-      <div className="relative z-10 w-full max-w-sm glass-modal rounded-[32px] h-full flex flex-col justify-between p-6 sm:p-8 overflow-hidden">
-        <div className="flex items-center justify-between pb-5 border-b border-[var(--glass-border-subtle)]">
-          <Link to="/" onClick={closeNav} className="font-editorial italic text-2xl">
-            Atelier Studio
-          </Link>
+      <aside className="relative z-10 w-full max-w-sm surface-modal rounded-[28px] h-full flex flex-col justify-between p-6 overflow-y-auto">
+        <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
+          <Logo size="sm" />
           <button
-            onClick={closeNav}
-            className="w-9 h-9 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs hover:scale-105 transition-transform"
+            onClick={closeMobileNav}
+            className="w-9 h-9 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs font-bold"
           >
             ✕
           </button>
         </div>
 
-        <nav className="flex-1 py-8 space-y-4 overflow-y-auto no-scrollbar">
+        <nav className="my-auto py-6 space-y-2">
           {links.map((item, idx) => (
             <Link
-              key={item.label}
-              to={item.to}
-              onClick={closeNav}
-              className="block font-editorial italic text-3xl sm:text-4xl text-[var(--ink-primary)] hover:opacity-70 transition-opacity"
+              key={item.path}
+              to={item.path}
+              onClick={closeMobileNav}
+              className="flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-sub)]/60 hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-all group"
             >
-              <span className="text-xs uppercase tracking-widest font-sans not-italic text-[var(--ink-muted)] block mb-1">
-                0{idx + 1}
+              <div className="flex items-center gap-3.5">
+                <span className="font-mono-tech text-xs text-[var(--accent-signal)] font-bold">
+                  0{idx + 1}
+                </span>
+                <span className="font-display font-bold text-base uppercase tracking-tight">
+                  {item.label}
+                </span>
+              </div>
+              <span className="font-mono-tech text-sm opacity-60 group-hover:translate-x-1 transition-transform">
+                →
               </span>
-              {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="pt-5 border-t border-[var(--glass-border-subtle)] flex items-center justify-between">
+        <div className="pt-5 border-t border-[var(--border-subtle)] space-y-3">
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              onClick={() => {
+                closeMobileNav();
+                openSearch();
+              }}
+              className="py-3 px-4 rounded-2xl bg-[var(--bg-sub)] font-mono-tech text-xs font-semibold uppercase"
+            >
+              Search
+            </button>
+            <button
+              onClick={() => {
+                closeMobileNav();
+                openWishlist();
+              }}
+              className="py-3 px-4 rounded-2xl bg-[var(--bg-sub)] font-mono-tech text-xs font-semibold uppercase"
+            >
+              ♥ Saved ({wishlistCount})
+            </button>
+          </div>
+
           <button
             onClick={toggleTheme}
-            className="px-4 py-2 rounded-full glass-pill text-xs font-medium flex items-center gap-2"
+            className="w-full py-3.5 rounded-full btn-primary text-xs uppercase tracking-wider"
           >
-            <span>Atmosphere</span>
-            <span>◐</span>
+            ◐ Switch Atmosphere
           </button>
-
-          <Link
-            to="/shop"
-            onClick={closeNav}
-            className="btn-prism px-5 py-2 text-xs"
-          >
-            Explore →
-          </Link>
         </div>
-      </div>
+      </aside>
     </div>
   );
 };
