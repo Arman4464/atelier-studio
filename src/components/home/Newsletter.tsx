@@ -37,18 +37,18 @@ export const Newsletter: React.FC = () => {
               </p>
             </div>
           ) : (
-            <form onSubmit={onSubmit} className="flex items-center gap-2">
+            <form onSubmit={onSubmit} className="flex items-center gap-2.5">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter email address..."
-                className="w-full px-5 py-3.5 rounded-full bg-[var(--bg-sub)] text-sm placeholder:text-[var(--ink-muted)] focus:outline-none text-[var(--ink-primary)]"
+                className="glass-input rounded-full px-5 py-3.5 text-sm placeholder:text-[var(--ink-muted)]"
               />
               <button
                 type="submit"
-                className="px-6 py-3.5 rounded-full bg-[var(--ink-primary)] text-[var(--bg-canvas)] text-xs font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity shrink-0 shadow-md"
+                className="btn-prism px-7 py-3.5 rounded-full text-xs font-semibold uppercase tracking-wider shrink-0"
               >
                 Join →
               </button>

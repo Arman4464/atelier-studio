@@ -55,7 +55,7 @@ export const CartDrawer: React.FC = () => {
           </div>
 
           {/* Liquid Gradient Free-Shipping Progress Bar */}
-          <div className="py-3 px-4 rounded-2xl bg-white/40 dark:bg-white/5 border border-[var(--glass-border-subtle)] space-y-1.5 my-4">
+          <div className="p-4 rounded-2xl glass-pill space-y-2 my-4">
             <div className="flex justify-between text-xs">
               <span className="text-[var(--ink-secondary)]">
                 {remaining === 0 ? (
@@ -66,7 +66,7 @@ export const CartDrawer: React.FC = () => {
               </span>
               <span className="font-semibold text-[var(--ink-primary)]">{progress}%</span>
             </div>
-            <div className="w-full h-1.5 rounded-full bg-[var(--glass-border-subtle)] overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500"
                 style={{ width: `${progress}%` }}
@@ -100,12 +100,12 @@ export const CartDrawer: React.FC = () => {
               return (
                 <div
                   key={`${item.id}-${size}-${idx}`}
-                  className="flex gap-4 p-3.5 rounded-2xl glass-card border border-[var(--glass-border-subtle)]"
+                  className="flex gap-4 p-3.5 rounded-2xl glass-pill transition-all duration-200 hover:scale-[1.01]"
                 >
                   <img
                     src={item?.images?.[0] || item?.image}
                     alt={item?.name || item?.title}
-                    className="w-20 h-24 rounded-xl object-cover shrink-0"
+                    className="w-20 h-24 rounded-xl object-cover shrink-0 shadow-sm"
                   />
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
@@ -121,7 +121,7 @@ export const CartDrawer: React.FC = () => {
                     </div>
 
                     <div className="flex items-center justify-between mt-3">
-                      <div className="inline-flex items-center rounded-full bg-[var(--bg-sub)] px-2.5 py-1 text-xs border border-[var(--glass-border-subtle)]">
+                      <div className="inline-flex items-center rounded-full glass-pill px-2.5 py-1 text-xs">
                         <button
                           onClick={() =>
                             updateQuantity?.(item.id, Math.max(1, qty - 1), size, color)

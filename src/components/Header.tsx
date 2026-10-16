@@ -106,10 +106,10 @@ export const Header: React.FC = () => {
 
           <button
             onClick={openCart}
-            className="px-4 py-2 rounded-full text-xs font-semibold bg-[var(--ink-primary)] text-[var(--bg-canvas)] flex items-center gap-2 hover:opacity-90 transition-opacity"
+            className="px-4 py-2 rounded-full text-xs font-semibold btn-prism flex items-center gap-2"
           >
             <span>Bag</span>
-            <span className="w-5 h-5 rounded-full bg-[var(--bg-canvas)] text-[var(--ink-primary)] text-[10px] flex items-center justify-center font-bold">
+            <span className="w-5 h-5 rounded-full bg-[var(--bg-canvas)] dark:bg-[#08090E] text-[var(--ink-primary)] dark:text-white text-[10px] flex items-center justify-center font-bold">
               {totalCount}
             </span>
           </button>
@@ -119,7 +119,7 @@ export const Header: React.FC = () => {
       {/* BOTTOM-CENTER FLOATING SPATIAL DOCK */}
       <nav
         aria-label="Primary Spatial Navigation"
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 glass-island p-1.5 rounded-full flex items-center gap-1"
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 glass-island p-1.5 rounded-full flex items-center gap-1 shadow-2xl"
       >
         {dockLinks.map((item) => {
           const isActive =
@@ -133,8 +133,8 @@ export const Header: React.FC = () => {
               to={item.path}
               className={`px-4 sm:px-5 py-2.5 rounded-full text-xs font-medium transition-all duration-300 ${
                 isActive
-                  ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] shadow-sm scale-[1.02]'
-                  : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--bg-sub)]/60'
+                  ? 'bg-purple-600 text-white dark:bg-purple-500/90 dark:text-white shadow-md shadow-purple-500/30 scale-[1.02] font-semibold'
+                  : 'text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-black/5 dark:hover:bg-white/10'
               }`}
             >
               {item.label}

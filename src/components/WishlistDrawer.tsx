@@ -104,7 +104,7 @@ export const WishlistDrawer: React.FC = () => {
             savedProducts.map((item, idx) => (
               <div
                 key={item.id || idx}
-                className="flex gap-4 p-3.5 rounded-2xl glass-card border border-[var(--glass-border-subtle)]"
+                className="flex gap-4 p-3.5 rounded-2xl glass-pill transition-all duration-200 hover:scale-[1.01]"
               >
                 <Link
                   to={`/product/${item.slug || item.id}`}

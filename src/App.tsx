@@ -93,9 +93,9 @@ function AmbientAuraWrapper({ children }: { children: React.ReactNode }) {
     <div className="ambient-canvas min-h-screen relative overflow-x-hidden selection:bg-rose-200 selection:text-slate-900">
       {/* Live Cursor-Following Silk Gradient Orb */}
       <div
-        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 opacity-60 dark:opacity-35"
+        className="pointer-events-none fixed inset-0 z-0 transition-opacity duration-700 opacity-60 dark:opacity-80"
         style={{
-          background: `radial-gradient(650px circle at ${pos.x}% ${pos.y}%, var(--aura-2), transparent 70%)`,
+          background: `radial-gradient(750px circle at ${pos.x}% ${pos.y}%, var(--aura-1), var(--aura-2) 40%, transparent 72%)`,
         }}
       />
       <div className="relative z-10">{children}</div>

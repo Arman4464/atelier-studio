@@ -25,7 +25,7 @@ export const Manifesto: React.FC = () => {
 
         {/* Right Stacked Bento Column */}
         <div className="lg:col-span-5 flex flex-col justify-between gap-6">
-          <div className="flex-1 rounded-[28px] bg-[var(--bg-sub)] p-8 sm:p-10 flex flex-col justify-between">
+          <div className="flex-1 glass-card p-8 sm:p-10 flex flex-col justify-between">
             <span className="text-xs uppercase tracking-[0.2em] text-[var(--ink-muted)]">
               01 — Textile Provenance
             </span>
@@ -34,24 +34,24 @@ export const Manifesto: React.FC = () => {
             </p>
             <Link
               to="/journal"
-              className="text-xs font-semibold uppercase tracking-widest underline underline-offset-8 self-start"
+              className="text-xs font-semibold uppercase tracking-widest underline underline-offset-8 self-start text-purple-600 dark:text-purple-400 hover:text-[var(--ink-primary)] transition-colors"
             >
               Read the Journal →
             </Link>
           </div>
 
-          <div className="rounded-[28px] bg-[var(--ink-primary)] text-[var(--bg-canvas)] p-8 sm:p-10 flex items-center justify-between gap-6">
+          <div className="glass-modal rounded-[28px] p-8 sm:p-10 flex items-center justify-between gap-6 relative overflow-hidden">
             <div>
-              <span className="text-[11px] uppercase tracking-[0.2em] opacity-60 block">
+              <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--ink-muted)] block">
                 Complimentary Service
               </span>
-              <h4 className="font-editorial italic text-2xl sm:text-3xl mt-1">
+              <h4 className="font-editorial italic text-2xl sm:text-3xl mt-1 text-[var(--ink-primary)]">
                 Bespoke Hemming & Global Express Delivery
               </h4>
             </div>
             <Link
               to="/shop"
-              className="w-12 h-12 rounded-full bg-[var(--bg-canvas)] text-[var(--ink-primary)] flex items-center justify-center shrink-0 text-sm hover:scale-105 transition-transform"
+              className="w-12 h-12 rounded-full btn-prism flex items-center justify-center shrink-0 text-sm hover:scale-105 transition-transform"
             >
               ↗
             </Link>

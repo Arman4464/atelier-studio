@@ -136,8 +136,8 @@ export const ProductDetail: React.FC = () => {
                       onClick={() => setSelectedColor(name)}
                       className={`px-3.5 py-2 rounded-full text-xs flex items-center gap-2 transition-all ${
                         active
-                          ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] font-medium shadow-sm'
-                          : 'bg-[var(--bg-sub)] text-[var(--ink-secondary)]'
+                          ? 'btn-prism font-medium shadow-sm scale-[1.02]'
+                          : 'glass-pill text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
                       }`}
                     >
                       <span
@@ -171,8 +171,8 @@ export const ProductDetail: React.FC = () => {
                       onClick={() => setSelectedSize(sz)}
                       className={`py-3 rounded-2xl text-xs font-medium transition-all ${
                         active
-                          ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] shadow-md scale-[1.02]'
-                          : 'bg-[var(--bg-sub)] text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
+                          ? 'btn-prism font-semibold scale-[1.02]'
+                          : 'glass-pill text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]'
                       }`}
                     >
                       {sz}
@@ -185,7 +185,7 @@ export const ProductDetail: React.FC = () => {
             {/* Primary Add to Bag Capsule */}
             <button
               onClick={handleAdd}
-              className="w-full py-4 rounded-full bg-[var(--ink-primary)] text-[var(--bg-canvas)] text-xs font-semibold uppercase tracking-[0.18em] hover:opacity-90 transition-all shadow-lg"
+              className="w-full py-4 rounded-full btn-prism text-xs font-semibold uppercase tracking-[0.18em] shadow-lg"
             >
               Add to Bag — ${priceNum.toFixed(2)}
             </button>
@@ -199,8 +199,8 @@ export const ProductDetail: React.FC = () => {
                     onClick={() => setOpenTab(tab)}
                     className={`px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-colors ${
                       openTab === tab
-                        ? 'bg-[var(--bg-sub)] text-[var(--ink-primary)]'
-                        : 'text-[var(--ink-muted)]'
+                        ? 'glass-pill text-[var(--ink-primary)] font-semibold'
+                        : 'text-[var(--ink-muted)] hover:text-[var(--ink-secondary)]'
                     }`}
                   >
                     {tab}
