@@ -1,73 +1,139 @@
-import { create } from "zustand";
-import type { Product } from "../data/products";
+// src/store/uiStore.ts
+import { create } from 'zustand';
 
-export interface Toast {
+export interface ToastItem {
   id: string;
+  title?: string;
   message: string;
+  type?: 'success' | 'error' | 'info';
 }
 
-interface UIState {
-  mobileNavOpen: boolean;
+interface UIStore {
   cartOpen: boolean;
+  isCartOpen: boolean;
   wishlistOpen: boolean;
+  isWishlistOpen: boolean;
   searchOpen: boolean;
+  isSearchOpen: boolean;
+  mobileNavOpen: boolean;
+  isMobileNavOpen: boolean;
   sizeGuideOpen: boolean;
-  quickViewProduct: Product | null;
-  toasts: Toast[];
+  isSizeGuideOpen: boolean;
+  quickViewProduct: any | null;
+  selectedProduct: any | null;
+  toasts: ToastItem[];
 
   openCart: () => void;
   closeCart: () => void;
-  openSearch: () => void;
-  closeSearch: () => void;
+  toggleCart: () => void;
+  setCartOpen: (v: boolean) => void;
+
   openWishlist: () => void;
   closeWishlist: () => void;
-  setMobileNavOpen: (v: boolean) => void;
-  setCartOpen: (v: boolean) => void;
+  toggleWishlistDrawer: () => void;
   setWishlistOpen: (v: boolean) => void;
-  setSearchOpen: (v: boolean) => void;
-  setSizeGuideOpen: (v: boolean) => void;
-  setQuickViewProduct: (p: Product | null) => void;
-  closeAll: () => void;
 
-  showToast: (message: string) => void;
+  openSearch: () => void;
+  closeSearch: () => void;
+  setSearchOpen: (v: boolean) => void;
+
+  openMobileNav: () => void;
+  closeMobileNav: () => void;
+  setMobileNavOpen: (v: boolean) => void;
+
+  openSizeGuide: () => void;
+  closeSizeGuide: () => void;
+  setSizeGuideOpen: (v: boolean) => void;
+
+  openQuickView: (product: any) => void;
+  closeQuickView: () => void;
+  setQuickViewProduct: (product: any | null) => void;
+
+  closeAll: () => void;
+  showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+  addToast: (message: string | { title?: string; message?: string; type?: 'success' | 'error' | 'info' }, type?: 'success' | 'error' | 'info') => void;
+  removeToast: (id: string) => void;
+  dismissToast: (id: string) => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
-  mobileNavOpen: false,
+export const useUIStore = create<UIStore>((set, get) => ({
   cartOpen: false,
+  isCartOpen: false,
   wishlistOpen: false,
+  isWishlistOpen: false,
   searchOpen: false,
+  isSearchOpen: false,
+  mobileNavOpen: false,
+  isMobileNavOpen: false,
   sizeGuideOpen: false,
+  isSizeGuideOpen: false,
   quickViewProduct: null,
+  selectedProduct: null,
   toasts: [],
 
-  openCart: () => set({ cartOpen: true }),
-  closeCart: () => set({ cartOpen: false }),
-  openSearch: () => set({ searchOpen: true }),
-  closeSearch: () => set({ searchOpen: false }),
-  openWishlist: () => set({ wishlistOpen: true }),
-  closeWishlist: () => set({ wishlistOpen: false }),
-  setMobileNavOpen: (v) => set({ mobileNavOpen: v }),
-  setCartOpen: (v) => set({ cartOpen: v }),
-  setWishlistOpen: (v) => set({ wishlistOpen: v }),
-  setSearchOpen: (v) => set({ searchOpen: v }),
-  setSizeGuideOpen: (v) => set({ sizeGuideOpen: v }),
-  setQuickViewProduct: (p) => set({ quickViewProduct: p }),
+  openCart: () => set({ cartOpen: true, isCartOpen: true }),
+  closeCart: () => set({ cartOpen: false, isCartOpen: false }),
+  toggleCart: () => {
+    const next = !get().cartOpen;
+    set({ cartOpen: next, isCartOpen: next });
+  },
+  setCartOpen: (v) => set({ cartOpen: v, isCartOpen: v }),
+
+  openWishlist: () => set({ wishlistOpen: true, isWishlistOpen: true }),
+  closeWishlist: () => set({ wishlistOpen: false, isWishlistOpen: false }),
+  toggleWishlistDrawer: () => {
+    const next = !get().wishlistOpen;
+    set({ wishlistOpen: next, isWishlistOpen: next });
+  },
+  setWishlistOpen: (v) => set({ wishlistOpen: v, isWishlistOpen: v }),
+
+  openSearch: () => set({ searchOpen: true, isSearchOpen: true }),
+  closeSearch: () => set({ searchOpen: false, isSearchOpen: false }),
+  setSearchOpen: (v) => set({ searchOpen: v, isSearchOpen: v }),
+
+  openMobileNav: () => set({ mobileNavOpen: true, isMobileNavOpen: true }),
+  closeMobileNav: () => set({ mobileNavOpen: false, isMobileNavOpen: false }),
+  setMobileNavOpen: (v) => set({ mobileNavOpen: v, isMobileNavOpen: v }),
+
+  openSizeGuide: () => set({ sizeGuideOpen: true, isSizeGuideOpen: true }),
+  closeSizeGuide: () => set({ sizeGuideOpen: false, isSizeGuideOpen: false }),
+  setSizeGuideOpen: (v) => set({ sizeGuideOpen: v, isSizeGuideOpen: v }),
+
+  openQuickView: (product) => set({ quickViewProduct: product, selectedProduct: product }),
+  closeQuickView: () => set({ quickViewProduct: null, selectedProduct: null }),
+  setQuickViewProduct: (product) => set({ quickViewProduct: product, selectedProduct: product }),
+
   closeAll: () =>
     set({
       mobileNavOpen: false,
+      isMobileNavOpen: false,
       cartOpen: false,
+      isCartOpen: false,
       wishlistOpen: false,
+      isWishlistOpen: false,
       searchOpen: false,
+      isSearchOpen: false,
       sizeGuideOpen: false,
+      isSizeGuideOpen: false,
       quickViewProduct: null,
+      selectedProduct: null,
     }),
 
-  showToast: (message) => {
+  showToast: (message, type = 'info') => get().addToast(message, type),
+
+  addToast: (input, type = 'info') => {
     const id = `${Date.now()}-${Math.random()}`;
-    set((state) => ({ toasts: [...state.toasts, { id, message }] }));
+    const item: ToastItem =
+      typeof input === 'string'
+        ? { id, message: input, type }
+        : { id, title: input.title, message: input.message || input.title || 'Updated', type: input.type || type };
+    set((state) => ({ toasts: [...state.toasts, item] }));
     setTimeout(() => {
       set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
-    }, 3500);
+    }, 3200);
   },
+  removeToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
+  dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 }));
+
+export default useUIStore;

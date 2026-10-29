@@ -1,195 +1,205 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Product } from "../data/products";
-import type { Currency } from "../lib/format";
-import { DEFAULT_CURRENCY } from "../lib/format";
-import { useSettingsStore } from "./settingsStore";
-import { useDiscountsStore, type Discount } from "./discountsStore";
+// src/store/cartStore.ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { Currency } from '../lib/format';
+import { DEFAULT_CURRENCY } from '../lib/format';
 
-export interface CartItem extends Product {
-  qty: number;
-  quantity?: number;
-  selectedSize?: string;
-  selectedColor?: string;
-  size?: string;
-  color?: string;
+export interface CartItem {
+  id: string;
+  productId: string;
+  slug: string;
+  name: string;
+  title: string;
+  price: number;
+  image: string;
+  images: string[];
+  category: string;
+  size: string;
+  selectedSize: string;
+  color: string;
+  selectedColor: string;
+  quantity: number;
+  product: any;
 }
 
-interface CartState {
-  cart: CartItem[];
-  items?: CartItem[];
-  wishlist: number[];
+interface CartStore {
+  items: CartItem[];
+  wishlist: (string | number)[];
   currency: Currency;
-  promoCode: string;
-  appliedDiscount: Discount | null;
-  promoError: string | null;
-
-  addToCart: (product: Product, qty?: number, size?: string, color?: string) => void;
-  addItem?: (product: any) => void;
-  updateQty: (id: number, delta: number) => void;
-  updateQuantity?: (id: number, qty: number, size?: string, color?: string) => void;
-  removeFromCart: (id: number) => void;
-  removeItem?: (id: number, size?: string, color?: string) => void;
+  discountCode: string | null;
+  discountPercent: number;
+  addItem: (productOrItem: any, size?: string, color?: string, quantity?: number) => void;
+  addToCart: (product: any, quantity?: number, size?: string, color?: string) => void;
+  removeItem: (id: string | number, size?: string, color?: string) => void;
+  removeFromCart: (id: string | number, size?: string, color?: string) => void;
+  updateQuantity: (id: string | number, quantity: number, size?: string, color?: string) => void;
   clearCart: () => void;
-
-  toggleWishlist: (id: number) => void;
-  isWishlisted: (id: number) => boolean;
-
+  toggleWishlist: (productId: string | number) => void;
+  isInWishlist: (productId: string | number) => boolean;
   setCurrency: (c: Currency) => void;
-  setPromoCode: (code: string) => void;
-  applyPromo: () => void;
-  removePromo: () => void;
-
-  cartTotal: () => number;
-  cartCount: () => number;
-  discountAmount: () => number;
-  shippingCost: () => number;
-  cartGrandTotal: () => number;
+  applyDiscount: (code: string, percent?: number) => boolean;
+  removeDiscount: () => void;
+  totalItems: () => number;
+  subtotal: () => number;
+  total: () => number;
 }
 
-function toItems(cart: CartItem[]): CartItem[] {
-  return cart.map((i) => ({
-    ...i,
-    quantity: i.qty || i.quantity || 1,
-    size: i.selectedSize || i.size || "M",
-    color: i.selectedColor || i.color || "RAW",
-  }));
+function normalizeCartEntry(
+  raw: any,
+  sizeArg?: string,
+  colorArg?: string,
+  qtyArg?: number
+): CartItem {
+  const base = raw?.product ? { ...raw.product, ...raw } : raw || {};
+  const id = String(base.id ?? base.productId ?? base.slug ?? 'item-1');
+  const slug = String(base.slug ?? id);
+  const name = String(base.name ?? base.title ?? 'Atelier Piece');
+  const price =
+    typeof base.price === 'number'
+      ? base.price
+      : parseFloat(String(base.price || '380').replace(/[^0-9.]/g, '')) || 380;
+
+  const images =
+    Array.isArray(base.images) && base.images.length > 0
+      ? base.images
+      : base.image
+      ? [base.image]
+      : ['https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=900&q=80'];
+
+  const size = String(sizeArg ?? raw?.selectedSize ?? raw?.size ?? base.sizes?.[0] ?? 'M');
+  const rawCol = colorArg ?? raw?.selectedColor ?? raw?.color ?? base.colors?.[0] ?? 'Obsidian';
+  const color = typeof rawCol === 'object' ? String(rawCol.name || 'Obsidian') : String(rawCol);
+  const quantity = Math.max(1, Number(qtyArg ?? raw?.quantity ?? 1));
+
+  return {
+    id,
+    productId: id,
+    slug,
+    name,
+    title: name,
+    price,
+    image: images[0],
+    images,
+    category: String(base.category || 'Collection'),
+    size,
+    selectedSize: size,
+    color,
+    selectedColor: color,
+    quantity,
+    product: {
+      ...base,
+      id,
+      slug,
+      name,
+      title: name,
+      price,
+      image: images[0],
+      images,
+    },
+  };
 }
 
-export const useCartStore = create<CartState>()(
+export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
-      cart: [],
       items: [],
       wishlist: [],
       currency: DEFAULT_CURRENCY,
-      promoCode: "",
-      appliedDiscount: null,
-      promoError: null,
+      discountCode: null,
+      discountPercent: 0,
 
-      addToCart: (product, qty = 1, size = "M", color = "RAW") => {
+      addItem: (productOrItem, size, color, quantity) => {
+        const entry = normalizeCartEntry(productOrItem, size, color, quantity);
         set((state) => {
-          const existing = state.cart.find((i) => i.id === product.id && (i.selectedSize || i.size) === size);
-          let nextCart: CartItem[];
-          if (existing) {
-            nextCart = state.cart.map((i) =>
-              i.id === product.id && (i.selectedSize || i.size) === size
-                ? { ...i, qty: i.qty + qty, quantity: i.qty + qty }
-                : i
-            );
-          } else {
-            nextCart = [
-              ...state.cart,
-              {
-                ...product,
-                qty,
-                quantity: qty,
-                selectedSize: size,
-                size,
-                selectedColor: color,
-                color,
-              },
-            ];
+          const idx = state.items.findIndex(
+            (i) => i.id === entry.id && i.size === entry.size && i.color === entry.color
+          );
+          if (idx > -1) {
+            const updated = [...state.items];
+            updated[idx] = {
+              ...updated[idx],
+              quantity: updated[idx].quantity + entry.quantity,
+            };
+            return { items: updated };
           }
-          return { cart: nextCart, items: toItems(nextCart) };
+          return { items: [...state.items, entry] };
         });
       },
 
-      addItem: (product: any) => {
-        const qty = product.quantity || 1;
-        const size = product.selectedSize || product.size || "M";
-        const color = product.selectedColor || product.color || "RAW";
-        get().addToCart(product, qty, size, color);
+      addToCart: (product, quantity = 1, size = 'M', color = 'Obsidian') => {
+        get().addItem(product, size, color, quantity);
       },
 
-      updateQty: (id, delta) => {
-        set((state) => {
-          const next = state.cart
-            .map((i) => (i.id === id ? { ...i, qty: i.qty + delta, quantity: i.qty + delta } : i))
-            .filter((i) => i.qty > 0);
-          return { cart: next, items: toItems(next) };
-        });
+      removeItem: (id, size, color) => {
+        const strId = String(id);
+        set((state) => ({
+          items: state.items.filter((i) => {
+            const sameId = String(i.id) === strId || String(i.productId) === strId;
+            if (!sameId) return true;
+            if (size && i.size !== size) return true;
+            if (color && i.color !== color) return true;
+            return false;
+          }),
+        }));
       },
 
-      updateQuantity: (id, qty, size) => {
-        set((state) => {
-          let next: CartItem[];
-          if (qty <= 0) {
-            next = state.cart.filter((i) => !(i.id === id && (!size || (i.selectedSize || i.size) === size)));
-          } else {
-            next = state.cart.map((i) =>
-              i.id === id && (!size || (i.selectedSize || i.size) === size)
-                ? { ...i, qty, quantity: qty }
-                : i
-            );
-          }
-          return { cart: next, items: toItems(next) };
-        });
+      removeFromCart: (id, size, color) => {
+        get().removeItem(id, size, color);
       },
 
-      removeFromCart: (id) =>
-        set((state) => {
-          const next = state.cart.filter((i) => i.id !== id);
-          return { cart: next, items: toItems(next) };
-        }),
-
-      removeItem: (id, size) =>
-        set((state) => {
-          const next = state.cart.filter((i) => !(i.id === id && (!size || (i.selectedSize || i.size) === size)));
-          return { cart: next, items: toItems(next) };
-        }),
-
-      clearCart: () => set({ cart: [], items: [], appliedDiscount: null, promoCode: "", promoError: null }),
-
-      toggleWishlist: (id) => {
-        set((state) => {
-          const has = state.wishlist.includes(id);
-          return { wishlist: has ? state.wishlist.filter((w) => w !== id) : [...state.wishlist, id] };
-        });
-      },
-      isWishlisted: (id) => get().wishlist.includes(id),
-
-      setCurrency: (c) => set({ currency: c }),
-      setPromoCode: (code) => set({ promoCode: code }),
-
-      applyPromo: () => {
-        const result = useDiscountsStore.getState().redeem(get().promoCode);
-        if (result.ok) {
-          set({ appliedDiscount: result.discount, promoError: null });
-        } else {
-          set({ appliedDiscount: null, promoError: result.error });
-          setTimeout(() => set({ promoError: null }), 4000);
+      updateQuantity: (id, quantity, size, color) => {
+        if (quantity <= 0) {
+          get().removeItem(id, size, color);
+          return;
         }
+        const strId = String(id);
+        set((state) => ({
+          items: state.items.map((i) => {
+            const sameId = String(i.id) === strId || String(i.productId) === strId;
+            const sameSize = !size || i.size === size;
+            const sameColor = !color || i.color === color;
+            return sameId && sameSize && sameColor ? { ...i, quantity } : i;
+          }),
+        }));
       },
 
-      removePromo: () => set({ appliedDiscount: null, promoCode: "" }),
+      clearCart: () => set({ items: [], discountCode: null, discountPercent: 0 }),
 
-      cartTotal: () => get().cart.reduce((sum, i) => sum + i.price * i.qty, 0),
-      cartCount: () => get().cart.reduce((sum, i) => sum + i.qty, 0),
-
-      discountAmount: () => {
-        const discount = get().appliedDiscount;
-        if (!discount) return 0;
-        const total = get().cartTotal();
-        const amount = discount.type === "percentage" ? total * (discount.value / 100) : discount.value;
-        return Math.min(amount, total);
+      toggleWishlist: (productId) => {
+        const pid = String(productId);
+        set((state) => ({
+          wishlist: state.wishlist.includes(pid)
+            ? state.wishlist.filter((id) => id !== pid)
+            : [...state.wishlist, pid],
+        }));
       },
 
-      shippingCost: () => {
-        const total = get().cartTotal();
-        const { freeShippingThreshold, standardShippingCost } = useSettingsStore.getState();
-        return total === 0 || total >= freeShippingThreshold ? 0 : standardShippingCost;
+      isInWishlist: (productId) => get().wishlist.includes(String(productId)),
+
+      setCurrency: (currency) => set({ currency }),
+
+      applyDiscount: (code, percent = 15) => {
+        const clean = code.trim().toUpperCase();
+        if (!clean) return false;
+        set({ discountCode: clean, discountPercent: percent });
+        return true;
       },
 
-      cartGrandTotal: () => {
-        const total = get().cartTotal();
-        return Math.max(0, total + get().shippingCost() - get().discountAmount());
+      removeDiscount: () => set({ discountCode: null, discountPercent: 0 }),
+
+      totalItems: () => get().items.reduce((sum, i) => sum + (i.quantity || 1), 0),
+
+      subtotal: () =>
+        get().items.reduce((sum, i) => sum + (Number(i.price) || 0) * (i.quantity || 1), 0),
+
+      total: () => {
+        const sub = get().subtotal();
+        const disc = (sub * (get().discountPercent || 0)) / 100;
+        return Math.max(0, sub - disc);
       },
     }),
-    {
-      name: "atelier-cart-v2",
-      version: 1,
-      partialize: (state) => ({ cart: state.cart, wishlist: state.wishlist, currency: state.currency }),
-    }
+    { name: 'atelier-cart-v2' }
   )
 );
+
+export default useCartStore;

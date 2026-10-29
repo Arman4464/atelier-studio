@@ -6,8 +6,8 @@
   --bg-sub: #EBE9E0;
   --bg-elevated: #FFFFFF;
   --bg-card: #FFFFFF;
-  --bg-glass: rgba(246, 245, 240, 0.82);
-  --bg-glass-heavy: rgba(255, 255, 255, 0.94);
+  --bg-glass: rgba(246, 245, 240, 0.85);
+  --bg-glass-heavy: rgba(255, 255, 255, 0.96);
 
   --ink-primary: #111113;
   --ink-secondary: #52525A;
@@ -19,14 +19,13 @@
   --accent-contrast: #FFFFFF;
 
   --border-subtle: rgba(17, 17, 19, 0.09);
-  --border-hairline: rgba(17, 17, 19, 0.11);
-  --border-strong: rgba(17, 17, 19, 0.22);
-  --glass-border: rgba(17, 17, 19, 0.08);
+  --border-hairline: rgba(17, 17, 19, 0.12);
+  --border-strong: rgba(17, 17, 19, 0.24);
+  --glass-border: rgba(17, 17, 19, 0.09);
   --glass-border-subtle: rgba(17, 17, 19, 0.06);
 
   --shadow-soft: 0 16px 36px -12px rgba(17, 17, 19, 0.07);
-  --shadow-float: 0 24px 55px -12px rgba(17, 17, 19, 0.14);
-  --shadow-ambient: 0 20px 50px -15px rgba(17, 17, 19, 0.08);
+  --shadow-float: 0 24px 55px -12px rgba(17, 17, 19, 0.16);
 
   --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Syne', 'Plus Jakarta Sans', sans-serif;
@@ -39,8 +38,8 @@
   --bg-sub: #141419;
   --bg-elevated: #18181F;
   --bg-card: #18181F;
-  --bg-glass: rgba(20, 20, 25, 0.82);
-  --bg-glass-heavy: rgba(24, 24, 31, 0.95);
+  --bg-glass: rgba(20, 20, 25, 0.85);
+  --bg-glass-heavy: rgba(24, 24, 31, 0.96);
 
   --ink-primary: #F5F4F0;
   --ink-secondary: #A0A0AB;
@@ -53,16 +52,17 @@
 
   --border-subtle: rgba(245, 244, 240, 0.1);
   --border-hairline: rgba(245, 244, 240, 0.12);
-  --border-strong: rgba(245, 244, 240, 0.24);
+  --border-strong: rgba(245, 244, 240, 0.25);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-border-subtle: rgba(255, 255, 255, 0.07);
 
   --shadow-soft: 0 16px 36px -12px rgba(0, 0, 0, 0.55);
   --shadow-float: 0 24px 55px -12px rgba(0, 0, 0, 0.75);
-  --shadow-ambient: 0 20px 50px -15px rgba(0, 0, 0, 0.65);
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   border-color: var(--border-subtle);
 }
@@ -79,13 +79,7 @@ body {
   overflow-x: hidden;
 }
 
-img,
-svg {
-  max-width: 100%;
-  display: block;
-}
-
-/* Unified Typography Classes (Supports all turns) */
+/* Typography Classes */
 .font-display,
 .font-grotesk {
   font-family: var(--font-display);
@@ -101,7 +95,14 @@ svg {
   letter-spacing: -0.02em;
 }
 
-/* Unified Surface & Glass Classes (Supports all turns) */
+/* Surface & Glass Classes */
+.ambient-canvas {
+  background-color: var(--bg-canvas);
+  background-image:
+    radial-gradient(at 15% 15%, rgba(255, 51, 31, 0.06) 0px, transparent 45%),
+    radial-gradient(at 85% 20%, rgba(139, 92, 246, 0.06) 0px, transparent 50%);
+}
+
 .surface-card,
 .glass-card {
   background-color: var(--bg-card);
@@ -130,15 +131,15 @@ svg {
   box-shadow: var(--shadow-float);
 }
 
-/* Legacy Structural Border Support so older components never break */
+/* Legacy Structural Classes (Backward compatibility) */
 .hairline-t { border-top: 1px solid var(--border-hairline); }
 .hairline-b { border-bottom: 1px solid var(--border-hairline); }
 .hairline-l { border-left: 1px solid var(--border-hairline); }
 .hairline-r { border-right: 1px solid var(--border-hairline); }
-.hairline-box { border: 1px solid var(--border-hairline); border-radius: 16px; }
+.hairline-box { border: 1px solid var(--border-hairline); }
 .perforated-b { border-bottom: 1px dashed var(--border-strong); }
 
-/* Unified Button Classes */
+/* Buttons */
 .btn-primary,
 .btn-prism {
   background-color: var(--ink-primary);
@@ -149,6 +150,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-primary:hover,
@@ -167,6 +169,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .btn-signal:hover {
@@ -174,7 +177,7 @@ svg {
   transform: translateY(-1px);
 }
 
-/* Unified Input Classes */
+/* Inputs */
 .input-studio,
 .glass-input {
   width: 100%;
