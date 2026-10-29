@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAtelierBridge } from '../lib/storeBridge';
 import { ProductCard } from '../components/ProductCard';
+import { WovenCareLabel } from '../components/WovenCareLabel';
 
 export const ProductDetail: React.FC = () => {
   const { id, slug } = useParams<{ id?: string; slug?: string }>();
@@ -244,6 +245,16 @@ export const ProductDetail: React.FC = () => {
             >
               Add to Bag — ${(product.price * quantity).toFixed(2)}
             </button>
+          </div>
+
+          {/* Interactive Jacquard Woven Care Label & Pattern Ledger */}
+          <div className="pt-6 border-t border-[var(--border-subtle)]">
+            <WovenCareLabel
+              productId={product.id}
+              productName={product.name}
+              category={product.category}
+              selectedSize={selectedSize as any}
+            />
           </div>
         </div>
       </div>

@@ -216,3 +216,47 @@ export const products: Product[] = [
     ],
   },
 ];
+
+
+export interface ArchivalPatternSpec {
+  patternBlockId: string;
+  fabricWeightGsm: number;
+  stitchDensitySpi: number;
+  seamAllowanceMm: number;
+  grainlineAngleDeg: number;
+  yardageMeters: number;
+  millOrigin: string;
+  lotNumber: string;
+  fiberComposition: Array<{ fiber: string; percentage: number }>;
+  careSymbols: Array<'hand-wash' | 'do-not-bleach' | 'dry-flat' | 'cool-iron' | 'dry-clean'>;
+  gradingMatrixMm: Record<'XS' | 'S' | 'M' | 'L' | 'XL', { chest: number; shoulder: number; length: number; sleeve: number }>;
+}
+
+export function getProductLedgerSpec(productId: string | number, category = 'Outerwear'): ArchivalPatternSpec {
+  const strId = String(productId);
+  const seed = strId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const gsm = 240 + (seed % 180);
+  return {
+    patternBlockId: `PAT-${category.slice(0, 3).toUpperCase()}-${String((seed % 89) + 10).padStart(2, '0')}`,
+    fabricWeightGsm: gsm,
+    stitchDensitySpi: 12 + (seed % 6),
+    seamAllowanceMm: 10 + (seed % 6),
+    grainlineAngleDeg: seed % 5 === 0 ? 45 : 0,
+    yardageMeters: Number((2.1 + (seed % 18) * 0.1).toFixed(1)),
+    millOrigin: seed % 2 === 0 ? 'Biella, Italy — Jacquard Shuttle Loom #04' : 'Wakayama, Japan — Loopwheel Frame #11',
+    lotNumber: `ATLR-26-${String(seed).slice(-3).padStart(3, '0')}`,
+    fiberComposition: [
+      { fiber: 'Virgin Merino Wool', percentage: 78 },
+      { fiber: 'Mulberry Silk', percentage: 16 },
+      { fiber: 'Cashmere', percentage: 6 },
+    ],
+    careSymbols: ['do-not-bleach', 'dry-flat', 'cool-iron', 'dry-clean'],
+    gradingMatrixMm: {
+      XS: { chest: 1040, shoulder: 455, length: 710, sleeve: 615 },
+      S: { chest: 1080, shoulder: 470, length: 730, sleeve: 630 },
+      M: { chest: 1120, shoulder: 485, length: 750, sleeve: 645 },
+      L: { chest: 1160, shoulder: 500, length: 770, sleeve: 660 },
+      XL: { chest: 1200, shoulder: 515, length: 790, sleeve: 675 },
+    },
+  };
+}

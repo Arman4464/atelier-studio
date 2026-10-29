@@ -1,54 +1,71 @@
-import { create } from "zustand";
+// src/store/themeStore.ts
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-export type Theme = "dark" | "light";
-
-const STORAGE_KEY = "atelier_theme";
-
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY) || window.localStorage.getItem("atelier-theme");
-    if (stored === "dark" || stored === "light") return stored;
-    if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) return "dark";
-  } catch (e) {}
-  return "light";
-}
-
-function applyTheme(theme: Theme) {
-  if (typeof window === "undefined" || !window.document) return;
-  const root = window.document.documentElement;
-  root.classList.toggle("dark", theme === "dark");
-  root.classList.toggle("light", theme === "light");
-  try {
-    window.localStorage.setItem(STORAGE_KEY, theme);
-    window.localStorage.setItem("atelier-theme", theme);
-  } catch (e) {}
-}
+export type ThemeMode = 'light' | 'dark';
+export type Theme = ThemeMode;
 
 interface ThemeState {
-  theme: Theme;
+  theme: ThemeMode;
   isDark: boolean;
+  ledgerXRay: boolean;
+  soundEnabled: boolean;
+  _hasHydrated: boolean;
+}
+
+interface ThemeActions {
+  setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
-  setTheme: (t: Theme) => void;
+  toggleLedgerXRay: () => void;
+  toggleSound: () => void;
+  setHasHydrated: (state: boolean) => void;
 }
 
-export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: getInitialTheme(),
-  isDark: getInitialTheme() === "dark",
+const applyDomAttributes = (theme: ThemeMode, ledgerXRay: boolean) => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  root.classList.toggle('dark', theme === 'dark');
+  root.setAttribute('data-theme', theme);
+  root.setAttribute('data-ledger', String(ledgerXRay));
+};
 
-  setTheme: (t: Theme) => {
-    applyTheme(t);
-    set({ theme: t, isDark: t === "dark" });
-  },
+export const useThemeStore = create<ThemeState & ThemeActions>()(
+  persist(
+    (set, get) => ({
+      theme: 'light',
+      isDark: false,
+      ledgerXRay: false,
+      soundEnabled: true,
+      _hasHydrated: false,
 
-  toggleTheme: () => {
-    const next: Theme = get().theme === "dark" ? "light" : "dark";
-    get().setTheme(next);
-  },
-}));
-
-if (typeof window !== "undefined") {
-  applyTheme(getInitialTheme());
-}
+      setTheme: (theme) => {
+        applyDomAttributes(theme, get().ledgerXRay);
+        set({ theme, isDark: theme === 'dark' });
+      },
+      toggleTheme: () => {
+        const next = get().theme === 'light' ? 'dark' : 'light';
+        applyDomAttributes(next, get().ledgerXRay);
+        set({ theme: next, isDark: next === 'dark' });
+      },
+      toggleLedgerXRay: () => {
+        const nextLedger = !get().ledgerXRay;
+        applyDomAttributes(get().theme, nextLedger);
+        set({ ledgerXRay: nextLedger });
+      },
+      toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+    }),
+    {
+      name: 'atelier-theme-preferences',
+      storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          applyDomAttributes(state.theme, state.ledgerXRay);
+          state.setHasHydrated(true);
+        }
+      },
+    }
+  )
+);
 
 export default useThemeStore;

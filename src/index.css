@@ -1,92 +1,170 @@
-/* src/index.css */
+/* src/index.css — Tailwind CSS v4 Tactile Ledger & Woven Care Label Engine */
 @import "tailwindcss";
 
-:root,
-[data-atmosphere="alabaster"] {
-  --bg-canvas: #F6F5F0;
-  --bg-sub: #EAE8DF;
-  --bg-elevated: #FFFFFF;
-  --bg-card: rgba(255, 255, 255, 0.86);
-  --bg-glass: rgba(246, 245, 240, 0.78);
-  --bg-glass-heavy: rgba(255, 255, 255, 0.94);
+/* 1. Zero-specificity custom variants for Dark Mode and Pattern Ledger X-Ray Mode */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+@custom-variant ledger (&:where([data-ledger="true"], [data-ledger="true"] *));
 
-  --ink-primary: #111113;
-  --ink-secondary: #4E4E57;
-  --ink-muted: #868692;
+/* 2. Base semantic variables for Light (Woven Care Label), Dark (Midnight Atelier), and Blueprint X-Ray */
+@layer base {
+  :root,
+  [data-atmosphere="alabaster"] {
+    --surface-paper: #f6f3ec;
+    --surface-card: #fdfbf7;
+    --ink-primary: #1c1d1a;
+    --ink-muted: #5c5a54;
+    --accent-oxblood: #752e38;
+    --border-stitch: rgba(28, 29, 26, 0.14);
+    --grid-chalk: rgba(28, 29, 26, 0.05);
 
-  --accent-signal: #FF331F;
-  --accent-stamp: #FF331F;
-  --accent-volt: #D4FF00;
-  --accent-contrast: #FFFFFF;
-  --aura-glow: rgba(255, 51, 31, 0.11);
+    --bg-canvas: #F6F5F0;
+    --bg-sub: #EAE8DF;
+    --bg-elevated: #FFFFFF;
+    --bg-card: rgba(255, 255, 255, 0.86);
+    --bg-glass: rgba(246, 245, 240, 0.78);
+    --bg-glass-heavy: rgba(255, 255, 255, 0.94);
 
-  --border-subtle: rgba(17, 17, 19, 0.09);
-  --border-hairline: rgba(17, 17, 19, 0.12);
-  --border-strong: rgba(17, 17, 19, 0.24);
-  --glass-border: rgba(17, 17, 19, 0.09);
+    --ink-secondary: #4E4E57;
 
-  --shadow-soft: 0 20px 45px -15px rgba(17, 17, 19, 0.07);
-  --shadow-float: 0 30px 70px -15px rgba(17, 17, 19, 0.18);
+    --accent-signal: #FF331F;
+    --accent-stamp: #FF331F;
+    --accent-volt: #D4FF00;
+    --accent-contrast: #FFFFFF;
+    --aura-glow: rgba(255, 51, 31, 0.11);
 
-  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Syne', 'Plus Jakarta Sans', sans-serif;
-  --font-serif: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
-  --font-mono: 'JetBrains Mono', monospace;
+    --border-subtle: rgba(17, 17, 19, 0.09);
+    --border-hairline: rgba(17, 17, 19, 0.12);
+    --border-strong: rgba(17, 17, 19, 0.24);
+    --glass-border: rgba(17, 17, 19, 0.09);
+
+    --shadow-soft: 0 20px 45px -15px rgba(17, 17, 19, 0.07);
+    --shadow-float: 0 30px 70px -15px rgba(17, 17, 19, 0.18);
+
+    --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Syne', 'Plus Jakarta Sans', sans-serif;
+    --font-serif: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  .dark,
+  [data-theme="dark"],
+  [data-atmosphere="obsidian"] {
+    --surface-paper: #141513;
+    --surface-card: #1c1e1b;
+    --ink-primary: #ece7dc;
+    --ink-muted: #9e9a90;
+    --accent-oxblood: #c86d77;
+    --border-stitch: rgba(236, 231, 220, 0.16);
+    --grid-chalk: rgba(236, 231, 220, 0.06);
+
+    --bg-canvas: #09090C;
+    --bg-sub: #13131A;
+    --bg-elevated: #181822;
+    --bg-card: rgba(24, 24, 34, 0.85);
+    --bg-glass: rgba(19, 19, 26, 0.78);
+    --bg-glass-heavy: rgba(22, 22, 30, 0.95);
+
+    --ink-secondary: #A2A2B0;
+
+    --accent-signal: #FF3B28;
+    --accent-stamp: #FF3B28;
+    --accent-volt: #D4FF00;
+    --accent-contrast: #FFFFFF;
+    --aura-glow: rgba(255, 59, 40, 0.16);
+
+    --border-subtle: rgba(245, 244, 240, 0.09);
+    --border-hairline: rgba(245, 244, 240, 0.13);
+    --border-strong: rgba(245, 244, 240, 0.28);
+    --glass-border: rgba(255, 255, 255, 0.11);
+
+    --shadow-soft: 0 20px 45px -15px rgba(0, 0, 0, 0.6);
+    --shadow-float: 0 30px 70px -15px rgba(0, 0, 0, 0.82);
+  }
+
+  [data-atmosphere="verdigris"] {
+    --surface-paper: #07120E;
+    --surface-card: #142E25;
+    --ink-primary: #E8F5EF;
+    --ink-muted: #587D70;
+    --accent-oxblood: #FF5500;
+    --border-stitch: rgba(232, 245, 239, 0.14);
+    --grid-chalk: rgba(232, 245, 239, 0.08);
+
+    --bg-canvas: #07120E;
+    --bg-sub: #0F231C;
+    --bg-elevated: #142E25;
+    --bg-card: rgba(20, 46, 37, 0.85);
+    --bg-glass: rgba(15, 35, 28, 0.8);
+    --bg-glass-heavy: rgba(18, 42, 34, 0.95);
+
+    --ink-secondary: #98BDB0;
+
+    --accent-signal: #FF5500;
+    --accent-stamp: #FF5500;
+    --accent-volt: #00FF9D;
+    --accent-contrast: #FFFFFF;
+    --aura-glow: rgba(0, 255, 157, 0.12);
+
+    --border-subtle: rgba(232, 245, 239, 0.1);
+    --border-hairline: rgba(232, 245, 239, 0.14);
+    --border-strong: rgba(232, 245, 239, 0.28);
+    --glass-border: rgba(232, 245, 239, 0.12);
+
+    --shadow-soft: 0 20px 45px -15px rgba(0, 0, 0, 0.65);
+    --shadow-float: 0 30px 70px -15px rgba(0, 0, 0, 0.85);
+  }
+
+  /* Twist State: Tailor's Chalk Blueprint Ledger */
+  [data-ledger="true"] {
+    --surface-paper: #0f1722;
+    --surface-card: #131e2d;
+    --ink-primary: #e2f1ff;
+    --ink-muted: #7fa4c4;
+    --accent-oxblood: #38bdf8;
+    --border-stitch: rgba(56, 189, 248, 0.32);
+    --grid-chalk: rgba(56, 189, 248, 0.11);
+
+    --bg-canvas: #0f1722;
+    --bg-sub: #152234;
+    --bg-elevated: #1a2a40;
+    --bg-card: rgba(19, 30, 45, 0.88);
+    --bg-glass: rgba(15, 23, 34, 0.85);
+    --bg-glass-heavy: rgba(19, 30, 45, 0.96);
+
+    --ink-secondary: #93b7d6;
+
+    --accent-signal: #38bdf8;
+    --accent-stamp: #38bdf8;
+    --accent-volt: #7dd3fc;
+    --border-subtle: rgba(56, 189, 248, 0.18);
+    --border-hairline: rgba(56, 189, 248, 0.22);
+    --border-strong: rgba(56, 189, 248, 0.4);
+    --glass-border: rgba(56, 189, 248, 0.2);
+  }
 }
 
-.dark,
-[data-atmosphere="obsidian"] {
-  --bg-canvas: #09090C;
-  --bg-sub: #13131A;
-  --bg-elevated: #181822;
-  --bg-card: rgba(24, 24, 34, 0.85);
-  --bg-glass: rgba(19, 19, 26, 0.78);
-  --bg-glass-heavy: rgba(22, 22, 30, 0.95);
-
-  --ink-primary: #F5F4F0;
-  --ink-secondary: #A2A2B0;
-  --ink-muted: #626270;
-
-  --accent-signal: #FF3B28;
-  --accent-stamp: #FF3B28;
-  --accent-volt: #D4FF00;
-  --accent-contrast: #FFFFFF;
-  --aura-glow: rgba(255, 59, 40, 0.16);
-
-  --border-subtle: rgba(245, 244, 240, 0.09);
-  --border-hairline: rgba(245, 244, 240, 0.13);
-  --border-strong: rgba(245, 244, 240, 0.28);
-  --glass-border: rgba(255, 255, 255, 0.11);
-
-  --shadow-soft: 0 20px 45px -15px rgba(0, 0, 0, 0.6);
-  --shadow-float: 0 30px 70px -15px rgba(0, 0, 0, 0.82);
+/* 3. @theme inline ensures dynamic variable resolution across data-theme & data-ledger containers */
+@theme inline {
+  --color-paper: var(--surface-paper);
+  --color-card: var(--surface-card);
+  --color-ink: var(--ink-primary);
+  --color-muted: var(--ink-muted);
+  --color-oxblood: var(--accent-oxblood);
+  --color-stitch: var(--border-stitch);
 }
 
-[data-atmosphere="verdigris"] {
-  --bg-canvas: #07120E;
-  --bg-sub: #0F231C;
-  --bg-elevated: #142E25;
-  --bg-card: rgba(20, 46, 37, 0.85);
-  --bg-glass: rgba(15, 35, 28, 0.8);
-  --bg-glass-heavy: rgba(18, 42, 34, 0.95);
+/* 4. Custom v4 @utility definitions */
+@utility pattern-ledger-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-chalk) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-chalk) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
 
-  --ink-primary: #E8F5EF;
-  --ink-secondary: #98BDB0;
-  --ink-muted: #587D70;
-
-  --accent-signal: #FF5500;
-  --accent-stamp: #FF5500;
-  --accent-volt: #00FF9D;
-  --accent-contrast: #FFFFFF;
-  --aura-glow: rgba(0, 255, 157, 0.12);
-
-  --border-subtle: rgba(232, 245, 239, 0.1);
-  --border-hairline: rgba(232, 245, 239, 0.14);
-  --border-strong: rgba(232, 245, 239, 0.28);
-  --glass-border: rgba(232, 245, 239, 0.12);
-
-  --shadow-soft: 0 20px 45px -15px rgba(0, 0, 0, 0.65);
-  --shadow-float: 0 30px 70px -15px rgba(0, 0, 0, 0.85);
+@utility woven-salvage-edge {
+  border-top: 2px dashed var(--border-stitch);
+  border-bottom: 2px dashed var(--border-stitch);
+  box-shadow: inset 0 2px 0 0 var(--surface-paper), inset 0 -2px 0 0 var(--surface-paper);
 }
 
 *,

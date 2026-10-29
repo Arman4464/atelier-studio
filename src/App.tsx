@@ -17,6 +17,10 @@ import PreloaderController from "./components/PreloaderController";
 import Home from "./pages/Home";
 import type { ShippingInfo } from "./pages/Checkout";
 import { useUIStore } from "./store/uiStore";
+import { useThemeStore } from "./store/themeStore";
+import { useProductsStore } from "./store/productsStore";
+import { useDiscountsStore } from "./store/discountsStore";
+import { useCartStore } from "./store/cartStore";
 
 const Shop = lazy(() => import("./pages/Shop"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
@@ -69,10 +73,28 @@ function GlobalShortcuts({ isAdminRoute }: { isAdminRoute: boolean }) {
         e.preventDefault();
         setSearchOpen(true);
       }
+      if (!isAdminRoute && !e.metaKey && !e.ctrlKey && e.key.toLowerCase() === "l") {
+        if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+          useThemeStore.getState().toggleLedgerXRay();
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [closeAll, setSearchOpen, isAdminRoute]);
+
+  // Synchronize state across multi-tabs
+  useEffect(() => {
+    const handleStorageSync = (e: StorageEvent) => {
+      if (!e.key) return;
+      useProductsStore.persist?.rehydrate();
+      useDiscountsStore.persist?.rehydrate();
+      useCartStore.persist?.rehydrate();
+      useThemeStore.persist?.rehydrate();
+    };
+    window.addEventListener("storage", handleStorageSync);
+    return () => window.removeEventListener("storage", handleStorageSync);
+  }, []);
 
   return null;
 }
