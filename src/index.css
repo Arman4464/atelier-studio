@@ -1,51 +1,65 @@
 /* src/index.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --bg-canvas: #F6F5F0;
   --bg-sub: #EBE9E0;
+  --bg-elevated: #FFFFFF;
   --bg-card: #FFFFFF;
-  --bg-glass: rgba(246, 245, 240, 0.78);
-  --bg-glass-heavy: rgba(255, 255, 255, 0.92);
+  --bg-glass: rgba(246, 245, 240, 0.82);
+  --bg-glass-heavy: rgba(255, 255, 255, 0.94);
 
   --ink-primary: #111113;
   --ink-secondary: #52525A;
   --ink-muted: #8E8E99;
 
   --accent-signal: #FF331F;
+  --accent-stamp: #FF331F;
   --accent-volt: #D4FF00;
+  --accent-contrast: #FFFFFF;
+
   --border-subtle: rgba(17, 17, 19, 0.09);
+  --border-hairline: rgba(17, 17, 19, 0.11);
   --border-strong: rgba(17, 17, 19, 0.22);
+  --glass-border: rgba(17, 17, 19, 0.08);
+  --glass-border-subtle: rgba(17, 17, 19, 0.06);
 
-  --shadow-soft: 0 18px 40px -15px rgba(17, 17, 19, 0.07);
-  --shadow-float: 0 28px 65px -15px rgba(17, 17, 19, 0.16);
+  --shadow-soft: 0 16px 36px -12px rgba(17, 17, 19, 0.07);
+  --shadow-float: 0 24px 55px -12px rgba(17, 17, 19, 0.14);
+  --shadow-ambient: 0 20px 50px -15px rgba(17, 17, 19, 0.08);
 
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Syne', sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Syne', 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
 .dark {
   --bg-canvas: #0A0A0D;
-  --bg-sub: #131318;
-  --bg-card: #17171E;
-  --bg-glass: rgba(19, 19, 24, 0.78);
-  --bg-glass-heavy: rgba(23, 23, 30, 0.94);
+  --bg-sub: #141419;
+  --bg-elevated: #18181F;
+  --bg-card: #18181F;
+  --bg-glass: rgba(20, 20, 25, 0.82);
+  --bg-glass-heavy: rgba(24, 24, 31, 0.95);
 
   --ink-primary: #F5F4F0;
   --ink-secondary: #A0A0AB;
   --ink-muted: #636370;
 
   --accent-signal: #FF3B28;
+  --accent-stamp: #FF3B28;
   --accent-volt: #D4FF00;
-  --border-subtle: rgba(245, 244, 240, 0.1);
-  --border-strong: rgba(245, 244, 240, 0.25);
+  --accent-contrast: #FFFFFF;
 
-  --shadow-soft: 0 18px 40px -15px rgba(0, 0, 0, 0.55);
-  --shadow-float: 0 28px 65px -15px rgba(0, 0, 0, 0.75);
+  --border-subtle: rgba(245, 244, 240, 0.1);
+  --border-hairline: rgba(245, 244, 240, 0.12);
+  --border-strong: rgba(245, 244, 240, 0.24);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-subtle: rgba(255, 255, 255, 0.07);
+
+  --shadow-soft: 0 16px 36px -12px rgba(0, 0, 0, 0.55);
+  --shadow-float: 0 24px 55px -12px rgba(0, 0, 0, 0.75);
+  --shadow-ambient: 0 20px 50px -15px rgba(0, 0, 0, 0.65);
 }
 
 * {
@@ -55,62 +69,60 @@
 
 html,
 body {
+  margin: 0;
+  padding: 0;
   background-color: var(--bg-canvas);
   color: var(--ink-primary);
   font-family: var(--font-sans);
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Subtle Architectural Dot Grid Texture */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.35;
-  background-image: radial-gradient(var(--border-subtle) 1px, transparent 1px);
-  background-size: 28px 28px;
+img,
+svg {
+  max-width: 100%;
+  display: block;
 }
 
-::selection {
-  background-color: var(--accent-signal);
-  color: #FFFFFF;
+/* Unified Typography Classes (Supports all turns) */
+.font-display,
+.font-grotesk {
+  font-family: var(--font-display);
 }
 
-/* Typography Helpers */
-.font-display { font-family: var(--font-display); }
-.font-editorial { font-family: var(--font-serif); }
-.font-mono-tech { font-family: var(--font-mono); letter-spacing: -0.02em; }
+.font-editorial {
+  font-family: var(--font-serif);
+}
 
-/* Tactile Surface Primitives */
-.surface-card {
+.font-mono-tech,
+.font-ledger {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
+/* Unified Surface & Glass Classes (Supports all turns) */
+.surface-card,
+.glass-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   border-radius: 24px;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-              border-color 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.surface-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-float);
-}
-
-.surface-glass {
+.surface-glass,
+.glass-pill {
   background: var(--bg-glass);
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
 }
 
-.surface-modal {
+.surface-modal,
+.glass-modal,
+.glass-island {
   background: var(--bg-glass-heavy);
   backdrop-filter: blur(32px) saturate(190%);
   -webkit-backdrop-filter: blur(32px) saturate(190%);
@@ -118,20 +130,32 @@ body::before {
   box-shadow: var(--shadow-float);
 }
 
-/* Interactive Buttons */
-.btn-primary {
+/* Legacy Structural Border Support so older components never break */
+.hairline-t { border-top: 1px solid var(--border-hairline); }
+.hairline-b { border-bottom: 1px solid var(--border-hairline); }
+.hairline-l { border-left: 1px solid var(--border-hairline); }
+.hairline-r { border-right: 1px solid var(--border-hairline); }
+.hairline-box { border: 1px solid var(--border-hairline); border-radius: 16px; }
+.perforated-b { border-bottom: 1px dashed var(--border-strong); }
+
+/* Unified Button Classes */
+.btn-primary,
+.btn-prism {
   background-color: var(--ink-primary);
   color: var(--bg-canvas);
   border-radius: 9999px;
   font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-prism:hover {
   background-color: var(--accent-signal);
   color: #FFFFFF;
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px -6px rgba(255, 51, 31, 0.4);
 }
 
 .btn-signal {
@@ -139,16 +163,20 @@ body::before {
   color: #FFFFFF;
   border-radius: 9999px;
   font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-signal:hover {
   filter: brightness(1.08);
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px -6px rgba(255, 51, 31, 0.45);
 }
 
-.input-studio {
+/* Unified Input Classes */
+.input-studio,
+.glass-input {
   width: 100%;
   background-color: var(--bg-sub);
   border: 1px solid var(--border-subtle);
@@ -159,11 +187,27 @@ body::before {
   transition: all 0.2s ease;
 }
 
-.input-studio:focus {
+.input-studio:focus,
+.glass-input:focus {
   outline: none;
   background-color: var(--bg-card);
   border-color: var(--accent-signal);
   box-shadow: 0 0 0 3px rgba(255, 51, 31, 0.14);
+}
+
+.aura-badge,
+.volt-pill {
+  background-color: var(--bg-sub);
+  color: var(--ink-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+}
+
+.sculptural-img {
+  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .sculptural-img {
+  transform: scale(1.04);
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }

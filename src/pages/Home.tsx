@@ -1,24 +1,19 @@
-import { motion } from "motion/react";
-import Hero from "../components/home/Hero";
-import KeyPieces from "../components/home/KeyPieces";
-import Manifesto from "../components/home/Manifesto";
-import TrustStrip from "../components/home/TrustStrip";
-import Testimonials from "../components/home/Testimonials";
-import Community from "../components/home/Community";
-import FAQSection from "../components/home/FAQSection";
-import Newsletter from "../components/home/Newsletter";
+// src/pages/Home.tsx
+import React from 'react';
+import { Hero } from '../components/home/Hero';
+import { KeyPieces } from '../components/home/KeyPieces';
+import { Manifesto } from '../components/home/Manifesto';
+import { Newsletter } from '../components/home/Newsletter';
 
-export default function Home() {
+export const Home: React.FC = () => {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+    <main className="min-h-screen space-y-8 pb-20">
       <Hero />
       <KeyPieces />
       <Manifesto />
-      <TrustStrip />
-      <Testimonials />
-      <Community />
-      <FAQSection />
       <Newsletter />
-    </motion.div>
+    </main>
   );
-}
+};
+
+export default Home;
