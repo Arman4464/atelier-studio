@@ -1,6 +1,7 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
+import { SpatialEnvironment } from "./components/SpatialEnvironment";
 import Footer from "./components/Footer";
 import MobileNav from "./components/MobileNav";
 import CartDrawer from "./components/CartDrawer";
@@ -113,6 +114,7 @@ export default function App() {
 
   return (
     <AmbientAuraWrapper>
+      <SpatialEnvironment />
       <ScrollToTop />
       <GlobalShortcuts isAdminRoute={isAdminRoute} />
       <PreloaderController />

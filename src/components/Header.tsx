@@ -3,10 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAtelierBridge } from '../lib/storeBridge';
 import { Logo } from './Logo';
+import { soundEngine } from './SpatialEnvironment';
+
+type Atmosphere = 'alabaster' | 'obsidian' | 'verdigris';
+
+const ATMOSPHERES: { id: Atmosphere; label: string; color: string }[] = [
+  { id: 'alabaster', label: 'Stone', color: '#F6F5F0' },
+  { id: 'obsidian', label: 'Obsidian', color: '#09090C' },
+  { id: 'verdigris', label: 'Emerald', color: '#0F231C' },
+];
 
 export const Header: React.FC = () => {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [atmo, setAtmo] = useState<Atmosphere>('alabaster');
+  const [soundOn, setSoundOn] = useState<boolean>(soundEngine.enabled);
 
   const {
     cartCount,
@@ -15,11 +26,23 @@ export const Header: React.FC = () => {
     openSearch,
     openWishlist,
     openMobileNav,
-    toggleTheme,
   } = useAtelierBridge();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const saved = (localStorage.getItem('atelier_atmo') as Atmosphere) || 'alabaster';
+    applyAtmosphere(saved);
+  }, []);
+
+  const applyAtmosphere = (next: Atmosphere) => {
+    setAtmo(next);
+    document.documentElement.setAttribute('data-atmosphere', next);
+    document.documentElement.classList.toggle('dark', next !== 'alabaster');
+    localStorage.setItem('atelier_atmo', next);
+    soundEngine.playTick(320, 0.04);
+  };
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -28,24 +51,39 @@ export const Header: React.FC = () => {
     { label: 'Index', path: '/' },
     { label: 'Collection', path: '/shop' },
     { label: 'Outerwear', path: '/shop?category=Outerwear' },
-    { label: 'Editorial', path: '/journal' },
+    { label: 'Journal', path: '/journal' },
     { label: 'Portal', path: '/account' },
   ];
 
   return (
     <header className="sticky top-0 z-40 px-3 sm:px-6 pt-3 pb-2 pointer-events-none">
       <div
-        className={`max-w-[1440px] mx-auto pointer-events-auto surface-glass rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 transition-all duration-300 ${
-          scrolled ? 'shadow-xl py-2' : ''
+        className={`max-w-[1440px] mx-auto pointer-events-auto surface-glass rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 transition-all duration-300 ${
+          scrolled ? 'shadow-2xl py-2' : ''
         }`}
       >
-        {/* Left: Brand Lockup */}
-        <Link to="/" className="shrink-0">
-          <Logo size="sm" />
-        </Link>
+        {/* Left: Emblem + Live Sound Toggle */}
+        <div className="flex items-center gap-3 shrink-0">
+          <Link to="/" className="shrink-0">
+            <Logo size="sm" />
+          </Link>
 
-        {/* Center: Pill Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 bg-[var(--bg-sub)]/80 p-1 rounded-full border border-[var(--border-subtle)]">
+          <button
+            onClick={() => setSoundOn(soundEngine.toggle())}
+            className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--bg-sub)] font-mono-tech text-[10px] uppercase text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors"
+            title="Toggle Tactile Sound Synthesizer"
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                soundOn ? 'bg-[var(--accent-signal)] animate-pulse' : 'bg-[var(--ink-muted)]'
+              }`}
+            />
+            <span>{soundOn ? 'SFX ON' : 'MUTED'}</span>
+          </button>
+        </div>
+
+        {/* Center: Spatial Pill Navigation */}
+        <nav className="hidden lg:flex items-center gap-1 bg-[var(--bg-sub)]/85 p-1 rounded-full border border-[var(--border-subtle)]">
           {navItems.map((item) => {
             const isActive =
               item.path === '/'
@@ -57,6 +95,7 @@ export const Header: React.FC = () => {
               <Link
                 key={item.label}
                 to={item.path}
+                onMouseEnter={() => soundEngine.playTick(150, 0.015)}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
                   isActive
                     ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] shadow-sm'
@@ -69,40 +108,50 @@ export const Header: React.FC = () => {
           })}
         </nav>
 
-        {/* Right: Interactive Controls */}
+        {/* Right: 3-Atmosphere Switcher + Search + Vault + Bag */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* 3-Atmosphere Swatch Capsule */}
+          <div className="hidden md:flex items-center gap-1 bg-[var(--bg-sub)] p-1 rounded-full border border-[var(--border-subtle)]">
+            {ATMOSPHERES.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => applyAtmosphere(a.id)}
+                className={`px-2.5 py-1 rounded-full font-mono-tech text-[10px] flex items-center gap-1.5 transition-all ${
+                  atmo === a.id
+                    ? 'bg-[var(--ink-primary)] text-[var(--bg-canvas)] font-bold shadow-sm'
+                    : 'text-[var(--ink-secondary)] opacity-75 hover:opacity-100'
+                }`}
+                title={`Switch to ${a.label} Atmosphere`}
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-current"
+                  style={{ backgroundColor: a.color }}
+                />
+                <span className="hidden xl:inline">{a.label}</span>
+              </button>
+            ))}
+          </div>
+
           <button
             onClick={openSearch}
-            className="px-3.5 py-2 rounded-full bg-[var(--bg-sub)] hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors text-xs font-medium flex items-center gap-2"
-            title="Search Collection (⌘K)"
+            className="px-3.5 py-2 rounded-full bg-[var(--bg-sub)] hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors text-xs font-semibold flex items-center gap-1.5"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
             </svg>
             <span className="hidden sm:inline">Search</span>
-            <kbd className="hidden md:inline-block font-mono-tech text-[10px] opacity-60">⌘K</kbd>
           </button>
 
           <button
             onClick={openWishlist}
-            className="relative px-3.5 py-2 rounded-full bg-[var(--bg-sub)] hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors text-xs font-medium flex items-center gap-1.5"
-            title="Saved Pieces"
+            className="relative px-3.5 py-2 rounded-full bg-[var(--bg-sub)] hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors text-xs font-semibold flex items-center gap-1.5"
           >
             <span>♥</span>
-            <span className="hidden md:inline">Saved</span>
             {wishlistCount > 0 && (
               <span className="w-4 h-4 rounded-full bg-[var(--accent-signal)] text-white font-mono-tech text-[10px] flex items-center justify-center font-bold">
                 {wishlistCount}
               </span>
             )}
-          </button>
-
-          <button
-            onClick={toggleTheme}
-            className="w-9 h-9 rounded-full bg-[var(--bg-sub)] hover:bg-[var(--ink-primary)] hover:text-[var(--bg-canvas)] transition-colors flex items-center justify-center text-xs"
-            title="Switch Daylight / Nocturnal Mode"
-          >
-            ◐
           </button>
 
           <button
@@ -118,7 +167,6 @@ export const Header: React.FC = () => {
           <button
             onClick={openMobileNav}
             className="lg:hidden w-9 h-9 rounded-full bg-[var(--bg-sub)] flex items-center justify-center text-xs font-bold"
-            aria-label="Open Menu"
           >
             ☰
           </button>
